@@ -1,60 +1,9 @@
 from decimal import Decimal
-from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
 from django_countries.fields import CountryField
-# countries: 'USDOS/LSIB/2013' https://developers.google.com/earth-engine/datasets/catalog/USDOS_LSIB_2013
-
-
-class Profile(models.Model):
-    created_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now=True)
-    updated_by = models.ForeignKey('self', on_delete=models.SET_NULL,
-                                   null=True, blank=True,
-                                   related_name='%(class)s_updated_by')
-    email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=100, blank=True, null=True)
-    last_name = models.CharField(max_length=100, blank=True, null=True)
-    countries = CountryField(multiple=True)
-
-    class Meta:
-        ordering = ('last_name', 'first_name',)
-
-    def __str__(self):
-        return '{} [{}]'.format(self.full_name, self.pk)
-
-    @property
-    def full_name(self):
-        name = []
-        if self.first_name:
-            name.append(self.first_name)
-
-        if self.last_name:
-            name.append(self.last_name)
-
-        if len(name) > 0:
-            return ' '.join(name)
-        else:
-            try:
-                email_name = self.email.split('@')[0]
-                return email_name
-            except IndexError:
-                return ''
-
-
-class BaseModel(models.Model):
-    created_on = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey('Profile', on_delete=models.SET_NULL,
-                                   null=True, blank=True,
-                                   related_name='%(class)s_created_by')
-    updated_on = models.DateTimeField(auto_now=True)
-    updated_by = models.ForeignKey('Profile', on_delete=models.SET_NULL,
-                                   null=True, blank=True,
-                                   related_name='%(class)s_updated_by')
-
-    class Meta:
-        abstract = True
+from .base import *
 
 
 class Genus(BaseModel):
@@ -72,8 +21,10 @@ class Species(BaseModel):
     genus = models.ForeignKey(Genus, on_delete=models.CASCADE)
     name_common = models.CharField(max_length=255, blank=True, verbose_name=_('common name (English)'))
     colid = models.CharField(max_length=32, verbose_name=_('Catalog of Life ID'), unique=True)
-    # http://apiv3.iucnredlist.org/api/v3/species/id/15955?token=9bb4facb6d23f48efbf424bb05c0c1ef1cf6f468393bc745d42179ac4aca5fee
+    # http://apiv3.iucnredlist.org/api/v3/species/id/15955?token
+    # =9bb4facb6d23f48efbf424bb05c0c1ef1cf6f468393bc745d42179ac4aca5fee
     iucnid = models.PositiveIntegerField(verbose_name=_('IUCN ID'), unique=True)
+    notes = models.TextField(blank=True)
 
     @property
     def ee_path(self):
@@ -115,7 +66,36 @@ class ProtectedArea(BaseModel):
         return _('%s') % self.name
 
 
-class SCL(BaseModel):
+class Landscape(BaseModel):
+    ee_name = None
+    species = models.ForeignKey(Species, on_delete=models.CASCADE)
+
+    @property
+    def ee_path(self):
+        if settings.EE_SCL_ROOTDIR is None or self.ee_name is None:
+            return None
+        return '{}/{}_{}/{}'.format(
+            settings.EE_SCL_ROOTDIR,
+            self.species.genus.name.capitalize(),
+            self.species.name,
+            self.ee_name
+        )
+
+    class Meta:
+        abstract = True
+        ordering = ('name', 'species',)
+
+    def __str__(self):
+        if settings.EE_SCL_ROOTDIR is None or self.ee_name is None:
+            return ''
+        name = ''
+        if hasattr(self, 'name'):
+            name = ' {}'.format(self.name)
+        return _('%s%s %s [%s]') % (self.ee_name, name, self.species, self.pk)
+
+
+class SCL(Landscape):
+    ee_name = 'scl'
     CLASS_CHOICES = (
         (1, 'I'),
         (2, 'II'),
@@ -124,27 +104,39 @@ class SCL(BaseModel):
     )
 
     name = models.CharField(max_length=255)
-    species = models.ForeignKey(Species, on_delete=models.CASCADE)
-    # What is in 2006 tcl data -- but probably restoration, survey, and fragment are different "types"
     sclclass = models.PositiveSmallIntegerField(
         choices=CLASS_CHOICES,
         null=True, blank=True,
         verbose_name=_('SCL class')
     )
 
-    @property
-    def ee_path(self):
-        if settings.EE_SCL_ROOTDIR is None:
-            return None
-        return '{}/{}_{}/scl'.format(settings.EE_SCL_ROOTDIR, self.species.genus.name.capitalize(), self.name)
-
     class Meta:
-        ordering = ('name', 'species',)
         verbose_name = _('species conservation landscape')
         verbose_name_plural = _('species conservation landscapes')
 
-    def __str__(self):
-        return _('%s [%s]') % (self.name, self.species)
+
+class FragmentLandscape(Landscape):
+    ee_name = 'fragment'
+
+    class Meta:
+        verbose_name = _('fragment')
+        verbose_name_plural = _('fragments')
+
+
+class RestorationLandscape(Landscape):
+    ee_name = 'restoration'
+
+    class Meta:
+        verbose_name = _('restoration landscape')
+        verbose_name_plural = _('restoration landscapes')
+
+
+class SurveyLandscape(Landscape):
+    ee_name = 'survey'
+
+    class Meta:
+        verbose_name = _('survey landscape')
+        verbose_name_plural = _('survey landscapes')
 
 
 class SCLStats(BaseModel):
@@ -154,3 +146,11 @@ class SCLStats(BaseModel):
     pa = models.ForeignKey(ProtectedArea, on_delete=models.CASCADE)
     date = models.DateField(default=timezone.now)
     area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal('0.00'))
+
+    class Meta:
+        ordering = ('date', 'country', 'scl', 'biome', 'pa')
+        verbose_name = _('SCL statistics')
+        verbose_name_plural = _('SCL statistics')
+
+    def __str__(self):
+        return _('')
