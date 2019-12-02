@@ -20,6 +20,7 @@ class Species(BaseModel):
     name = models.CharField(max_length=100)
     genus = models.ForeignKey(Genus, on_delete=models.CASCADE)
     name_common = models.CharField(max_length=255, blank=True, verbose_name=_('common name (English)'))
+    # https://www.catalogueoflife.org/col/details/species/id/9c35aba4cb7f388bf29a05fba221135c
     colid = models.CharField(max_length=32, verbose_name=_('Catalog of Life ID'), unique=True)
     # http://apiv3.iucnredlist.org/api/v3/species/id/15955?token
     # =9bb4facb6d23f48efbf424bb05c0c1ef1cf6f468393bc745d42179ac4aca5fee
@@ -32,12 +33,16 @@ class Species(BaseModel):
             return None
         return '{}/{}_{}/aoi'.format(settings.EE_SCL_ROOTDIR, self.genus.name.capitalize(), self.name)
 
+    @property
+    def full_name(self):
+        return _('%s %s') % (self.genus.name.capitalize(), self.name)
+
     class Meta:
         ordering = ('genus', 'name',)
         verbose_name_plural = _('species')
 
     def __str__(self):
-        return _('%s %s') % (self.genus.name, self.name)
+        return self.full_name
 
 
 class Biome(BaseModel):
@@ -153,4 +158,4 @@ class SCLStats(BaseModel):
         verbose_name_plural = _('SCL statistics')
 
     def __str__(self):
-        return _('')
+        return _('%s %s %s %s %s') % (self.scl, self.country, self.biome_id, self.pa_id, self.date)

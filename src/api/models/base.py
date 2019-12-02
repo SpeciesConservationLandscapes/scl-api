@@ -22,7 +22,7 @@ class Profile(BaseModel):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
-    countries = CountryField(multiple=True)
+    countries = CountryField(multiple=True, blank=True)
 
     class Meta:
         ordering = ('last_name', 'first_name',)
