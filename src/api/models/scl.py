@@ -1,7 +1,9 @@
 from decimal import Decimal
-from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
+
 from django.conf import settings
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
+
 from django_countries.fields import CountryField
 from .base import *
 
