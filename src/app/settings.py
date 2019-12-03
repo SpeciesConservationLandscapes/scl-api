@@ -71,18 +71,10 @@ TEMPLATES = [
 WSGI_APPLICATION = "app.wsgi.application"
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        # "rest_framework.authentication.SessionAuthentication",
-        "api.auth_backends.JWTAuthentication",
-    ),
-    # 'DEFAULT_PERMISSION_CLASSES': (
-    #     'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    # ),
+    "DEFAULT_AUTHENTICATION_CLASSES": ("api.auth_backends.JWTAuthentication",),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
-    "DEFAULT_RENDERER_CLASSES": (
-        "rest_framework.renderers.JSONRenderer",
-        "rest_framework.renderers.BrowsableAPIRenderer",
-    ),
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     "COERCE_DECIMAL_TO_STRING": False,
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
 }
@@ -120,7 +112,6 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
-
 APPEND_SLASH = True
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -132,6 +123,4 @@ API_SIGNING_SECRET = os.environ.get("API_SIGNING_SECRET")
 ADMIN_API_CLIENT_ID = os.environ.get("ADMIN_API_CLIENT_ID")
 ADMIN_API_CLIENT_SECRET = os.environ.get("ADMIN_API_CLIENT_SECRET")
 ADMIN_API_AUDIENCE = os.environ.get("ADMIN_API_AUDIENCE")
-APPLICATION_CLIENT_ID = os.environ.get("APPLICATION_CLIENT_ID")
-APPLICATION_CLIENT_SECRET = os.environ.get("APPLICATION_CLIENT_SECRET")
 AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")

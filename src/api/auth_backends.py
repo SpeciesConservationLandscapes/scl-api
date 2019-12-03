@@ -35,7 +35,7 @@ class JWTAuthentication(BaseAuthentication):
         jwt_token = get_jwt_token(request)
         if jwt_token is None or is_hs_token(jwt_token) is False:
             logger.debug("Invalid Token: {}".format(jwt_token))
-            return None
+            return None, None
 
         payload = decode(jwt_token)
         profile = self._authenticate_profile(payload)
