@@ -1,4 +1,4 @@
-from django.db import models
+from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
 
 # countries: 'USDOS/LSIB/2013' https://developers.google.com/earth-engine/datasets/catalog/USDOS_LSIB_2013
@@ -31,7 +31,7 @@ class Profile(BaseModel):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
-    countries = CountryField(multiple=True)
+    countries = CountryField(multiple=True, blank=True)
 
     class Meta:
         ordering = (
