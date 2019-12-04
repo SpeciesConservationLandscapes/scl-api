@@ -85,7 +85,6 @@ class Application(BaseModel):
     client_id = models.CharField(max_length=100, unique=True)
 
     class Meta:
-        db_table = "applications"
         unique_together = ("profile", "client_id")
 
     def __str__(self):

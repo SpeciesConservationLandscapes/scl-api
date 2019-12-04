@@ -2,15 +2,13 @@ version: 2
 
 default: &default
   docker:
-    - image: circleci/python:3.7.3
-  environment:
-    AWS_DEFAULT_REGION: us-east-1
+    - image: circleci/python
 
 install_dependencies: &install_dependencies
   run:
     name: Load Dependencies
     command: |
-      sudo pip install awscli==1.16.96 boto3==1.9.86 awsebcli==3.14.10 fabric==2.5.0
+      sudo pip install fabric==2.5.0
 
 build: &build
   run:
@@ -21,8 +19,6 @@ jobs:
   build_and_test:
     docker:
       - image: circleci/python:3.7.3
-    environment:
-      AWS_DEFAULT_REGION: us-east-1
     steps:
       - checkout
       - setup_remote_docker

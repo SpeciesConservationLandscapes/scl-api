@@ -24,7 +24,6 @@ class Migration(migrations.Migration):
                 ('updated_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='application_updated_by', to='api.Profile')),
             ],
             options={
-                'db_table': 'applications',
                 'unique_together': {('profile', 'client_id')},
             },
         ),
