@@ -21,7 +21,6 @@ from api.urls import api_urls
 admin.autodiscover()
 
 urlpatterns = [
-    url(r'^v1/', include(api_urls), name='api-root'),
+    url(r"^v1/", include(api_urls), name="api-root"),
     path("admin/", admin.site.urls),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
