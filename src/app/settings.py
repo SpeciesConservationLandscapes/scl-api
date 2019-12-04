@@ -35,14 +35,14 @@ INSTALLED_APPS = [
     "django_filters",
     "django_extensions",
     "api.apps.ApiConfig",
-    'corsheaders',
-    'django_countries',
+    "corsheaders",
+    "django_countries",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -69,6 +69,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "app.wsgi.application"
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": ("api.auth_backends.JWTAuthentication",),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+    "COERCE_DECIMAL_TO_STRING": False,
+    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+}
 
 
 DATABASES = {
@@ -118,9 +127,15 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
-
 APPEND_SLASH = True
 CORS_ORIGIN_ALLOW_ALL = True
 
-EE_HII_ROOTDIR = 'projects/HII/v1/'
-EE_SCL_ROOTDIR = 'projects/SCL/v1/'
+EE_HII_ROOTDIR = "projects/HII/v1/"
+EE_SCL_ROOTDIR = "projects/SCL/v1/"
+
+API_AUDIENCE = os.environ.get("API_AUDIENCE")
+API_SIGNING_SECRET = os.environ.get("API_SIGNING_SECRET")
+ADMIN_API_CLIENT_ID = os.environ.get("ADMIN_API_CLIENT_ID")
+ADMIN_API_CLIENT_SECRET = os.environ.get("ADMIN_API_CLIENT_SECRET")
+ADMIN_API_AUDIENCE = os.environ.get("ADMIN_API_AUDIENCE")
+AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")

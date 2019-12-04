@@ -34,7 +34,10 @@ class Profile(BaseModel):
     countries = CountryField(multiple=True, blank=True)
 
     class Meta:
-        ordering = ("last_name", "first_name")
+        ordering = (
+            "last_name",
+            "first_name",
+        )
 
     def __str__(self):
         return "{} [{}]".format(self.full_name, self.pk)
@@ -65,7 +68,24 @@ class AuthUser(BaseModel):
     user_id = models.CharField(unique=True, max_length=255)
 
     class Meta:
-        unique_together = ("profile", "user_id")
+        unique_together = (
+            "profile",
+            "user_id",
+        )
 
     def __str__(self):
         return _(u"%s") % self.profile.full_name
+
+
+class Application(BaseModel):
+    name = models.CharField(max_length=100)
+    profile = models.ForeignKey(
+        "Profile", related_name="registered_apps", on_delete=models.CASCADE
+    )
+    client_id = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        unique_together = ("profile", "client_id")
+
+    def __str__(self):
+        return "{} - {}".format(self.profile, self.client_id)

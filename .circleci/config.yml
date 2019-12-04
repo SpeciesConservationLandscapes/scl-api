@@ -1,0 +1,110 @@
+version: 2
+
+default: &default
+  docker:
+    - image: circleci/python
+
+install_dependencies: &install_dependencies
+  run:
+    name: Load Dependencies
+    command: |
+      sudo pip install fabric==2.5.0
+
+build: &build
+  run:
+    name: Build
+    command: ./ci_cd/build.sh ${CIRCLE_SHA1:0:7}
+
+jobs:
+  build_and_test:
+    docker:
+      - image: circleci/python:3.7.3
+    steps:
+      - checkout
+      - setup_remote_docker
+      - *install_dependencies
+      - *build
+      - run:
+          name: Setup
+          command: env > .env && fab buildnocache && fab up  && docker cp ./src/. api_service:/var/projects/webapp && sleep 10 && fab createdatabase && fab migrate
+      - run:
+          name: Test
+          command: fab test
+
+  deploy_dev:
+    <<: *default
+    steps:
+      # - checkout
+      # - setup_remote_docker
+      - *install_dependencies
+      - *build
+      # - run:
+      #     name: Docker image update
+      #     command: |
+      #         docker login -u $DOCKER_USER -p $DOCKER_PASS
+      #         docker tag honeycrisp/mermaid-api:${CIRCLE_SHA1:0:7} honeycrisp/mermaid-api:mermaid-dev-api
+      #         docker push honeycrisp/mermaid-api:mermaid-dev-api
+      # - run:
+      #     name: Deploy
+      #     command: |
+      #         ./ci_cd/deploy.sh mermaid-dev-api ${CIRCLE_SHA1:0:7} Mermaid-API
+      #         python ci_cd/wait_for_ok.py mermaid-dev-api ${CIRCLE_SHA1:0:7}
+      # - run:
+      #     name: Update version
+      #     command: |
+      #         python ci_cd/update_version.py dev api "${CIRCLE_BRANCH}-${CIRCLE_SHA1:0:7}"
+
+  deploy_prod:
+    <<: *default
+    steps:
+      # - checkout
+      # - setup_remote_docker
+      - *install_dependencies
+      - *build
+      # - run:
+      #     name: Docker image update
+      #     command: |
+      #         docker login -u $DOCKER_USER -p $DOCKER_PASS
+      #         docker tag honeycrisp/mermaid-api:${CIRCLE_SHA1:0:7} honeycrisp/mermaid-api:mermaid-prod-api
+      #         docker push honeycrisp/mermaid-api:mermaid-prod-api
+      # - run:
+      #     name: Deploy
+      #     command: |
+      #         ./ci_cd/deploy.sh mermaid-prod-api ${CIRCLE_SHA1:0:7} Mermaid-API
+      #         python ci_cd/wait_for_ok.py mermaid-prod-api ${CIRCLE_SHA1:0:7}
+      # - run:
+      #     name: Update version
+      #     command: |
+      #         python ci_cd/update_version.py prod api ${CIRCLE_TAG}
+      # - run:
+      #     name: Update changelog
+      #     command: |
+      #         chlog
+            
+workflows:
+  version: 2
+  build_test_deploy:
+    jobs:
+      - build_and_test:
+          context: org-global
+          filters:
+            tags:
+              only: /.*/
+      # branch: develop
+      - deploy_develop:
+          context: org-global
+          filters:
+            branches:
+              only: develop
+          requires:
+            - build_and_test
+      # tag: v1.2.3
+      - deploy_prod:
+          context: org-global
+          filters:
+            branches:
+              ignore: /.*/  # IMPORTANT!
+            tags:
+              only: /v[0-9]+(\.[0-9]+)+/ # v1.2.3
+          requires:
+            - build_and_test

@@ -58,7 +58,7 @@ def shell(c):
 
 @task
 def test(c):
-    local(_api_cmd("pytest --cov-report=html --cov=api --verbose"))
+    local(_api_cmd("pytest --numprocesses=2 --cov-report=html --cov=api --verbose"))
 
 
 @task
