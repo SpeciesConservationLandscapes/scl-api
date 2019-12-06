@@ -106,3 +106,6 @@ venv.bak/
 src/data/
 src/static/
 .DS_Store
+.idea
+
+cloud_sql_proxy
