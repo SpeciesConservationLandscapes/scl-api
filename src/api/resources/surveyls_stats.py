@@ -1,20 +1,12 @@
-from django.contrib.gis.db.models.functions import Area
-from rest_framework import serializers
 from rest_framework_gis.pagination import GeoJsonPagination
-from .base import BaseAPIFilterSet, BaseAPISerializer, BaseAPIViewSet, StatsSerializer
+from .base import BaseAPIFilterSet, BaseAPIViewSet, LandscapeSerializer, StatsSerializer
 from ..models import SurveyLandscape, SurveyStats
 
 
-class SurveySerializer(BaseAPISerializer):
-    species = serializers.SerializerMethodField()
-
+class SurveySerializer(LandscapeSerializer):
     class Meta:
         model = SurveyLandscape
         exclude = []
-
-    @staticmethod
-    def get_species(obj):
-        return str(obj.species)
 
 
 class SurveyStatsSerializer(StatsSerializer):
@@ -22,41 +14,20 @@ class SurveyStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = SurveyStats
-        fields = [
-            "id",
-            "country",
-            "date",
-            "biome",
-            "pa",
-            "survey_landscape",
-            "geom",
-            "area_km2",
-        ]
+        fields = ["id", "country", "date", "survey_landscape", "geom", "areas"]
 
 
 class SurveyStatsFilterSet(BaseAPIFilterSet):
     class Meta:
         model = SurveyStats
-        fields = [
-            "country",
-            "survey_landscape__species",
-            "date",
-            "biome__name",
-            "pa__name",
-        ]
+        fields = ["country", "survey_landscape__species", "date"]
 
 
 class SurveyStatsViewSet(BaseAPIViewSet):
     pagination_class = GeoJsonPagination
     serializer_class = SurveyStatsSerializer
     filter_class = SurveyStatsFilterSet
-    ordering_fields = [
-        "country",
-        "survey_landscape__species",
-        "date",
-        "biome__name",
-        "pa__name",
-    ]
+    ordering_fields = ["country", "survey_landscape__species", "date"]
     required_filters = ["country", "survey_landscape__species", "date"]
 
     def get_queryset(self):
@@ -76,8 +47,4 @@ class SurveyStatsViewSet(BaseAPIViewSet):
             "date": self.request.query_params["date"],
         }
 
-        return (
-            SurveyStats.objects.filter(**filters)
-            .annotate(area=Area("geom"))
-            .select_related()
-        )
+        return SurveyStats.objects.filter(**filters).select_related()

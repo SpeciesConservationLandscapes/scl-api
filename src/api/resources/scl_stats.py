@@ -1,21 +1,15 @@
-from django.contrib.gis.db.models.functions import Area
 from rest_framework import serializers
 from rest_framework_gis.pagination import GeoJsonPagination
-from .base import BaseAPIFilterSet, BaseAPISerializer, BaseAPIViewSet, StatsSerializer
+from .base import BaseAPIFilterSet, BaseAPIViewSet, LandscapeSerializer, StatsSerializer
 from ..models import SCL, SCLStats
 
 
-class SCLSerializer(BaseAPISerializer):
-    species = serializers.SerializerMethodField()
+class SCLSerializer(LandscapeSerializer):
     sclclass = serializers.SerializerMethodField()
 
     class Meta:
         model = SCL
         exclude = []
-
-    @staticmethod
-    def get_species(obj):
-        return str(obj.species)
 
     @staticmethod
     def get_sclclass(obj):
@@ -27,34 +21,20 @@ class SCLStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = SCLStats
-        fields = ["id", "country", "date", "biome", "pa", "scl", "geom", "area_km2"]
+        fields = ["id", "country", "date", "scl", "geom", "areas"]
 
 
 class SCLStatsFilterSet(BaseAPIFilterSet):
     class Meta:
         model = SCLStats
-        fields = [
-            "country",
-            "scl__species",
-            "date",
-            "biome__name",
-            "pa__name",
-            "scl__name",
-        ]
+        fields = ["country", "scl__species", "date", "scl__name"]
 
 
 class SCLStatsViewSet(BaseAPIViewSet):
     pagination_class = GeoJsonPagination
     serializer_class = SCLStatsSerializer
     filter_class = SCLStatsFilterSet
-    ordering_fields = [
-        "country",
-        "scl__species",
-        "date",
-        "biome__name",
-        "pa__name",
-        "scl__name",
-    ]
+    ordering_fields = ["country", "scl__species", "date", "scl__name"]
     required_filters = ["country", "scl__species", "date"]
 
     def get_queryset(self):
@@ -72,8 +52,4 @@ class SCLStatsViewSet(BaseAPIViewSet):
             "date": self.request.query_params["date"],
         }
 
-        return (
-            SCLStats.objects.filter(**filters)
-            .annotate(area=Area("geom"))
-            .select_related()
-        )
+        return SCLStats.objects.filter(**filters).select_related()
