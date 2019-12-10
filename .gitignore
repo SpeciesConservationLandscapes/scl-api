@@ -109,3 +109,4 @@ src/static/
 .idea
 
 cloud_sql_proxy
+app.yaml
