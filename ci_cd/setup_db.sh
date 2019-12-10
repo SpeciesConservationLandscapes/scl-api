@@ -6,7 +6,6 @@ _POSTGRES_USER_PWD=${POSTGRES_USER_PWD}
 _GCP_PROJECT_ID="scl3-244715"
 _GCP_SQL_INSTANCE_NAME="scl-cloud-sql-instance"
 _GCP_REGION="us-central"
-_GCP_INSTANCE_CONNECT_STRING="${_GCP_PROJECT_ID}:${_GCP_REGION}:${_GCP_SQL_INSTANCE_NAME}"
 
 _SERVICE_ACCOUNT_EMAIL="scl-339@scl3-244715.iam.gserviceaccount.com"
 _POSTGRES_DB_NAME="scl_db"
@@ -78,6 +77,8 @@ chmod +x cloud_sql_proxy
 echo
 echo "Starting cloud_sql_proxy connection..."
 export PGPASSWORD=${_POSTGRES_USER_PWD}
+_GCP_INSTANCE_CONNECT_STRING=$(gcloud sql instances describe ${_GCP_SQL_INSTANCE_NAME} | grep connectionName)
+_GCP_INSTANCE_CONNECT_STRING="${_GCP_INSTANCE_CONNECT_STRING:15}"
 ./cloud_sql_proxy -instances=${_GCP_INSTANCE_CONNECT_STRING}=tcp:5433 &
 sleep 5
 
