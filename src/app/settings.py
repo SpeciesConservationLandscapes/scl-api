@@ -79,17 +79,20 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
 }
 
-
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": os.environ.get("DB_NAME") or "scl",
         "USER": os.environ.get("DB_USER") or "postgres",
         "PASSWORD": os.environ.get("DB_PASSWORD") or "postgres",
-        "HOST": os.environ.get("DB_HOST") or "localhost",
         "PORT": os.environ.get("DB_PORT") or "5432",
     }
 }
+
+if os.getenv('GAE_INSTANCE'):
+    DATABASES['default']['HOST'] = '/cloudsql/' + os.environ.get("CLOUD_SQL_CONNECTION_STRING")
+else:
+    DATABASES['default']['HOST'] = 'localhost'
 
 
 AUTH_PASSWORD_VALIDATORS = [
