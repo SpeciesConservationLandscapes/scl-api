@@ -1,3 +1,4 @@
+import requests
 from django.core.files import File
 from rest_framework.decorators import (
     api_view,
@@ -8,7 +9,19 @@ from rest_framework.decorators import (
 from rest_framework.renderers import BaseRenderer
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from rest_framework.exceptions import NotFound, APIException, ValidationError
+
+
 import ee
+
+ee.Initialize()
+img = ee.Image("projects/SCL/v1/Panthera_tigris/source/Inputs_2006/density")
+vis_params = {
+    format: 'png'
+}
+
+map_id = img.getMapId(vis_params)
+print(map_id)
 
 
 def _initialize_ee_client(self):
@@ -47,8 +60,17 @@ class PngRenderer(BaseRenderer):
 @permission_classes((AllowAny,))
 @renderer_classes((PngRenderer,))
 def pas(request, z, x, y):
-    print(z, x, y)
-    img = File(open("/var/projects/webapp/Capture.PNG", "rb"))
+    x = int(x)
+    y = int(y)
+    z = int(z)
+
+    tile_url = ee.data.getTileUrl(map_id, x, y, z)
+    resp = requests.get(tile_url)
+    status_code = resp.status_code
+    if status_code == 404:
+        raise NotFound()
+    if status_code >= 500:
+        raise APIException()
     return Response(
-        data=img, content_type="image/png", headers={"content-type": "image/png"}
+        data=resp.content, content_type="image/png", headers={"content-type": "image/png"}
     )
