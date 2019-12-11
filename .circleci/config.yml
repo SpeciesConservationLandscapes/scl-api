@@ -58,8 +58,6 @@ jobs:
     <<: *default
     steps:
       - checkout
-      - setup_remote_docker
-      - *install_dependencies
       - *install_gcloud
       - *install_cloud_sql_proxy
       - *dump_credentials
@@ -75,7 +73,7 @@ jobs:
             DB_HOST=${GCP_DB_HOST} \
             DB_PORT=${GCP_DB_PORT} \
             GAE_INSTANCE=TRUE \
-            fab migrate
+            python ./src/migrate.py migrate
       - run:
           name: Deploy to AppEngine
           command: |
