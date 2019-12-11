@@ -58,6 +58,7 @@ jobs:
     <<: *default
     steps:
       - checkout
+      - *install_dependencies
       - *install_gcloud
       - *install_cloud_sql_proxy
       - *dump_credentials
