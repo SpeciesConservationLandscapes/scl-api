@@ -92,7 +92,7 @@ DATABASES = {
 if os.getenv('GAE_INSTANCE'):
     DATABASES['default']['HOST'] = '/cloudsql/' + os.environ.get("GCP_CLOUD_SQL_CONNECTION_STRING")
 else:
-    DATABASES['default']['HOST'] = 'localhost'
+    DATABASES['default']['HOST'] = os.environ.get("DB_HOST") or "localhost"
 
 
 AUTH_PASSWORD_VALIDATORS = [
