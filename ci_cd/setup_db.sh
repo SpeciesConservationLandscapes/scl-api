@@ -1,14 +1,14 @@
 #! /bin/bash
 
-_SERVICE_ACCOUNT_KEY_FILE=${SERVICE_ACCOUNT_KEY_FILE}
-_POSTGRES_USER_PWD=${POSTGRES_USER_PWD}
+_GCP_SERVICE_ACCOUNT_KEY_FILE=${GCP_SERVICE_ACCOUNT_KEY_FILE}
+_GCP_DB_PASSWORD=${GCP_DB_PASSWORD}
 
-_GCP_PROJECT_ID="scl3-244715"
-_GCP_SQL_INSTANCE_NAME="scl-cloud-sql-instance"
-_GCP_REGION="us-central"
+_GCP_PROJECT_ID=${GCP_PROJECT_ID}
+_GCP_SQL_INSTANCE_NAME=${GCP_SQL_INSTANCE_NAME}
+_GCP_REGION=${GCP_REGION}
 
-_SERVICE_ACCOUNT_EMAIL="scl-339@scl3-244715.iam.gserviceaccount.com"
-_POSTGRES_DB_NAME="scl_db"
+_GCP_SERVICE_ACCOUNT_EMAIL=${GCP_SERVICE_ACCOUNT_EMAIL}
+_GCP_DB_NAME=${GCP_DB_NAME}
 _MACHINE_TYPE="$(uname -s)"
 
 
@@ -17,16 +17,16 @@ echo "Setting up database..."
 
 echo
 echo "Checking credentials..."
-if [[ -z "${_POSTGRES_USER_PWD}" ]]
+if [[ -z "${_GCP_DB_PASSWORD}" ]]
 then
-      echo "POSTGRES_USER_PWD is undefined."
-      echo "Set it by executing: export POSTGRES_USER_PWD=your_secure_password"
+      echo "GCP_DB_PASSWORD is undefined."
+      echo "Set it by executing: export GCP_DB_PASSWORD=your_secure_password"
       echo "Cancelling database setup..."
       exit 1
 else
-      echo "POSTGRES_USER_PWD is set."
+      echo "GCP_DB_PASSWORD is set."
 fi
-if [[ -z "${_SERVICE_ACCOUNT_KEY_FILE}" ]]
+if [[ -z "${_GCP_SERVICE_ACCOUNT_KEY_FILE}" ]]
 then
       echo "SERVICE_ACCOUNT_KEY_FILE is undefined."
       echo "Set it by executing: export SERVICE_ACCOUNT_KEY_FILE=path_to_key_file.json"
@@ -39,8 +39,8 @@ fi
 echo
 echo "Authenticating gcloud using service account..."
 gcloud auth activate-service-account \
-        ${_SERVICE_ACCOUNT_EMAIL} \
-        --key-file=${_SERVICE_ACCOUNT_KEY_FILE} \
+        ${_GCP_SERVICE_ACCOUNT_EMAIL} \
+        --key-file=${_GCP_SERVICE_ACCOUNT_KEY_FILE} \
         --project=${_GCP_PROJECT_ID}
 
 echo
@@ -57,12 +57,12 @@ echo "Setting password of default 'postgres' user..."
 gcloud sql users set-password \
         postgres \
         --instance=${_GCP_SQL_INSTANCE_NAME} \
-        --password=${_POSTGRES_USER_PWD}
+        --password=${_GCP_DB_PASSWORD}
 
 echo
 echo "Creating database..."
 gcloud sql databases create \
-        ${_POSTGRES_DB_NAME} \
+        ${_GCP_DB_NAME} \
         --instance=${_GCP_SQL_INSTANCE_NAME}
 
 echo
@@ -76,7 +76,7 @@ chmod +x cloud_sql_proxy
 
 echo
 echo "Starting cloud_sql_proxy connection..."
-export PGPASSWORD=${_POSTGRES_USER_PWD}
+export PGPASSWORD=${_GCP_DB_PASSWORD}
 _GCP_INSTANCE_CONNECT_STRING=$(gcloud sql instances describe ${_GCP_SQL_INSTANCE_NAME} | grep connectionName)
 _GCP_INSTANCE_CONNECT_STRING="${_GCP_INSTANCE_CONNECT_STRING:15}"
 ./cloud_sql_proxy -instances=${_GCP_INSTANCE_CONNECT_STRING}=tcp:5433 &
@@ -86,7 +86,7 @@ echo
 echo "Installing extensions postgis..."
 psql \
     --username="postgres" \
-    --dbname="${_POSTGRES_DB_NAME}" \
+    --dbname="${_GCP_DB_NAME}" \
     --host 127.0.0.1 \
     --port 5433 \
     --command="CREATE EXTENSION postgis;"
@@ -95,7 +95,7 @@ echo
 echo "Installing extension postgis_tiger_geocoder..."
 psql \
     --username="postgres" \
-    --dbname="${_POSTGRES_DB_NAME}" \
+    --dbname="${_GCP_DB_NAME}" \
     --host 127.0.0.1 \
     --port 5433 \
     --command="CREATE EXTENSION postgis_tiger_geocoder CASCADE;"
@@ -104,7 +104,7 @@ echo
 echo "Installing extension postgis_topology..."
 psql \
     --username="postgres" \
-    --dbname="${_POSTGRES_DB_NAME}" \
+    --dbname="${_GCP_DB_NAME}" \
     --host 127.0.0.1 \
     --port 5433 \
     --command="CREATE EXTENSION postgis_topology;"
