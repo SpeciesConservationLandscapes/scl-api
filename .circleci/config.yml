@@ -65,9 +65,19 @@ jobs:
           name: Generate app.yaml file
           command: ./ci_cd/create_app_yaml.sh
       - run:
+          name: Run DB migration
+          command: |
+            DB_NAME=${GCP_DB_NAME} \
+            DB_USER=$GCP_DB_USER} \
+            DB_PASSWORD={GCP_DB_PASSWORD} \
+            DB_HOST=${GCP_DB_HOST} \
+            DB_PORT=${GCP_DB_PORT} \
+            GAE_INSTANCE=TRUE \
+            fab migrate
+      - run:
           name: Deploy to AppEngine
           command: |
-            /home/circleci/project/google-cloud-sdk/bin/gcloud app deploy --stop-previous-version
+            /home/circleci/project/google-cloud-sdk/bin/gcloud app deploy --stop-previous-version --promote --quiet
 
   deploy_dev:
     <<: *default
