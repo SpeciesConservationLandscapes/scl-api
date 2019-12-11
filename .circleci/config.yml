@@ -67,13 +67,14 @@ jobs:
       - run:
           name: Run DB migration
           command: |
+            ls -l
             DB_NAME=${GCP_DB_NAME} \
             DB_USER=$GCP_DB_USER} \
             DB_PASSWORD={GCP_DB_PASSWORD} \
             DB_HOST=${GCP_DB_HOST} \
             DB_PORT=${GCP_DB_PORT} \
             GAE_INSTANCE=TRUE \
-            python ./src/migrate.py migrate
+            python ./src/manage.py migrate
       - run:
           name: Deploy to AppEngine
           command: |
