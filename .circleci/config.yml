@@ -22,8 +22,7 @@ gcp_tasks:
       command: |
         curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-236.0.0-linux-x86_64.tar.gz
         tar zxf google-cloud-sdk-236.0.0-linux-x86_64.tar.gz google-cloud-sdk
-        ./google-cloud-sdk/install.sh --rc-path /home/circleci/.bashrc -q
-        source /home/circleci/.bashrc
+        ./google-cloud-sdk/install.sh --quiet
   install_cloud_sql_proxy: &install_cloud_sql_proxy
     run:
       name: Install Cloud SQL Proxy
@@ -35,8 +34,9 @@ gcp_tasks:
       name: Dump Google Cloud Credentials to file
       command: |
         echo ${GCP_CREDENTIAL_STRING} > "${GCP_SERVICE_ACCOUNT_KEY_FILE}"
-        gcloud auth activate-service-account --key-file ${GCP_SERVICE_ACCOUNT_KEY_FILE}
-        gcloud --quiet config set project ${GCP_PROJECT_ID}
+        /home/circleci/project/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${GCP_SERVICE_ACCOUNT_KEY_FILE}
+        /home/circleci/project/google-cloud-sdk/bin/gcloud --quiet config set project ${GCP_PROJECT_ID}
+        rm ${GCP_SERVICE_ACCOUNT_KEY_FILE}
 
 jobs:
   build_and_test:
@@ -57,14 +57,17 @@ jobs:
   deploy_dev_2_wip:
     <<: *default
     steps:
+      - checkout
       - *install_gcloud
       - *install_cloud_sql_proxy
       - *dump_credentials
       - run:
-          name: Create app.yaml
+          name: Generate app.yaml file
           command: ./ci_cd/create_app_yaml.sh
-      - run: |
-          gcloud app deploy --stop-previous-version
+      - run:
+          name: Deploy to AppEngine
+          command: |
+            /home/circleci/project/google-cloud-sdk/bin/gcloud app deploy --stop-previous-version
 
   deploy_dev:
     <<: *default
@@ -116,31 +119,49 @@ jobs:
       #     command: |
       #         chlog
 
+#workflows:
+#  version: 2
+#  build_test_deploy:
+#    jobs:
+#      - build_and_test:
+#          context: org-global
+#          filters:
+#            tags:
+#              only: /.*/
+#      # branch: develop
+#
+#      - deploy_dev_2_wip:
+#          context: org-global
+#          filters:
+#            branches:
+#              only: S31
+#          requires:
+#              - build_and_test
+#
+#      - deploy_develop:
+#          context: org-global
+#          filters:
+#            branches:
+#              only: develop
+#          requires:
+#            - build_and_test
+#      # tag: v1.2.3
+#      - deploy_prod:
+#          context: org-global
+#          filters:
+#            branches:
+#              ignore: /.*/  # IMPORTANT!
+#            tags:
+#              only: /v[0-9]+(\.[0-9]+)+/ # v1.2.3
+#          requires:
+#            - build_and_test
+
 workflows:
   version: 2
   build_test_deploy:
     jobs:
-      - build_and_test:
-          context: org-global
-          filters:
-            tags:
-              only: /.*/
-      # branch: develop
-      - deploy_develop:
+      - deploy_dev_2_wip:
           context: org-global
           filters:
             branches:
-              only: develop
-          requires:
-            - build_and_test
-      # tag: v1.2.3
-      - deploy_prod:
-          context: org-global
-          filters:
-            branches:
-              ignore: /.*/  # IMPORTANT!
-            tags:
-              only: /v[0-9]+(\.[0-9]+)+/ # v1.2.3
-          requires:
-            - build_and_test
-
+              only: S31

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#! /bin/bash
 
 _CIRCLE_SHA1="${CIRCLE_SHA1:0:7}"
 _APP_YAML_FILE='app.yaml'
@@ -13,6 +13,7 @@ skip_files:
 - ^Makefile$
 - ^README.md$
 - ^requirements-dev.txt$
+- ^google-cloud-sdk^
 - ci_cd/
 
 manual_scaling:
