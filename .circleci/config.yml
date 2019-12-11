@@ -58,6 +58,7 @@ jobs:
     <<: *default
     steps:
       - checkout
+      - setup_remote_docker
       - *install_dependencies
       - *install_gcloud
       - *install_cloud_sql_proxy
