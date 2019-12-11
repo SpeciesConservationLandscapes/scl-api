@@ -34,8 +34,8 @@ gcp_tasks:
     run:
       name: Dump Google Cloud Credentials to file
       command: |
-        echo ${GCP_CREDENTIAL_STRING} > "${SERVICE_ACCOUNT_KEY_FILE}"
-        gcloud auth activate-service-account --key-file ${SERVICE_ACCOUNT_KEY_FILE}
+        echo ${GCP_CREDENTIAL_STRING} > "${GCP_SERVICE_ACCOUNT_KEY_FILE}"
+        gcloud auth activate-service-account --key-file ${GCP_SERVICE_ACCOUNT_KEY_FILE}
         gcloud --quiet config set project ${GCP_PROJECT_ID}
 
 jobs:
