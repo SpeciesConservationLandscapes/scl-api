@@ -152,8 +152,11 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - deploy_develop:
+      - deploy_dev:
           context: org-global
           filters:
             branches:
               only: S31
+          requires:
+            - build_and_test
+
