@@ -127,7 +127,7 @@ USE_L10N = True
 USE_TZ = True
 
 if os.getenv('GAE_INSTANCE'):
-    STATIC_URL = DATABASES['default']['HOST'] = os.environ.get("GCP_DJANGO_STATIC_URL")
+    STATIC_URL = os.environ.get("GCP_DJANGO_STATIC_URL")
 else:
     STATIC_URL = "/static/"
 
