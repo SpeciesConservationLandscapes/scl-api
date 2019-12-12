@@ -58,6 +58,8 @@ jobs:
     <<: *default
     steps:
       - checkout
+      - setup_remote_docker
+      - *install_dependencies
       - *install_gcloud
       - *install_cloud_sql_proxy
       - *dump_credentials
@@ -68,6 +70,7 @@ jobs:
           name: Run DB migration
           command: |
             ls -l
+            pip install --upgrade -r requirements.txt
             DB_NAME=${GCP_DB_NAME} \
             DB_USER=$GCP_DB_USER} \
             DB_PASSWORD={GCP_DB_PASSWORD} \
