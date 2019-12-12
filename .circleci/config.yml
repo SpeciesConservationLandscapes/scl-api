@@ -54,7 +54,7 @@ jobs:
           name: Test
           command: fab test
 
-  deploy_dev_2_wip:
+  deploy_dev:
     <<: *default
     steps:
       - checkout
@@ -67,39 +67,17 @@ jobs:
           name: Generate app.yaml file
           command: ./ci_cd/create_app_yaml.sh
       - run:
+          name: Deploy to AppEngine
+          command: |
+            /home/circleci/project/google-cloud-sdk/bin/gcloud app deploy --stop-previous-version --quiet
+      - run:
           name: Run DB migration
           command: |
             env > .env && fab buildnocache && fab up
             docker cp ./src/. api_service:/var/projects/webapp
+            docker exec -it api_service python /var/projects/webapp/manage.py collectstatic
             docker cp ./ci_cd/migrate_db.sh api_service:/var/projects/webapp/migrate_db.sh
             docker exec -it api_service /var/projects/webapp/migrate_db.sh
-      - run:
-          name: Deploy to AppEngine
-          command: |
-            /home/circleci/project/google-cloud-sdk/bin/gcloud app deploy --stop-previous-version --promote --quiet
-
-  deploy_dev:
-    <<: *default
-    steps:
-      # - checkout
-      # - setup_remote_docker
-      - *install_dependencies
-      - *build
-      # - run:
-      #     name: Docker image update
-      #     command: |
-      #         docker login -u $DOCKER_USER -p $DOCKER_PASS
-      #         docker tag honeycrisp/mermaid-api:${CIRCLE_SHA1:0:7} honeycrisp/mermaid-api:mermaid-dev-api
-      #         docker push honeycrisp/mermaid-api:mermaid-dev-api
-      # - run:
-      #     name: Deploy
-      #     command: |
-      #         ./ci_cd/deploy.sh mermaid-dev-api ${CIRCLE_SHA1:0:7} Mermaid-API
-      #         python ci_cd/wait_for_ok.py mermaid-dev-api ${CIRCLE_SHA1:0:7}
-      # - run:
-      #     name: Update version
-      #     command: |
-      #         python ci_cd/update_version.py dev api "${CIRCLE_BRANCH}-${CIRCLE_SHA1:0:7}"
 
   deploy_prod:
     <<: *default
@@ -169,7 +147,12 @@ workflows:
   version: 2
   build_test_deploy:
     jobs:
-      - deploy_dev_2_wip:
+      - build_and_test:
+          context: org-global
+          filters:
+            tags:
+              only: /.*/
+      - deploy_develop:
           context: org-global
           filters:
             branches:
