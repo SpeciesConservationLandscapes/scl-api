@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     "corsheaders",
     "django_countries",
+    "tools",
 ]
 
 MIDDLEWARE = [
@@ -73,7 +74,10 @@ WSGI_APPLICATION = "app.wsgi.application"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ("api.auth_backends.JWTAuthentication",),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.OrderingFilter",
+    ),
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     "COERCE_DECIMAL_TO_STRING": False,
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
@@ -94,7 +98,6 @@ if os.getenv('GAE_INSTANCE'):
 else:
     DATABASES['default']['HOST'] = os.environ.get("DB_HOST") or "localhost"
 
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
@@ -103,22 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'api.auth_backends.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    ),
-    'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.OrderingFilter',
-    ),
-    'COERCE_DECIMAL_TO_STRING': False,
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
-}
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
@@ -138,6 +125,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 EE_HII_ROOTDIR = "projects/HII/v1/"
 EE_SCL_ROOTDIR = "projects/SCL/v1/"
+EE_SERVICE_ACCOUNT_KEY = os.environ.get("SERVICE_ACCOUNT_KEY")
+GCP_PROJECT_ID = "scl3-244715"
+GCP_BUCKET_SCLS = "scl-pipeline"
+GCP_BUCKET_BACKUP = "scl-backup"
 
 API_AUDIENCE = os.environ.get("API_AUDIENCE")
 API_SIGNING_SECRET = os.environ.get("API_SIGNING_SECRET")

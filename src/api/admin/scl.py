@@ -34,22 +34,6 @@ class SpeciesAdmin(BaseAdmin):
     iucn_link.short_description = _("IUCN ID")
 
 
-@admin.register(Biome)
-class BiomeAdmin(BaseAdmin):
-    list_display = ("name", "biomeid")
-
-
-@admin.register(ProtectedArea)
-class ProtectedAreaAdmin(BaseAdmin):
-    list_display = ("name", "wdpa_link")
-
-    def wdpa_link(self, obj):
-        root = "http://www.protectedplanet.net/"
-        return format_html(linkstr, root, obj.wdpaid, "", obj.wdpaid)
-
-    wdpa_link.short_description = _("WDPA ID")
-
-
 @admin.register(SCL)
 class SCLAdmin(BaseAdmin):
     list_display = ("name", "sclclass")
@@ -72,19 +56,19 @@ class SurveyLandscapeAdmin(BaseAdmin):
 
 @admin.register(SCLStats)
 class SCLStatsAdmin(BaseAdmin):
-    list_display = ("scl", "country", "biome", "pa", "date")
+    list_display = ("scl", "country", "date", "area")
 
 
 @admin.register(FragmentStats)
 class FragmentStatsAdmin(BaseAdmin):
-    list_display = ("fragment", "country", "biome", "pa", "date")
+    list_display = ("fragment", "country", "date", "area")
 
 
 @admin.register(RestorationStats)
 class RestorationStatsAdmin(BaseAdmin):
-    list_display = ("restoration_landscape", "country", "biome", "pa", "date")
+    list_display = ("restoration_landscape", "country", "date", "area")
 
 
 @admin.register(SurveyStats)
 class SurveyStatsAdmin(BaseAdmin):
-    list_display = ("survey_landscape", "country", "biome", "pa", "date")
+    list_display = ("survey_landscape", "country", "date", "area")

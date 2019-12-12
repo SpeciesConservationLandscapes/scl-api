@@ -1,20 +1,12 @@
-from django.contrib.gis.db.models.functions import Area
-from rest_framework import serializers
 from rest_framework_gis.pagination import GeoJsonPagination
-from .base import BaseAPIFilterSet, BaseAPISerializer, BaseAPIViewSet, StatsSerializer
+from .base import BaseAPIFilterSet, BaseAPIViewSet, LandscapeSerializer, StatsSerializer
 from ..models import FragmentLandscape, FragmentStats
 
 
-class FragmentSerializer(BaseAPISerializer):
-    species = serializers.SerializerMethodField()
-
+class FragmentSerializer(LandscapeSerializer):
     class Meta:
         model = FragmentLandscape
         exclude = []
-
-    @staticmethod
-    def get_species(obj):
-        return str(obj.species)
 
 
 class FragmentStatsSerializer(StatsSerializer):
@@ -22,35 +14,20 @@ class FragmentStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = FragmentStats
-        fields = [
-            "id",
-            "country",
-            "date",
-            "biome",
-            "pa",
-            "fragment",
-            "geom",
-            "area_km2",
-        ]
+        fields = ["id", "country", "date", "fragment", "geom", "biome_areas"]
 
 
 class FragmentStatsFilterSet(BaseAPIFilterSet):
     class Meta:
         model = FragmentStats
-        fields = ["country", "fragment__species", "date", "biome__name", "pa__name"]
+        fields = ["country", "fragment__species", "date"]
 
 
 class FragmentStatsViewSet(BaseAPIViewSet):
     pagination_class = GeoJsonPagination
     serializer_class = FragmentStatsSerializer
     filter_class = FragmentStatsFilterSet
-    ordering_fields = [
-        "country",
-        "fragment__species",
-        "date",
-        "biome__name",
-        "pa__name",
-    ]
+    ordering_fields = ["country", "fragment__species", "date"]
     required_filters = ["country", "fragment__species", "date"]
 
     def get_queryset(self):
@@ -68,8 +45,4 @@ class FragmentStatsViewSet(BaseAPIViewSet):
             "date": self.request.query_params["date"],
         }
 
-        return (
-            FragmentStats.objects.filter(**filters)
-            .annotate(area=Area("geom"))
-            .select_related()
-        )
+        return FragmentStats.objects.filter(**filters).select_related()
