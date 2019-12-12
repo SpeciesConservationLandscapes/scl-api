@@ -7,7 +7,7 @@ RUN rm requirements.txt
 WORKDIR /var/projects/webapp
 ADD ./src .
 
-RUN python manage.py collectstatic
+COPY ./deploy/collectstatic.conf /etc/supervisor/conf.d/collectstatic.conf
 
 COPY ./deploy/webapp.nginxconf /etc/nginx/sites-enabled/webapp.nginxconf
 
