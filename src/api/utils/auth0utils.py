@@ -53,11 +53,7 @@ class Auth0ClientManager(object):
         return resp
 
     def create_client_grant(self, client_id, audience, scopes):
-        params = {
-            "client_id": client_id,
-            "audience": audience,
-            "scope": scopes,
-        }
+        params = {"client_id": client_id, "audience": audience, "scope": scopes}
         resp = self.auth0.client_grants.create(params)
 
         return resp

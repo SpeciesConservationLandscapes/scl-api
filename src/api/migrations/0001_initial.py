@@ -11,296 +11,765 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Biome',
+            name="Biome",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
-                ('biomeid', models.PositiveIntegerField(unique=True, verbose_name='RESOLVE ecoregion biome number')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=100)),
+                (
+                    "biomeid",
+                    models.PositiveIntegerField(
+                        unique=True, verbose_name="RESOLVE ecoregion biome number"
+                    ),
+                ),
+            ],
+            options={"ordering": ("name",)},
+        ),
+        migrations.CreateModel(
+            name="FragmentLandscape",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+            ],
+            options={"verbose_name": "fragment", "verbose_name_plural": "fragments"},
+        ),
+        migrations.CreateModel(
+            name="Genus",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=100)),
+            ],
+            options={"verbose_name_plural": "genera"},
+        ),
+        migrations.CreateModel(
+            name="Profile",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                ("email", models.EmailField(max_length=254, unique=True)),
+                ("first_name", models.CharField(blank=True, max_length=100, null=True)),
+                ("last_name", models.CharField(blank=True, max_length=100, null=True)),
+                (
+                    "countries",
+                    django_countries.fields.CountryField(
+                        blank=True, max_length=746, multiple=True
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="profile_created_by",
+                        to="api.Profile",
+                    ),
+                ),
+                (
+                    "updated_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="profile_updated_by",
+                        to="api.Profile",
+                    ),
+                ),
+            ],
+            options={"ordering": ("last_name", "first_name")},
+        ),
+        migrations.CreateModel(
+            name="ProtectedArea",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=255)),
+                (
+                    "wdpaid",
+                    models.PositiveIntegerField(unique=True, verbose_name="WDPA ID"),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="protectedarea_created_by",
+                        to="api.Profile",
+                    ),
+                ),
+                (
+                    "updated_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="protectedarea_updated_by",
+                        to="api.Profile",
+                    ),
+                ),
             ],
             options={
-                'ordering': ('name',),
+                "verbose_name": "protected area",
+                "verbose_name_plural": "protected areas",
+                "ordering": ("name",),
             },
         ),
         migrations.CreateModel(
-            name='FragmentLandscape',
+            name="RestorationLandscape",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="restorationlandscape_created_by",
+                        to="api.Profile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'fragment',
-                'verbose_name_plural': 'fragments',
+                "verbose_name": "restoration landscape",
+                "verbose_name_plural": "restoration landscapes",
             },
         ),
         migrations.CreateModel(
-            name='Genus',
+            name="SCL",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=255)),
+                (
+                    "sclclass",
+                    models.PositiveSmallIntegerField(
+                        blank=True,
+                        choices=[(1, "I"), (2, "II"), (3, "III"), (4, "IV")],
+                        null=True,
+                        verbose_name="SCL class",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="scl_created_by",
+                        to="api.Profile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'genera',
+                "verbose_name": "species conservation landscape",
+                "verbose_name_plural": "species conservation landscapes",
             },
         ),
         migrations.CreateModel(
-            name='Profile',
+            name="Species",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('email', models.EmailField(max_length=254, unique=True)),
-                ('first_name', models.CharField(blank=True, max_length=100, null=True)),
-                ('last_name', models.CharField(blank=True, max_length=100, null=True)),
-                ('countries', django_countries.fields.CountryField(blank=True, max_length=746, multiple=True)),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='profile_created_by', to='api.Profile')),
-                ('updated_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='profile_updated_by', to='api.Profile')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=100)),
+                (
+                    "name_common",
+                    models.CharField(
+                        blank=True, max_length=255, verbose_name="common name (English)"
+                    ),
+                ),
+                (
+                    "colid",
+                    models.CharField(
+                        max_length=32, unique=True, verbose_name="Catalog of Life ID"
+                    ),
+                ),
+                (
+                    "iucnid",
+                    models.PositiveIntegerField(unique=True, verbose_name="IUCN ID"),
+                ),
+                ("notes", models.TextField(blank=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="species_created_by",
+                        to="api.Profile",
+                    ),
+                ),
+                (
+                    "genus",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="api.Genus"
+                    ),
+                ),
+                (
+                    "updated_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="species_updated_by",
+                        to="api.Profile",
+                    ),
+                ),
+            ],
+            options={"verbose_name_plural": "species", "ordering": ("genus", "name")},
+        ),
+        migrations.CreateModel(
+            name="SurveyLandscape",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="surveylandscape_created_by",
+                        to="api.Profile",
+                    ),
+                ),
+                (
+                    "species",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="api.Species"
+                    ),
+                ),
+                (
+                    "updated_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="surveylandscape_updated_by",
+                        to="api.Profile",
+                    ),
+                ),
             ],
             options={
-                'ordering': ('last_name', 'first_name'),
+                "verbose_name": "survey landscape",
+                "verbose_name_plural": "survey landscapes",
             },
         ),
         migrations.CreateModel(
-            name='ProtectedArea',
+            name="SurveyStats",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=255)),
-                ('wdpaid', models.PositiveIntegerField(unique=True, verbose_name='WDPA ID')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='protectedarea_created_by', to='api.Profile')),
-                ('updated_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='protectedarea_updated_by', to='api.Profile')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                ("country", django_countries.fields.CountryField(max_length=2)),
+                ("date", models.DateField(default=django.utils.timezone.now)),
+                (
+                    "geom",
+                    django.contrib.gis.db.models.fields.MultiPolygonField(
+                        blank=True, geography=True, null=True, srid=4326
+                    ),
+                ),
+                (
+                    "biome",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="api.Biome"
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="surveystats_created_by",
+                        to="api.Profile",
+                    ),
+                ),
+                (
+                    "pa",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.ProtectedArea",
+                    ),
+                ),
+                (
+                    "survey_landscape",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.SurveyLandscape",
+                    ),
+                ),
+                (
+                    "updated_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="surveystats_updated_by",
+                        to="api.Profile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'protected area',
-                'verbose_name_plural': 'protected areas',
-                'ordering': ('name',),
+                "verbose_name": "survey landscape statistics",
+                "verbose_name_plural": "survey landscape statistics",
+                "ordering": ("date", "country", "survey_landscape", "biome", "pa"),
             },
         ),
         migrations.CreateModel(
-            name='RestorationLandscape',
+            name="SCLStats",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='restorationlandscape_created_by', to='api.Profile')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                ("country", django_countries.fields.CountryField(max_length=2)),
+                ("date", models.DateField(default=django.utils.timezone.now)),
+                (
+                    "geom",
+                    django.contrib.gis.db.models.fields.MultiPolygonField(
+                        blank=True, geography=True, null=True, srid=4326
+                    ),
+                ),
+                (
+                    "biome",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="api.Biome"
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="sclstats_created_by",
+                        to="api.Profile",
+                    ),
+                ),
+                (
+                    "pa",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.ProtectedArea",
+                    ),
+                ),
+                (
+                    "scl",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="api.SCL"
+                    ),
+                ),
+                (
+                    "updated_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="sclstats_updated_by",
+                        to="api.Profile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'restoration landscape',
-                'verbose_name_plural': 'restoration landscapes',
-            },
-        ),
-        migrations.CreateModel(
-            name='SCL',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=255)),
-                ('sclclass', models.PositiveSmallIntegerField(blank=True, choices=[(1, 'I'), (2, 'II'), (3, 'III'), (4, 'IV')], null=True, verbose_name='SCL class')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='scl_created_by', to='api.Profile')),
-            ],
-            options={
-                'verbose_name': 'species conservation landscape',
-                'verbose_name_plural': 'species conservation landscapes',
-            },
-        ),
-        migrations.CreateModel(
-            name='Species',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
-                ('name_common', models.CharField(blank=True, max_length=255, verbose_name='common name (English)')),
-                ('colid', models.CharField(max_length=32, unique=True, verbose_name='Catalog of Life ID')),
-                ('iucnid', models.PositiveIntegerField(unique=True, verbose_name='IUCN ID')),
-                ('notes', models.TextField(blank=True)),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='species_created_by', to='api.Profile')),
-                ('genus', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.Genus')),
-                ('updated_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='species_updated_by', to='api.Profile')),
-            ],
-            options={
-                'verbose_name_plural': 'species',
-                'ordering': ('genus', 'name'),
-            },
-        ),
-        migrations.CreateModel(
-            name='SurveyLandscape',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='surveylandscape_created_by', to='api.Profile')),
-                ('species', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.Species')),
-                ('updated_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='surveylandscape_updated_by', to='api.Profile')),
-            ],
-            options={
-                'verbose_name': 'survey landscape',
-                'verbose_name_plural': 'survey landscapes',
-            },
-        ),
-        migrations.CreateModel(
-            name='SurveyStats',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('country', django_countries.fields.CountryField(max_length=2)),
-                ('date', models.DateField(default=django.utils.timezone.now)),
-                ('geom', django.contrib.gis.db.models.fields.MultiPolygonField(blank=True, geography=True, null=True, srid=4326)),
-                ('biome', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.Biome')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='surveystats_created_by', to='api.Profile')),
-                ('pa', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.ProtectedArea')),
-                ('survey_landscape', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.SurveyLandscape')),
-                ('updated_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='surveystats_updated_by', to='api.Profile')),
-            ],
-            options={
-                'verbose_name': 'survey landscape statistics',
-                'verbose_name_plural': 'survey landscape statistics',
-                'ordering': ('date', 'country', 'survey_landscape', 'biome', 'pa'),
-            },
-        ),
-        migrations.CreateModel(
-            name='SCLStats',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('country', django_countries.fields.CountryField(max_length=2)),
-                ('date', models.DateField(default=django.utils.timezone.now)),
-                ('geom', django.contrib.gis.db.models.fields.MultiPolygonField(blank=True, geography=True, null=True, srid=4326)),
-                ('biome', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.Biome')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='sclstats_created_by', to='api.Profile')),
-                ('pa', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.ProtectedArea')),
-                ('scl', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.SCL')),
-                ('updated_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='sclstats_updated_by', to='api.Profile')),
-            ],
-            options={
-                'verbose_name': 'SCL statistics',
-                'verbose_name_plural': 'SCL statistics',
-                'ordering': ('date', 'country', 'scl', 'biome', 'pa'),
+                "verbose_name": "SCL statistics",
+                "verbose_name_plural": "SCL statistics",
+                "ordering": ("date", "country", "scl", "biome", "pa"),
             },
         ),
         migrations.AddField(
-            model_name='scl',
-            name='species',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.Species'),
+            model_name="scl",
+            name="species",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="api.Species"
+            ),
         ),
         migrations.AddField(
-            model_name='scl',
-            name='updated_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='scl_updated_by', to='api.Profile'),
+            model_name="scl",
+            name="updated_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="scl_updated_by",
+                to="api.Profile",
+            ),
         ),
         migrations.CreateModel(
-            name='RestorationStats',
+            name="RestorationStats",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('country', django_countries.fields.CountryField(max_length=2)),
-                ('date', models.DateField(default=django.utils.timezone.now)),
-                ('geom', django.contrib.gis.db.models.fields.MultiPolygonField(blank=True, geography=True, null=True, srid=4326)),
-                ('biome', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.Biome')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='restorationstats_created_by', to='api.Profile')),
-                ('pa', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.ProtectedArea')),
-                ('restoration_landscape', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.RestorationLandscape')),
-                ('updated_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='restorationstats_updated_by', to='api.Profile')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                ("country", django_countries.fields.CountryField(max_length=2)),
+                ("date", models.DateField(default=django.utils.timezone.now)),
+                (
+                    "geom",
+                    django.contrib.gis.db.models.fields.MultiPolygonField(
+                        blank=True, geography=True, null=True, srid=4326
+                    ),
+                ),
+                (
+                    "biome",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="api.Biome"
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="restorationstats_created_by",
+                        to="api.Profile",
+                    ),
+                ),
+                (
+                    "pa",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.ProtectedArea",
+                    ),
+                ),
+                (
+                    "restoration_landscape",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.RestorationLandscape",
+                    ),
+                ),
+                (
+                    "updated_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="restorationstats_updated_by",
+                        to="api.Profile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'restoration landscape statistics',
-                'verbose_name_plural': 'restoration landscape statistics',
-                'ordering': ('date', 'country', 'restoration_landscape', 'biome', 'pa'),
+                "verbose_name": "restoration landscape statistics",
+                "verbose_name_plural": "restoration landscape statistics",
+                "ordering": ("date", "country", "restoration_landscape", "biome", "pa"),
             },
         ),
         migrations.AddField(
-            model_name='restorationlandscape',
-            name='species',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.Species'),
+            model_name="restorationlandscape",
+            name="species",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="api.Species"
+            ),
         ),
         migrations.AddField(
-            model_name='restorationlandscape',
-            name='updated_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='restorationlandscape_updated_by', to='api.Profile'),
+            model_name="restorationlandscape",
+            name="updated_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="restorationlandscape_updated_by",
+                to="api.Profile",
+            ),
         ),
         migrations.AddField(
-            model_name='genus',
-            name='created_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='genus_created_by', to='api.Profile'),
+            model_name="genus",
+            name="created_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="genus_created_by",
+                to="api.Profile",
+            ),
         ),
         migrations.AddField(
-            model_name='genus',
-            name='updated_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='genus_updated_by', to='api.Profile'),
+            model_name="genus",
+            name="updated_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="genus_updated_by",
+                to="api.Profile",
+            ),
         ),
         migrations.CreateModel(
-            name='FragmentStats',
+            name="FragmentStats",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('country', django_countries.fields.CountryField(max_length=2)),
-                ('date', models.DateField(default=django.utils.timezone.now)),
-                ('geom', django.contrib.gis.db.models.fields.MultiPolygonField(blank=True, geography=True, null=True, srid=4326)),
-                ('biome', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.Biome')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='fragmentstats_created_by', to='api.Profile')),
-                ('fragment', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.FragmentLandscape')),
-                ('pa', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.ProtectedArea')),
-                ('updated_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='fragmentstats_updated_by', to='api.Profile')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                ("country", django_countries.fields.CountryField(max_length=2)),
+                ("date", models.DateField(default=django.utils.timezone.now)),
+                (
+                    "geom",
+                    django.contrib.gis.db.models.fields.MultiPolygonField(
+                        blank=True, geography=True, null=True, srid=4326
+                    ),
+                ),
+                (
+                    "biome",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="api.Biome"
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="fragmentstats_created_by",
+                        to="api.Profile",
+                    ),
+                ),
+                (
+                    "fragment",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.FragmentLandscape",
+                    ),
+                ),
+                (
+                    "pa",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="api.ProtectedArea",
+                    ),
+                ),
+                (
+                    "updated_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="fragmentstats_updated_by",
+                        to="api.Profile",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'fragment statistics',
-                'verbose_name_plural': 'fragment statistics',
-                'ordering': ('date', 'country', 'fragment', 'biome', 'pa'),
+                "verbose_name": "fragment statistics",
+                "verbose_name_plural": "fragment statistics",
+                "ordering": ("date", "country", "fragment", "biome", "pa"),
             },
         ),
         migrations.AddField(
-            model_name='fragmentlandscape',
-            name='created_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='fragmentlandscape_created_by', to='api.Profile'),
+            model_name="fragmentlandscape",
+            name="created_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="fragmentlandscape_created_by",
+                to="api.Profile",
+            ),
         ),
         migrations.AddField(
-            model_name='fragmentlandscape',
-            name='species',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.Species'),
+            model_name="fragmentlandscape",
+            name="species",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="api.Species"
+            ),
         ),
         migrations.AddField(
-            model_name='fragmentlandscape',
-            name='updated_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='fragmentlandscape_updated_by', to='api.Profile'),
+            model_name="fragmentlandscape",
+            name="updated_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="fragmentlandscape_updated_by",
+                to="api.Profile",
+            ),
         ),
         migrations.AddField(
-            model_name='biome',
-            name='created_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='biome_created_by', to='api.Profile'),
+            model_name="biome",
+            name="created_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="biome_created_by",
+                to="api.Profile",
+            ),
         ),
         migrations.AddField(
-            model_name='biome',
-            name='updated_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='biome_updated_by', to='api.Profile'),
+            model_name="biome",
+            name="updated_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="biome_updated_by",
+                to="api.Profile",
+            ),
         ),
         migrations.CreateModel(
-            name='AuthUser',
+            name="AuthUser",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('user_id', models.CharField(max_length=255, unique=True)),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='authuser_created_by', to='api.Profile')),
-                ('profile', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='authusers', to='api.Profile')),
-                ('updated_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='authuser_updated_by', to='api.Profile')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                ("user_id", models.CharField(max_length=255, unique=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="authuser_created_by",
+                        to="api.Profile",
+                    ),
+                ),
+                (
+                    "profile",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="authusers",
+                        to="api.Profile",
+                    ),
+                ),
+                (
+                    "updated_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="authuser_updated_by",
+                        to="api.Profile",
+                    ),
+                ),
             ],
-            options={
-                'unique_together': {('profile', 'user_id')},
-            },
+            options={"unique_together": {("profile", "user_id")}},
         ),
     ]

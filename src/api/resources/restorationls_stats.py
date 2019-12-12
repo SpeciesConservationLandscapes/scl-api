@@ -1,20 +1,12 @@
-from django.contrib.gis.db.models.functions import Area
-from rest_framework import serializers
 from rest_framework_gis.pagination import GeoJsonPagination
-from .base import BaseAPIFilterSet, BaseAPISerializer, BaseAPIViewSet, StatsSerializer
+from .base import BaseAPIFilterSet, BaseAPIViewSet, LandscapeSerializer, StatsSerializer
 from ..models import RestorationLandscape, RestorationStats
 
 
-class RestorationSerializer(BaseAPISerializer):
-    species = serializers.SerializerMethodField()
-
+class RestorationSerializer(LandscapeSerializer):
     class Meta:
         model = RestorationLandscape
         exclude = []
-
-    @staticmethod
-    def get_species(obj):
-        return str(obj.species)
 
 
 class RestorationStatsSerializer(StatsSerializer):
@@ -22,41 +14,20 @@ class RestorationStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = RestorationStats
-        fields = [
-            "id",
-            "country",
-            "date",
-            "biome",
-            "pa",
-            "restoration_landscape",
-            "geom",
-            "area_km2",
-        ]
+        fields = ["id", "country", "date", "restoration_landscape", "geom", "areas"]
 
 
 class RestorationStatsFilterSet(BaseAPIFilterSet):
     class Meta:
         model = RestorationStats
-        fields = [
-            "country",
-            "restoration_landscape__species",
-            "date",
-            "biome__name",
-            "pa__name",
-        ]
+        fields = ["country", "restoration_landscape__species", "date"]
 
 
 class RestorationStatsViewSet(BaseAPIViewSet):
     pagination_class = GeoJsonPagination
     serializer_class = RestorationStatsSerializer
     filter_class = RestorationStatsFilterSet
-    ordering_fields = [
-        "country",
-        "restoration_landscape__species",
-        "date",
-        "biome__name",
-        "pa__name",
-    ]
+    ordering_fields = ["country", "restoration_landscape__species", "date"]
     required_filters = ["country", "restoration_landscape__species", "date"]
 
     def get_queryset(self):
@@ -76,8 +47,4 @@ class RestorationStatsViewSet(BaseAPIViewSet):
             "date": self.request.query_params["date"],
         }
 
-        return (
-            RestorationStats.objects.filter(**filters)
-            .annotate(area=Area("geom"))
-            .select_related()
-        )
+        return RestorationStats.objects.filter(**filters).select_related()

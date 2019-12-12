@@ -1,4 +1,3 @@
-from decimal import Decimal
 from rest_framework import serializers, viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import MethodNotAllowed
@@ -7,7 +6,6 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from rest_framework_gis.fields import GeometryField
 from rest_framework_gis.filterset import GeoFilterSet
 from django_countries.serializer_fields import CountryField
-from ..models import Biome, ProtectedArea
 
 
 META_FIELDS = ["created_on", "created_by", "updated_on", "updated_by"]
@@ -26,33 +24,21 @@ class BaseAPISerializer(BaseExcludedFieldsMixin, serializers.ModelSerializer):
     pass
 
 
-class BiomeSerializer(BaseAPISerializer):
-    class Meta:
-        model = Biome
-        exclude = []
+class LandscapeSerializer(BaseExcludedFieldsMixin, serializers.ModelSerializer):
+    species = serializers.SerializerMethodField()
 
-
-class PASerializer(BaseAPISerializer):
-    class Meta:
-        model = ProtectedArea
-        exclude = []
+    @staticmethod
+    def get_species(obj):
+        return str(obj.species)
 
 
 class StatsSerializer(BaseExcludedFieldsMixin, GeoFeatureModelSerializer):
-    biome = BiomeSerializer()
-    pa = PASerializer()
     country = CountryField(country_dict=True)
     geom = GeometryField(precision=4, remove_duplicates=True)
-    area_km2 = serializers.SerializerMethodField()
+    areas = serializers.JSONField()
 
     class Meta:
         geo_field = "geom"
-
-    @staticmethod
-    def get_area_km2(obj):
-        if obj.geom is None:
-            return Decimal("0.00")
-        return round(obj.area.sq_km, 2)
 
 
 class BaseAPIFilterSet(GeoFilterSet):

@@ -68,7 +68,11 @@ def migrate(c):
 
 @task
 def createdatabase(c):
-    local(_api_cmd("""psql "postgresql://postgres:postgres@api_db" -c "CREATE DATABASE scl;" """))
+    local(
+        _api_cmd(
+            """psql "postgresql://postgres:postgres@api_db" -c "CREATE DATABASE scl;" """
+        )
+    )
 
 
 @task(aliases=["fresh-install"])
