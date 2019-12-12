@@ -1,6 +1,7 @@
 #! /bin/bash
 
 _GCP_SERVICE_ACCOUNT_KEY_FILE=${GCP_SERVICE_ACCOUNT_KEY_FILE}
+_GCP_CREDENTIAL_STRING=${GCP_CREDENTIAL_STRING}
 _GCP_DB_PASSWORD=${GCP_DB_PASSWORD}
 
 _GCP_PROJECT_ID=${GCP_PROJECT_ID}
@@ -38,6 +39,7 @@ fi
 
 echo
 echo "Authenticating gcloud using service account..."
+echo "${_GCP_CREDENTIAL_STRING}" > "${_GCP_SERVICE_ACCOUNT_KEY_FILE}"
 gcloud auth activate-service-account \
         ${_GCP_SERVICE_ACCOUNT_EMAIL} \
         --key-file=${_GCP_SERVICE_ACCOUNT_KEY_FILE} \
