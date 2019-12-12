@@ -119,7 +119,7 @@ workflows:
           context: org-global
           filters:
             branches:
-              only: S31
+              only: develop
           requires:
             - build_and_test
       - deploy_prod:
