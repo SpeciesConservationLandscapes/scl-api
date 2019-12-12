@@ -14,7 +14,14 @@ class RestorationStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = RestorationStats
-        fields = ["id", "country", "date", "restoration_landscape", "geom", "areas"]
+        fields = [
+            "id",
+            "country",
+            "date",
+            "restoration_landscape",
+            "geom",
+            "biome_areas",
+        ]
 
 
 class RestorationStatsFilterSet(BaseAPIFilterSet):

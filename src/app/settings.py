@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     "corsheaders",
     "django_countries",
+    "tools",
 ]
 
 MIDDLEWARE = [
@@ -117,7 +118,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 EE_HII_ROOTDIR = "projects/HII/v1/"
 EE_SCL_ROOTDIR = "projects/SCL/v1/"
-EE_SERVICE_AACOUNT_KEY = os.environ.get("SERVICE_ACCOUNT_KEY")
+EE_SERVICE_ACCOUNT_KEY = os.environ.get("SERVICE_ACCOUNT_KEY")
+GCP_PROJECT_ID = "scl3-244715"
+GCP_BUCKET_SCLS = "scl-pipeline"
+GCP_BUCKET_BACKUP = "scl-backup"
 
 API_AUDIENCE = os.environ.get("API_AUDIENCE")
 API_SIGNING_SECRET = os.environ.get("API_SIGNING_SECRET")

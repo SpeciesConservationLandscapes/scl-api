@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -54,7 +55,6 @@ class Species(BaseModel):
 class Landscape(BaseModel):
     ee_name = None
     species = models.ForeignKey(Species, on_delete=models.CASCADE)
-    areas = JSONField(null=True, blank=True)
 
     @property
     def ee_path(self):
@@ -123,6 +123,8 @@ class SCLStats(BaseModel):
     country = CountryField()
     date = models.DateField(default=timezone.now)
     geom = models.MultiPolygonField(geography=True, null=True, blank=True)
+    area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
+    biome_areas = JSONField(null=True, blank=True)
 
     class Meta:
         ordering = ("date", "country", "scl")
@@ -138,6 +140,8 @@ class FragmentStats(BaseModel):
     country = CountryField()
     date = models.DateField(default=timezone.now)
     geom = models.MultiPolygonField(geography=True, null=True, blank=True)
+    area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
+    biome_areas = JSONField(null=True, blank=True)
 
     class Meta:
         ordering = ("date", "country", "fragment")
@@ -155,6 +159,8 @@ class RestorationStats(BaseModel):
     country = CountryField()
     date = models.DateField(default=timezone.now)
     geom = models.MultiPolygonField(geography=True, null=True, blank=True)
+    area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
+    biome_areas = JSONField(null=True, blank=True)
 
     class Meta:
         ordering = ("date", "country", "restoration_landscape")
@@ -170,6 +176,8 @@ class SurveyStats(BaseModel):
     country = CountryField()
     date = models.DateField(default=timezone.now)
     geom = models.MultiPolygonField(geography=True, null=True, blank=True)
+    area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
+    biome_areas = JSONField(null=True, blank=True)
 
     class Meta:
         ordering = ("date", "country", "survey_landscape")
