@@ -7,6 +7,8 @@ RUN rm requirements.txt
 WORKDIR /var/projects/webapp
 ADD ./src .
 
+RUN python manage.py collectstatic
+
 COPY ./deploy/webapp.nginxconf /etc/nginx/sites-enabled/webapp.nginxconf
 
 EXPOSE 8181 80 443
