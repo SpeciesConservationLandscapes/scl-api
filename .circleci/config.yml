@@ -107,8 +107,6 @@ jobs:
       #     command: |
       #         chlog
 
-       - build_and_test
-
 workflows:
   version: 2
   build_test_deploy:
