@@ -7,8 +7,6 @@ RUN rm requirements.txt
 WORKDIR /var/projects/webapp
 ADD ./src .
 
-COPY ./deploy/collectstatic.conf /etc/supervisor/conf.d/collectstatic.conf
-
 COPY ./deploy/webapp.nginxconf /etc/nginx/sites-enabled/webapp.nginxconf
 
 EXPOSE 8181 80 443
