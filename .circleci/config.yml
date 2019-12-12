@@ -69,15 +69,10 @@ jobs:
       - run:
           name: Run DB migration
           command: |
-            ls -l
-            pip install --upgrade -r requirements.txt
-            DB_NAME=${GCP_DB_NAME} \
-            DB_USER=$GCP_DB_USER} \
-            DB_PASSWORD={GCP_DB_PASSWORD} \
-            DB_HOST=${GCP_DB_HOST} \
-            DB_PORT=${GCP_DB_PORT} \
-            GAE_INSTANCE=TRUE \
-            python ./src/manage.py migrate
+            env > .env && fab buildnocache && fab up
+            docker cp ./src/. api_service:/var/projects/webapp
+            docker cp ./ci_cd/migrate_db.sh api_service:/var/projects/webapp/migrate_db.sh
+            docker exec -it api_service /var/projects/webapp/migrate_db.sh
       - run:
           name: Deploy to AppEngine
           command: |
