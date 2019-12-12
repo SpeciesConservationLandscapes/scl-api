@@ -14,7 +14,7 @@ class FragmentStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = FragmentStats
-        fields = ["id", "country", "date", "fragment", "geom", "areas"]
+        fields = ["id", "country", "date", "fragment", "geom", "biome_areas"]
 
 
 class FragmentStatsFilterSet(BaseAPIFilterSet):

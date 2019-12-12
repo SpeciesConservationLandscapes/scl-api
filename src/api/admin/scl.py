@@ -56,19 +56,19 @@ class SurveyLandscapeAdmin(BaseAdmin):
 
 @admin.register(SCLStats)
 class SCLStatsAdmin(BaseAdmin):
-    list_display = ("scl", "country", "date")
+    list_display = ("scl", "country", "date", "area")
 
 
 @admin.register(FragmentStats)
 class FragmentStatsAdmin(BaseAdmin):
-    list_display = ("fragment", "country", "date")
+    list_display = ("fragment", "country", "date", "area")
 
 
 @admin.register(RestorationStats)
 class RestorationStatsAdmin(BaseAdmin):
-    list_display = ("restoration_landscape", "country", "date")
+    list_display = ("restoration_landscape", "country", "date", "area")
 
 
 @admin.register(SurveyStats)
 class SurveyStatsAdmin(BaseAdmin):
-    list_display = ("survey_landscape", "country", "date")
+    list_display = ("survey_landscape", "country", "date", "area")

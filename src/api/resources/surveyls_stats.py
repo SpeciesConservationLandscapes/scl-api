@@ -14,7 +14,7 @@ class SurveyStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = SurveyStats
-        fields = ["id", "country", "date", "survey_landscape", "geom", "areas"]
+        fields = ["id", "country", "date", "survey_landscape", "geom", "biome_areas"]
 
 
 class SurveyStatsFilterSet(BaseAPIFilterSet):

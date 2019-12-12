@@ -21,7 +21,7 @@ class SCLStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = SCLStats
-        fields = ["id", "country", "date", "scl", "geom", "areas"]
+        fields = ["id", "country", "date", "scl", "geom", "biome_areas"]
 
 
 class SCLStatsFilterSet(BaseAPIFilterSet):

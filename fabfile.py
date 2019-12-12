@@ -1,4 +1,3 @@
-import os
 import time
 from fabric import task
 from invoke import run
@@ -30,13 +29,6 @@ def up(c):
 
 
 @task
-def winup(c):
-    path = os.path.dirname(os.path.realpath(__file__))
-    local("docker-share mount -t %s/src" % path)
-    up()
-
-
-@task
 def down(c):
     local("docker-compose down")
 
@@ -52,6 +44,11 @@ def dbshell(c):
 
 
 @task
+def shellplus(c):
+    local(_api_cmd("python manage.py shell_plus"))
+
+
+@task
 def shell(c):
     local(_api_cmd("/bin/bash"))
 
@@ -59,6 +56,16 @@ def shell(c):
 @task
 def test(c):
     local(_api_cmd("pytest --numprocesses=2 --cov-report=html --cov=api --verbose"))
+
+
+@task
+def dbbackup(c, key_name="local"):
+    local(_api_cmd("python manage.py dbbackup {}".format(key_name)))
+
+
+@task
+def dbrestore(c, key_name="local"):
+    local(_api_cmd("python manage.py dbrestore {}".format(key_name)))
 
 
 @task
@@ -79,13 +86,8 @@ def createdatabase(c):
 def freshinstall(c, key_name="local"):
     down(c)
     buildnocache(c)
-    if os.name == "nt":
-        winup(c)
-    else:
-        up(c)
+    up(c)
 
-    time.sleep(20)
-    createdatabase(c)
+    time.sleep(10)
+    dbrestore(c, key_name)
     migrate(c)
-    # db_restore(key_name)
-    # migrate()
