@@ -24,7 +24,7 @@ class Command(BaseCommand):
             os.mkdir(self.local_restore_dir)
         except OSError:
             pass  # Means it already exists.
-        key = json.loads(settings.EE_SERVICE_ACCOUNT_KEY)
+        key = json.loads(settings.GCP_SERVICE_ACCOUNT_KEY)
         credentials = service_account.Credentials.from_service_account_info(key)
         self.client = storage.Client(
             project=settings.GCP_PROJECT_ID, credentials=credentials

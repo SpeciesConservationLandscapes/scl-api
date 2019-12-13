@@ -9,9 +9,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.exceptions import NotFound, APIException
 
 
-service_account_name = json.loads(settings.EE_SERVICE_ACCOUNT_KEY)["client_email"]
+service_account_name = json.loads(settings.GCP_SERVICE_ACCOUNT_KEY)["client_email"]
 credentials = ee.ServiceAccountCredentials(
-    service_account_name, key_data=settings.EE_SERVICE_ACCOUNT_KEY
+    service_account_name, key_data=settings.GCP_SERVICE_ACCOUNT_KEY
 )
 ee.Initialize(credentials)
 
