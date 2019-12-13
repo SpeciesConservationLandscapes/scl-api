@@ -89,10 +89,14 @@ DATABASES = {
         "NAME": os.environ.get("DB_NAME") or "scl",
         "USER": os.environ.get("DB_USER") or "postgres",
         "PASSWORD": os.environ.get("DB_PASSWORD") or "postgres",
-        "HOST": os.environ.get("DB_HOST") or "localhost",
         "PORT": os.environ.get("DB_PORT") or "5432",
     }
 }
+
+if os.getenv('GAE_INSTANCE'):
+    DATABASES['default']['HOST'] = '/cloudsql/' + os.environ.get("GCP_CLOUD_SQL_CONNECTION_STRING")
+else:
+    DATABASES['default']['HOST'] = os.environ.get("DB_HOST") or "localhost"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -103,14 +107,17 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-STATIC_URL = "/static/"
+if os.getenv('GAE_INSTANCE'):
+    STATIC_URL = os.environ.get("GCP_DJANGO_STATIC_URL")
+else:
+    STATIC_URL = "/static/"
+
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 APPEND_SLASH = True
