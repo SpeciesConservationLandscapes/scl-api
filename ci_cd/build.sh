@@ -4,7 +4,7 @@ SHA1=$1
 
 echo "SHA1: $SHA1"
 
-DOCKER_TAG="scl3/mermaid-api:$SHA1"
+DOCKER_TAG="scl3/scl-api:$SHA1"
 echo "Image Tag: $DOCKER_TAG"
 
 echo "VERSION $SHA1" > src/VERSION
