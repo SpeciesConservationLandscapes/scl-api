@@ -1,5 +1,4 @@
-from rest_framework_gis.pagination import GeoJsonPagination
-from .base import BaseAPIFilterSet, BaseAPIViewSet, LandscapeSerializer, StatsSerializer
+from .base import BaseAPIFilterSet, LandscapeSerializer, StatsSerializer, StatsViewSet
 from ..models import SurveyLandscape, SurveyStats
 
 
@@ -14,7 +13,15 @@ class SurveyStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = SurveyStats
-        fields = ["id", "country", "date", "survey_landscape", "geom", "biome_areas"]
+        fields = [
+            "id",
+            "country",
+            "date",
+            "survey_landscape",
+            "geom",
+            "area",
+            "biome_areas",
+        ]
 
 
 class SurveyStatsFilterSet(BaseAPIFilterSet):
@@ -23,8 +30,7 @@ class SurveyStatsFilterSet(BaseAPIFilterSet):
         fields = ["country", "survey_landscape__species", "date"]
 
 
-class SurveyStatsViewSet(BaseAPIViewSet):
-    pagination_class = GeoJsonPagination
+class SurveyStatsViewSet(StatsViewSet):
     serializer_class = SurveyStatsSerializer
     filter_class = SurveyStatsFilterSet
     ordering_fields = ["country", "survey_landscape__species", "date"]

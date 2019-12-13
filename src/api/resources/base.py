@@ -1,7 +1,9 @@
 from rest_framework import serializers, viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.permissions import BasePermission
 import django_filters
+from rest_framework_gis.pagination import GeoJsonPagination
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from rest_framework_gis.fields import GeometryField
 from rest_framework_gis.filterset import GeoFilterSet
@@ -58,6 +60,16 @@ class StandardResultPagination(PageNumberPagination):
     max_page_size = 5000
 
 
+class UserCountryPermission(BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        query = request.query_params
+        if not user.is_authenticated or "country" not in query:
+            return False
+
+        return query["country"] in user.profile.countries
+
+
 class BaseAPIViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultPagination
 
@@ -72,3 +84,8 @@ class BaseAPIViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed("DELETE")
+
+
+class StatsViewSet(BaseAPIViewSet):
+    pagination_class = GeoJsonPagination
+    permission_classes = [UserCountryPermission]
