@@ -12,9 +12,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = ENVIRONMENT not in ("prod",)
+DEBUG = os.getenv('GAE_INSTANCE') is None
 
-if ENVIRONMENT in ("dev", "prod"):
+if "ALLOWED_HOSTS" in os.environ:
     ALLOWED_HOSTS = [host.strip() for host in os.environ["ALLOWED_HOSTS"].split(",")]
 else:
     ALLOWED_HOSTS = ["*"]
