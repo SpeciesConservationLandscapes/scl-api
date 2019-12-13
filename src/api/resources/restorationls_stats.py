@@ -1,5 +1,4 @@
-from rest_framework_gis.pagination import GeoJsonPagination
-from .base import BaseAPIFilterSet, BaseAPIViewSet, LandscapeSerializer, StatsSerializer
+from .base import BaseAPIFilterSet, LandscapeSerializer, StatsSerializer, StatsViewSet
 from ..models import RestorationLandscape, RestorationStats
 
 
@@ -20,6 +19,7 @@ class RestorationStatsSerializer(StatsSerializer):
             "date",
             "restoration_landscape",
             "geom",
+            "area",
             "biome_areas",
         ]
 
@@ -30,8 +30,7 @@ class RestorationStatsFilterSet(BaseAPIFilterSet):
         fields = ["country", "restoration_landscape__species", "date"]
 
 
-class RestorationStatsViewSet(BaseAPIViewSet):
-    pagination_class = GeoJsonPagination
+class RestorationStatsViewSet(StatsViewSet):
     serializer_class = RestorationStatsSerializer
     filter_class = RestorationStatsFilterSet
     ordering_fields = ["country", "restoration_landscape__species", "date"]

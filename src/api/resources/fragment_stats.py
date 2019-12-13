@@ -1,5 +1,4 @@
-from rest_framework_gis.pagination import GeoJsonPagination
-from .base import BaseAPIFilterSet, BaseAPIViewSet, LandscapeSerializer, StatsSerializer
+from .base import BaseAPIFilterSet, LandscapeSerializer, StatsSerializer, StatsViewSet
 from ..models import FragmentLandscape, FragmentStats
 
 
@@ -14,7 +13,7 @@ class FragmentStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = FragmentStats
-        fields = ["id", "country", "date", "fragment", "geom", "biome_areas"]
+        fields = ["id", "country", "date", "fragment", "geom", "area", "biome_areas"]
 
 
 class FragmentStatsFilterSet(BaseAPIFilterSet):
@@ -23,8 +22,7 @@ class FragmentStatsFilterSet(BaseAPIFilterSet):
         fields = ["country", "fragment__species", "date"]
 
 
-class FragmentStatsViewSet(BaseAPIViewSet):
-    pagination_class = GeoJsonPagination
+class FragmentStatsViewSet(StatsViewSet):
     serializer_class = FragmentStatsSerializer
     filter_class = FragmentStatsFilterSet
     ordering_fields = ["country", "fragment__species", "date"]

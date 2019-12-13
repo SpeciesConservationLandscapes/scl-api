@@ -81,8 +81,6 @@ class PngRenderer(BaseRenderer):
 
 
 class TileView(APIView):
-    authentication_classes = []
-    # permission_classes = (AllowAny,)
     renderer_classes = (PngRenderer,)
     layer = None
 

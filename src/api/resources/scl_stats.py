@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from rest_framework_gis.pagination import GeoJsonPagination
-from .base import BaseAPIFilterSet, BaseAPIViewSet, LandscapeSerializer, StatsSerializer
+from .base import BaseAPIFilterSet, LandscapeSerializer, StatsSerializer, StatsViewSet
 from ..models import SCL, SCLStats
 
 
@@ -21,7 +20,7 @@ class SCLStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = SCLStats
-        fields = ["id", "country", "date", "scl", "geom", "biome_areas"]
+        fields = ["id", "country", "date", "scl", "geom", "area", "biome_areas"]
 
 
 class SCLStatsFilterSet(BaseAPIFilterSet):
@@ -30,8 +29,7 @@ class SCLStatsFilterSet(BaseAPIFilterSet):
         fields = ["country", "scl__species", "date", "scl__name"]
 
 
-class SCLStatsViewSet(BaseAPIViewSet):
-    pagination_class = GeoJsonPagination
+class SCLStatsViewSet(StatsViewSet):
     serializer_class = SCLStatsSerializer
     filter_class = SCLStatsFilterSet
     ordering_fields = ["country", "scl__species", "date", "scl__name"]
