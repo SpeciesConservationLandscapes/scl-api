@@ -11,7 +11,6 @@ from google.oauth2 import service_account
 
 class Command(BaseCommand):
     help = "Restore primary django database from GCP bucket"
-    # requires_system_checks = False
 
     def __init__(self):
         super(Command, self).__init__()
