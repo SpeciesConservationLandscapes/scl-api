@@ -48,10 +48,11 @@ def ingest_landscapes(landscape_key, species, scldate, countries_biomes_pas):
     for countries_biomes_pa in countries_biomes_pas["features"]:
         props = countries_biomes_pa["properties"]
 
-        attribs = {"species": species}
+        # TODO: add eeid for landscape when we have it
+        attribs = {"species": species, "date": scldate}
         if landscape_key == "scl_species":
-            attribs["name"] = props["scl_name"]
-            attribs["sclclass"] = props["scl_class"]
+            attribs["name"] = props["lsname"]
+            attribs["sclclass"] = props["lsclass"]
         landscape, _ = landscape_model.objects.get_or_create(**attribs)
 
         geom = GEOSGeometry(json.dumps(countries_biomes_pa["geometry"]))
@@ -60,14 +61,12 @@ def ingest_landscapes(landscape_key, species, scldate, countries_biomes_pas):
 
         stats_attribs = {
             landscape_property: landscape,
-            "country": props["scl_country"],
-            "date": scldate,
-            "area": props["scl_country_area"],
+            "country": props["lscountry"],
+            "area": props["lscountry_area"],
             "biome_areas": props["areas"],
         }
         s, _ = stats_model.objects.get_or_create(**stats_attribs)
-        if _:
-            # Can't include geom in get_or_create with geography=True
+        if _:  # Can't include geom in get_or_create with geography=True
             s.geom = geom
             s.save()
             count += 1
@@ -108,6 +107,7 @@ class Command(BaseCommand):
                         settings.GCP_BUCKET_SCLS,
                         prefix="ls_stats/{}".format(species_slug),
                     )
+                    blobs = []
                     datafiles = []
                     for obj in bucket_file_list:
                         filename = os.path.join(
@@ -122,10 +122,12 @@ class Command(BaseCommand):
                         filedate = obj.name.split("/")[-2]
                         landscape_key = obj.name.split("/")[-1].split(".")[0]
                         datafiles.append((filename, filedate, landscape_key))
+                        blobs.append(obj)
 
                     if len(datafiles) < 1:
                         continue
 
+                    successes = []
                     for (datafile, scldate, landscape_key) in datafiles:
                         sid = transaction.savepoint()
                         success = False
@@ -140,6 +142,7 @@ class Command(BaseCommand):
                                     countries_biomes_pas,
                                 )
                                 success = True
+                                successes.append(datafile)
 
                         finally:
                             if dry_run is True or success is False:
@@ -150,6 +153,13 @@ class Command(BaseCommand):
                                 msg = "{} features were ingested from {}"
                             print(msg.format(count, datafile))
                             os.remove(datafile)
+
+                    if (
+                        len(successes) == len(datafiles)
+                        and settings.ENVIRONMENT == "prod"
+                    ):
+                        for obj in blobs:
+                            obj.delete()
 
         except Exception as err:
             # transaction.savepoint_rollback(sid)

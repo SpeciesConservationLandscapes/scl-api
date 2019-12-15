@@ -61,7 +61,7 @@ mapids = {
     "species": {
         "Panthera_tigris": empty.paint(
             featureCollection=ee.FeatureCollection(
-                "projects/SCL/v1/Panthera_tigris/scl_poly/2006-01-01/scl-species"
+                "projects/SCL/v1/Panthera_tigris/scl_poly/2006-01-01/scl_species"
             ),
             color="000000",
             width=4,

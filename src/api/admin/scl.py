@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import format_html
-from .base import BaseAdmin
+from .base import BaseAdmin, StatsAdmin
 from ..models.scl import *
 
 
@@ -55,20 +55,20 @@ class SurveyLandscapeAdmin(BaseAdmin):
 
 
 @admin.register(SCLStats)
-class SCLStatsAdmin(BaseAdmin):
-    list_display = ("scl", "country", "date", "area")
+class SCLStatsAdmin(StatsAdmin):
+    landscape_key = "scl"
 
 
 @admin.register(FragmentStats)
-class FragmentStatsAdmin(BaseAdmin):
-    list_display = ("fragment", "country", "date", "area")
+class FragmentStatsAdmin(StatsAdmin):
+    landscape_key = "fragment"
 
 
 @admin.register(RestorationStats)
-class RestorationStatsAdmin(BaseAdmin):
-    list_display = ("restoration_landscape", "country", "date", "area")
+class RestorationStatsAdmin(StatsAdmin):
+    landscape_key = "restoration_landscape"
 
 
 @admin.register(SurveyStats)
-class SurveyStatsAdmin(BaseAdmin):
-    list_display = ("survey_landscape", "country", "date", "area")
+class SurveyStatsAdmin(StatsAdmin):
+    landscape_key = "survey_landscape"

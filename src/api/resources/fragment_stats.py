@@ -13,20 +13,20 @@ class FragmentStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = FragmentStats
-        fields = ["id", "country", "date", "fragment", "geom", "area", "biome_areas"]
+        fields = ["id", "country", "fragment", "geom", "area", "biome_areas"]
 
 
 class FragmentStatsFilterSet(BaseAPIFilterSet):
     class Meta:
         model = FragmentStats
-        fields = ["country", "fragment__species", "date"]
+        fields = ["country", "fragment__species", "fragment__date"]
 
 
 class FragmentStatsViewSet(StatsViewSet):
     serializer_class = FragmentStatsSerializer
     filter_class = FragmentStatsFilterSet
-    ordering_fields = ["country", "fragment__species", "date"]
-    required_filters = ["country", "fragment__species", "date"]
+    ordering_fields = ["country", "fragment__species", "fragment__date"]
+    required_filters = ["country", "fragment__species", "fragment__date"]
 
     def get_queryset(self):
         for f in self.required_filters:
@@ -40,7 +40,7 @@ class FragmentStatsViewSet(StatsViewSet):
         filters = {
             "country": self.request.query_params["country"],
             "fragment__species": self.request.query_params["fragment__species"],
-            "date": self.request.query_params["date"],
+            "fragment__date": self.request.query_params["fragment__date"],
         }
 
         return FragmentStats.objects.filter(**filters).select_related()

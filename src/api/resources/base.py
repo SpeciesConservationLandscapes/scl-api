@@ -37,7 +37,6 @@ class LandscapeSerializer(BaseExcludedFieldsMixin, serializers.ModelSerializer):
 class StatsSerializer(BaseExcludedFieldsMixin, GeoFeatureModelSerializer):
     country = CountryField(country_dict=True)
     geom = GeometryField(precision=4, remove_duplicates=True)
-    areas = serializers.JSONField()
 
     class Meta:
         geo_field = "geom"
