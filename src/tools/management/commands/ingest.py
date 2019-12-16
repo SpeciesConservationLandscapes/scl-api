@@ -162,6 +162,6 @@ class Command(BaseCommand):
                             obj.delete()
 
         except Exception as err:
-            # transaction.savepoint_rollback(sid)
+            transaction.savepoint_rollback(sid)
             self.stderr.write(str(err))
             sys.exit(1)
