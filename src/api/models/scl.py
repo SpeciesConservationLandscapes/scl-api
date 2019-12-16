@@ -55,6 +55,7 @@ class Species(BaseModel):
 class Landscape(BaseModel):
     ee_name = None
     species = models.ForeignKey(Species, on_delete=models.CASCADE)
+    date = models.DateField(default=timezone.now)
 
     @property
     def ee_path(self):
@@ -77,7 +78,7 @@ class Landscape(BaseModel):
         name = ""
         if hasattr(self, "name"):
             name = " {}".format(self.name)
-        return _("%s%s %s [%s]") % (self.ee_name, name, self.species, self.pk)
+        return _("%s%s %s [%s]") % (self.ee_name, name, self.species, self.date)
 
 
 class SCL(Landscape):
@@ -121,35 +122,33 @@ class SurveyLandscape(Landscape):
 class SCLStats(BaseModel):
     scl = models.ForeignKey(SCL, on_delete=models.CASCADE)
     country = CountryField()
-    date = models.DateField(default=timezone.now)
     geom = models.MultiPolygonField(geography=True, null=True, blank=True)
     area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
     biome_areas = JSONField(null=True, blank=True)
 
     class Meta:
-        ordering = ("date", "country", "scl")
+        ordering = ("country", "scl__date")
         verbose_name = _("SCL statistics")
         verbose_name_plural = _("SCL statistics")
 
     def __str__(self):
-        return _("%s %s %s") % (self.scl, self.country, self.date)
+        return _("%s %s") % (self.scl, self.country)
 
 
 class FragmentStats(BaseModel):
     fragment = models.ForeignKey(FragmentLandscape, on_delete=models.CASCADE)
     country = CountryField()
-    date = models.DateField(default=timezone.now)
     geom = models.MultiPolygonField(geography=True, null=True, blank=True)
     area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
     biome_areas = JSONField(null=True, blank=True)
 
     class Meta:
-        ordering = ("date", "country", "fragment")
+        ordering = ("country", "fragment__date")
         verbose_name = _("fragment statistics")
         verbose_name_plural = _("fragment statistics")
 
     def __str__(self):
-        return _("%s %s %s") % (self.fragment, self.country, self.date)
+        return _("%s %s") % (self.fragment, self.country)
 
 
 class RestorationStats(BaseModel):
@@ -157,32 +156,30 @@ class RestorationStats(BaseModel):
         RestorationLandscape, on_delete=models.CASCADE
     )
     country = CountryField()
-    date = models.DateField(default=timezone.now)
     geom = models.MultiPolygonField(geography=True, null=True, blank=True)
     area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
     biome_areas = JSONField(null=True, blank=True)
 
     class Meta:
-        ordering = ("date", "country", "restoration_landscape")
+        ordering = ("country", "restoration_landscape__date")
         verbose_name = _("restoration landscape statistics")
         verbose_name_plural = _("restoration landscape statistics")
 
     def __str__(self):
-        return _("%s %s %s") % (self.restoration_landscape, self.country, self.date)
+        return _("%s %s") % (self.restoration_landscape, self.country)
 
 
 class SurveyStats(BaseModel):
     survey_landscape = models.ForeignKey(SurveyLandscape, on_delete=models.CASCADE)
     country = CountryField()
-    date = models.DateField(default=timezone.now)
     geom = models.MultiPolygonField(geography=True, null=True, blank=True)
     area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
     biome_areas = JSONField(null=True, blank=True)
 
     class Meta:
-        ordering = ("date", "country", "survey_landscape")
+        ordering = ("country", "survey_landscape__date")
         verbose_name = _("survey landscape statistics")
         verbose_name_plural = _("survey landscape statistics")
 
     def __str__(self):
-        return _("%s %s %s") % (self.survey_landscape, self.country, self.date)
+        return _("%s %s") % (self.survey_landscape, self.country)

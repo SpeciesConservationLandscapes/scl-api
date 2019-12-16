@@ -16,7 +16,6 @@ class RestorationStatsSerializer(StatsSerializer):
         fields = [
             "id",
             "country",
-            "date",
             "restoration_landscape",
             "geom",
             "area",
@@ -27,14 +26,26 @@ class RestorationStatsSerializer(StatsSerializer):
 class RestorationStatsFilterSet(BaseAPIFilterSet):
     class Meta:
         model = RestorationStats
-        fields = ["country", "restoration_landscape__species", "date"]
+        fields = [
+            "country",
+            "restoration_landscape__species",
+            "restoration_landscape__date",
+        ]
 
 
 class RestorationStatsViewSet(StatsViewSet):
     serializer_class = RestorationStatsSerializer
     filter_class = RestorationStatsFilterSet
-    ordering_fields = ["country", "restoration_landscape__species", "date"]
-    required_filters = ["country", "restoration_landscape__species", "date"]
+    ordering_fields = [
+        "country",
+        "restoration_landscape__species",
+        "restoration_landscape__date",
+    ]
+    required_filters = [
+        "country",
+        "restoration_landscape__species",
+        "restoration_landscape__date",
+    ]
 
     def get_queryset(self):
         for f in self.required_filters:
@@ -50,7 +61,9 @@ class RestorationStatsViewSet(StatsViewSet):
             "restoration_landscape__species": self.request.query_params[
                 "restoration_landscape__species"
             ],
-            "date": self.request.query_params["date"],
+            "restoration_landscape__date": self.request.query_params[
+                "restoration_landscape__date"
+            ],
         }
 
         return RestorationStats.objects.filter(**filters).select_related()

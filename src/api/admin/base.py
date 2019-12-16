@@ -84,6 +84,23 @@ class BaseAdmin(OSMGeoAdmin):
     actions = (export_model_display_as_csv, export_model_all_as_csv)
 
 
+class StatsAdmin(BaseAdmin):
+    landscape_key = None
+    list_filter = ("country",)
+
+    def get_list_display(self, request):
+        if self.landscape_key:
+            return self.landscape_key, "country", "related__date", "area"
+        return self.list_display
+
+    def related__date(self, obj):
+        landscape = getattr(obj, self.landscape_key)
+        return landscape.date
+
+    related__date.short_description = "date"
+    related__date.admin_order_field = "{}__date".format(landscape_key)
+
+
 @admin.register(AuthUser)
 class AuthUserAdmin(BaseAdmin):
     search_fields = [

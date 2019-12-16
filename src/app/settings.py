@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('GAE_INSTANCE') is None
+DEBUG = os.getenv("GAE_INSTANCE") is None
 
 if "ALLOWED_HOSTS" in os.environ:
     ALLOWED_HOSTS = [host.strip() for host in os.environ["ALLOWED_HOSTS"].split(",")]
@@ -93,10 +93,12 @@ DATABASES = {
     }
 }
 
-if os.getenv('GAE_INSTANCE'):
-    DATABASES['default']['HOST'] = '/cloudsql/' + os.environ.get("GCP_CLOUD_SQL_CONNECTION_STRING")
+if os.getenv("GAE_INSTANCE"):
+    DATABASES["default"]["HOST"] = "/cloudsql/" + os.environ.get(
+        "GCP_CLOUD_SQL_CONNECTION_STRING"
+    )
 else:
-    DATABASES['default']['HOST'] = os.environ.get("DB_HOST") or "api_db"
+    DATABASES["default"]["HOST"] = os.environ.get("DB_HOST") or "api_db"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -113,7 +115,7 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-if os.getenv('GAE_INSTANCE'):
+if os.getenv("GAE_INSTANCE"):
     STATIC_URL = os.environ.get("GCP_DJANGO_STATIC_URL")
 else:
     STATIC_URL = "/static/"
