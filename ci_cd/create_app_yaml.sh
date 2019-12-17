@@ -6,6 +6,10 @@ _APP_YAML_TEMPLATE="### Build ${_CIRCLE_SHA1}
 runtime: custom
 env: flex
 
+resources:
+  cpu: 2
+  memory_gb: 6
+
 skip_files:
 - ^docker-compose.yml$
 - ^fabfile.py$
