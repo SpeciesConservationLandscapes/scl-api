@@ -20,20 +20,20 @@ class SCLStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = SCLStats
-        fields = ["id", "country", "date", "scl", "geom", "area", "biome_areas"]
+        fields = ["id", "country", "scl", "geom", "area", "biome_areas"]
 
 
 class SCLStatsFilterSet(BaseAPIFilterSet):
     class Meta:
         model = SCLStats
-        fields = ["country", "scl__species", "date", "scl__name"]
+        fields = ["country", "scl__species", "scl__date", "scl__name"]
 
 
 class SCLStatsViewSet(StatsViewSet):
     serializer_class = SCLStatsSerializer
     filter_class = SCLStatsFilterSet
-    ordering_fields = ["country", "scl__species", "date", "scl__name"]
-    required_filters = ["country", "scl__species", "date"]
+    ordering_fields = ["country", "scl__species", "scl__date", "scl__name"]
+    required_filters = ["country", "scl__species", "scl__date"]
 
     def get_queryset(self):
         for f in self.required_filters:
@@ -47,7 +47,7 @@ class SCLStatsViewSet(StatsViewSet):
         filters = {
             "country": self.request.query_params["country"],
             "scl__species": self.request.query_params["scl__species"],
-            "date": self.request.query_params["date"],
+            "scl__date": self.request.query_params["scl__date"],
         }
 
         return SCLStats.objects.filter(**filters).select_related()

@@ -13,28 +13,24 @@ class SurveyStatsSerializer(StatsSerializer):
 
     class Meta(StatsSerializer.Meta):
         model = SurveyStats
-        fields = [
-            "id",
-            "country",
-            "date",
-            "survey_landscape",
-            "geom",
-            "area",
-            "biome_areas",
-        ]
+        fields = ["id", "country", "survey_landscape", "geom", "area", "biome_areas"]
 
 
 class SurveyStatsFilterSet(BaseAPIFilterSet):
     class Meta:
         model = SurveyStats
-        fields = ["country", "survey_landscape__species", "date"]
+        fields = ["country", "survey_landscape__species", "survey_landscape__date"]
 
 
 class SurveyStatsViewSet(StatsViewSet):
     serializer_class = SurveyStatsSerializer
     filter_class = SurveyStatsFilterSet
-    ordering_fields = ["country", "survey_landscape__species", "date"]
-    required_filters = ["country", "survey_landscape__species", "date"]
+    ordering_fields = ["country", "survey_landscape__species", "survey_landscape__date"]
+    required_filters = [
+        "country",
+        "survey_landscape__species",
+        "survey_landscape__date",
+    ]
 
     def get_queryset(self):
         for f in self.required_filters:
@@ -50,7 +46,9 @@ class SurveyStatsViewSet(StatsViewSet):
             "survey_landscape__species": self.request.query_params[
                 "survey_landscape__species"
             ],
-            "date": self.request.query_params["date"],
+            "survey_landscape__date": self.request.query_params[
+                "survey_landscape__date"
+            ],
         }
 
         return SurveyStats.objects.filter(**filters).select_related()
