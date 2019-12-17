@@ -63,10 +63,19 @@ class UserCountryPermission(BasePermission):
     def has_permission(self, request, view):
         user = request.user
         query = request.query_params
-        if not user.is_authenticated or "country" not in query:
+        if not user or not user.is_authenticated or "country" not in query:
             return False
 
-        return query["country"] in user.profile.countries
+        return bool(query["country"] in user.profile.countries)
+
+
+class UserAtLeastOneCountryPermission(BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        if not user or not user.is_authenticated:
+            return False
+
+        return bool(len(user.profile.countries) > 0)
 
 
 class BaseAPIViewSet(viewsets.ModelViewSet):
