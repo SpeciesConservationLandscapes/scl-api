@@ -5,8 +5,8 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.renderers import BaseRenderer
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
 from rest_framework.exceptions import NotFound, APIException
+from .base import UserAtLeastOneCountryPermission
 
 
 service_account_name = json.loads(settings.GCP_SERVICE_ACCOUNT_KEY)["client_email"]
@@ -82,6 +82,7 @@ class PngRenderer(BaseRenderer):
 
 class TileView(APIView):
     renderer_classes = (PngRenderer,)
+    permission_classes = [UserAtLeastOneCountryPermission]
     layer = None
 
     def __init__(self, layer=None):
