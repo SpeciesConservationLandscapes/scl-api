@@ -25,29 +25,29 @@ mapids = {
     ).getMapId(
         {
             "palette": [
-                "a6cee3",
-                "1f78b4",
-                "b2df8a",
-                "33a02c",
-                "fb9a99",
-                "e31a1c",
-                "fdbf6f",
-                "ff7f00",
-                "cab2d6",
-                "6a3d9a",
-                "ffff99",
-                "b15928",
-                "8dd3c7",
-                "b3de69",
+                "#38A700",
+                "#CCCD65",
+                "#88CE66",
+                "#00734C",
+                "#458970",
+                "#7AB6F5",
+                "#FEAA01",
+                "#FEFF73",
+                "#BEE7FF",
+                "#D6C39D",
+                "#9ED7C2",
+                "#FE0000",
+                "#CC6767",
+                "#FE01C4",
             ],
             "max": 14,
         }
     ),
     "pas": empty.paint(
         featureCollection=ee.FeatureCollection("WCMC/WDPA/current/polygons"),
-        color="2ca25f",
-        width=3,
-    ).getMapId(),
+        color=1,
+        # width=1,
+    ).getMapId({"palette": "#14A51C"}),
     "hii": ee.ImageCollection("projects/HII/v1/hii")
     .sort("system:index", False)
     .first()
@@ -64,7 +64,7 @@ mapids = {
                 "projects/SCL/v1/Panthera_tigris/aoi"
             ),
             color="000000",
-            width=4,
+            width=3,
         ).getMapId()
     },
 }
