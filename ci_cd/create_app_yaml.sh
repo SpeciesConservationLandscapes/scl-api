@@ -7,8 +7,8 @@ runtime: custom
 env: flex
 
 resources:
-  cpu: 2
-  memory_gb: 6
+  cpu: 1
+  memory_gb: 2
 
 skip_files:
 - ^docker-compose.yml$
