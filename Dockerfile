@@ -1,6 +1,6 @@
 FROM honeycrisp/docker:django-geo-api
 
-RUN sudo apt-get install -y --no-install-recommends cron
+RUN apt-get install -y --no-install-recommends cron
 
 ADD ./requirements.txt requirements.txt
 RUN pip install --upgrade -r requirements.txt
