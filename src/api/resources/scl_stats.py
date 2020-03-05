@@ -1,4 +1,7 @@
 from rest_framework import serializers
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from .base import BaseAPIFilterSet, LandscapeSerializer, StatsSerializer, StatsViewSet
 from ..models import SCL, SCLStats
 
@@ -51,3 +54,17 @@ class SCLStatsViewSet(StatsViewSet):
         }
 
         return SCLStats.objects.filter(**filters).select_related()
+    
+
+    @action(detail=False, methods=["get"])
+    def available_dates(self, request):
+        if "country" not in self.request.query_params or "scl__species" not in self.request.query_params:
+            return SCLStats.objects.none()
+
+        qs = SCLStats.objects.filter(
+            country=request.query_params["country"],
+            scl__species=request.query_params["scl__species"]
+        )
+        available_dates = qs.order_by("scl__date").values_list("scl__date", flat=True).distinct()
+
+        return Response(available_dates)
