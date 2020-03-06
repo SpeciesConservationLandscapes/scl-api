@@ -65,6 +65,6 @@ class SCLStatsViewSet(StatsViewSet):
             country=request.query_params["country"],
             scl__species=request.query_params["scl__species"]
         )
-        available_dates = qs.order_by("scl__date").values_list("scl__date", flat=True).distinct()
+        _available_dates = qs.order_by("scl__date").values_list("scl__date", flat=True).distinct()
 
-        return Response(available_dates)
+        return Response(_available_dates)
