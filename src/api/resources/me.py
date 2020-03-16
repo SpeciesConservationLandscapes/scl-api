@@ -7,7 +7,6 @@ from rest_framework.viewsets import GenericViewSet
 from .base import BaseAPISerializer
 from ..models import Profile
 
-
 class ProfileSerializer(BaseAPISerializer):
     countries = serializers.SerializerMethodField()
 
@@ -32,4 +31,4 @@ class MeViewSet(mixins.ListModelMixin, GenericViewSet):
         if profile is None:
             raise NotFound()
 
-        return Response(self.serializer_class(profile).data)
+        return Response(self.get_serializer(profile).data)
