@@ -11,9 +11,7 @@ from .resources import tiles
 
 router = routers.DefaultRouter()
 
-me_get = MeViewSet.as_view({
-    "get": "list"
-})
+me_get = MeViewSet.as_view({"get": "list"})
 
 
 router.register(r"species", SpeciesViewSet, "species")

@@ -54,17 +54,21 @@ class SCLStatsViewSet(StatsViewSet):
         }
 
         return SCLStats.objects.filter(**filters).select_related()
-    
 
     @action(detail=False, methods=["get"])
     def available_dates(self, request):
-        if "country" not in self.request.query_params or "scl__species" not in self.request.query_params:
+        if (
+            "country" not in self.request.query_params
+            or "scl__species" not in self.request.query_params
+        ):
             return SCLStats.objects.none()
 
         qs = SCLStats.objects.filter(
             country=request.query_params["country"],
-            scl__species=request.query_params["scl__species"]
+            scl__species=request.query_params["scl__species"],
         )
-        _available_dates = qs.order_by("scl__date").values_list("scl__date", flat=True).distinct()
+        _available_dates = (
+            qs.order_by("scl__date").values_list("scl__date", flat=True).distinct()
+        )
 
         return Response(_available_dates)
