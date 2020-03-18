@@ -72,3 +72,8 @@ class RestorationStatsAdmin(StatsAdmin):
 @admin.register(SurveyStats)
 class SurveyStatsAdmin(StatsAdmin):
     landscape_key = "survey_landscape"
+
+
+@admin.register(ProbabilityCoefficients)
+class ProbabilityCoefficientsAdmin(BaseAdmin):
+    pass

@@ -53,9 +53,22 @@ mapids = {
     .first()
     .getMapId(
         {
-            "min": 0,
-            "max": 100,
-            "palette": ["4df309", "fbff0f", "ffab11", "ed1043", "8e13ff", "000000"],
+            "min": 1,
+            "max": 50,
+            "palette": [
+                "224f1a",
+                "a3ff76",
+                "feff6f",
+                "a09568",
+                "ffa802",
+                "f7797c",
+                "fb0102",
+                "d87136",
+                "a90086",
+                "7a1ca5",
+                "421137",
+                "000000",
+            ],
         }
     ),
     "species": {
