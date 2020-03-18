@@ -183,3 +183,15 @@ class SurveyStats(BaseModel):
 
     def __str__(self):
         return _("%s %s") % (self.survey_landscape, self.country)
+
+
+class ProbabilityCoefficients(BaseModel):
+    species = models.ForeignKey(Species, on_delete=models.CASCADE)
+    date = models.DateField(default=timezone.now)
+    coefficients = JSONField()
+
+    class Meta:
+        ordering = ("species", "date")
+
+    def __str__(self):
+        return _("%s %s") % (self.species, self.date)
