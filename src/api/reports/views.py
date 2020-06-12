@@ -1,8 +1,9 @@
 import os
 from datetime import datetime
 
-from django.http import FileResponse, HttpResponseBadRequest
+from django.http import FileResponse
 from django_countries import countries
+from rest_framework.exceptions import ParseError
 from rest_framework.views import APIView
 
 from . import species_report
@@ -36,13 +37,13 @@ class SpeciesReportView(APIView):
             species_id = None
         
         if not country_code:
-            raise HttpResponseBadRequest("Missing country")
+            raise ParseError("Missing country")
 
         if not date:
-            raise HttpResponseBadRequest("Missing date")
+            raise ParseError("Missing date")
         
         if not species_id:
-            raise HttpResponseBadRequest("Missing species")
+            raise ParseError("Missing species")
 
         return country_code, date, species_id
     
