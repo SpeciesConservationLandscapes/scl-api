@@ -11,3 +11,4 @@ auth0-python==3.9.1
 pytest-xdist==1.30.0
 google-cloud-storage==1.23.0
 earthengine-api
+openpyxl==3.0.3
