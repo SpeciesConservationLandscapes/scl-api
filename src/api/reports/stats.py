@@ -16,7 +16,7 @@ def _calc_summary(queryset, date_field):
                 SELECT sum(protected)
                 FROM
                 (
-                    SELECT COALESCE(((jsonb_array_elements(biome_areas)::jsonb)->'protected'), 0.0)::numeric as protected
+                    SELECT ((jsonb_array_elements(biome_areas)::jsonb)->'protected')::numeric as protected
                 ) AS foo)""",
                     params=[],
                 )

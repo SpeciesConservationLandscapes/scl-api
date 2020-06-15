@@ -116,6 +116,7 @@ class SpeciesReportView(APIView):
         }
 
     def get(self, request):
+        report_path = None
         country_code, date, species_id = self._parse_query_params(request)
         data = self.get_report_data(country_code, date, species_id)
 
@@ -130,7 +131,6 @@ class SpeciesReportView(APIView):
             ] = f'attachment; filename="{report_name}"'
 
             return response
-
         finally:
             if report_path and os.path.exists(report_path):
                 os.remove(report_path)

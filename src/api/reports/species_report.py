@@ -36,8 +36,11 @@ def open_new_template(template):
 
 def rows_from_data(coord, data):
     p0, p1 = coordinate_to_tuple(coord)
+
     if not data:
         return []
+
+    h = len(data)
 
     if is_sequence(data[0]):
         w = len(data[0])
