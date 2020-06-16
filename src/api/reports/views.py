@@ -27,7 +27,7 @@ class SpeciesReportView(APIView):
     def get_file_name(self, ext="xlsx"):
         date = str(datetime.datetime.now().date())
         return f"species-report-{date}.{ext}"
-    
+
     def _parse_query_params(self, request):
         country_code = request.query_params.get("country")
         date = request.query_params.get("date")
@@ -35,13 +35,13 @@ class SpeciesReportView(APIView):
             species_id = int(request.query_params.get("species"))
         except (TypeError, ValueError):
             species_id = None
-        
+
         if not country_code:
             raise ParseError("Missing country")
 
         if not date:
             raise ParseError("Missing date")
-        
+
         if not species_id:
             raise ParseError("Missing species")
 
@@ -52,13 +52,12 @@ class SpeciesReportView(APIView):
             raise ParseError("Invalid date")
 
         return country_code, date, species_id
-    
 
     def chart_table_data(self, landscape_stats):
         dates = []
         for lss in landscape_stats.values():
             dates.extend(lss.keys())
-        
+
         dates = sorted(set(dates))
         table = []
         for date in dates:
@@ -71,14 +70,13 @@ class SpeciesReportView(APIView):
                 row.append(area)
             table.append(row)
         return table
-        
 
     def get_report_data(self, country_code, date, species_id):
         try:
             species = Species.objects.get(id=species_id)
             species_name = species.full_name
         except Species.DoesNotExist:
-            species_name = ""        
+            species_name = ""
         country_name = dict(countries).get(country_code)
 
         landscape_stats = stats.calc_landscape_stats(country_code, date, species_id)
@@ -89,16 +87,20 @@ class SpeciesReportView(APIView):
         total_percent_protected_area = None
         for landscape in self.table_data_order:
             lss = landscape_stats[landscape].get(date)
-            table_data.append([
-                lss.get("num_landscapes") or 0,
-                lss.get("habitat_area") or 0,
-                lss.get("percent_protected_area") or 0,
-            ])
+            table_data.append(
+                [
+                    lss.get("num_landscapes") or 0,
+                    lss.get("habitat_area") or 0,
+                    lss.get("percent_protected_area") or 0,
+                ]
+            )
             total_habitat_area += lss.get("habitat_area") or 0
             total_protected_area += lss.get("protected_area") or 0
 
         if total_habitat_area:
-            total_percent_protected_area = float(total_protected_area) / float(total_habitat_area)
+            total_percent_protected_area = float(total_protected_area) / float(
+                total_habitat_area
+            )
 
         chart_data = self.chart_table_data(landscape_stats)
 
@@ -110,9 +112,7 @@ class SpeciesReportView(APIView):
                 "total_protected": total_percent_protected_area,
                 "table_data": table_data,
             },
-            "landscapes over time": {
-                "chart_data": chart_data
-            }
+            "landscapes over time": {"chart_data": chart_data},
         }
 
     def get(self, request):
@@ -126,9 +126,7 @@ class SpeciesReportView(APIView):
             xl_file = open(report_path, "rb")
             response = FileResponse(xl_file, content_type=self.EXCEL_MIME_TYPE)
             response["Content-Length"] = os.fstat(xl_file.fileno()).st_size
-            response[
-                "Content-Disposition"
-            ] = f'attachment; filename="{report_name}"'
+            response["Content-Disposition"] = f'attachment; filename="{report_name}"'
 
             return response
         finally:

@@ -18,7 +18,7 @@ DATA_CELL_MAP = {
         "total_protected": "D12",
         "table_data": "B8:D11",  # 2D list (shape: 4 x 3)
     },
-    "landscapes over time": {"chart_data": "A2",},
+    "landscapes over time": {"chart_data": "A2"},
 }
 
 
