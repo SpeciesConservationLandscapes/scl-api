@@ -15,6 +15,8 @@ class SCLSerializer(LandscapeSerializer):
 
     @staticmethod
     def get_sclclass(obj):
+        if obj.sclclass is None:
+            return None
         return dict(SCL.CLASS_CHOICES)[obj.sclclass]
 
 

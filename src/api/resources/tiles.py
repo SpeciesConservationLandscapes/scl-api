@@ -10,19 +10,23 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, APIException
 from .base import UserAtLeastOneCountryPermission
 
-
-def init_ee_creds():
-    refresh_time = 72000.0  # 20hrs
-    service_account_name = json.loads(settings.GCP_SERVICE_ACCOUNT_KEY)["client_email"]
-    credentials = ee.ServiceAccountCredentials(
-        service_account_name, key_data=settings.GCP_SERVICE_ACCOUNT_KEY
-    )
-    ee.Initialize(credentials)
-    t = Timer(refresh_time, init_ee_creds)
-    t.start()
-
-
-init_ee_creds()
+service_account_name = json.loads(settings.GCP_SERVICE_ACCOUNT_KEY)["client_email"]
+credentials = ee.ServiceAccountCredentials(
+    service_account_name, key_data=settings.GCP_SERVICE_ACCOUNT_KEY
+)
+ee.Initialize(credentials)
+# def init_ee_creds():
+#     refresh_time = 72000.0  # 20hrs
+#     service_account_name = json.loads(settings.GCP_SERVICE_ACCOUNT_KEY)["client_email"]
+#     credentials = ee.ServiceAccountCredentials(
+#         service_account_name, key_data=settings.GCP_SERVICE_ACCOUNT_KEY
+#     )
+#     ee.Initialize(credentials)
+#     t = Timer(refresh_time, init_ee_creds)
+#     t.start()
+#
+#
+# init_ee_creds()
 
 # https://developers.google.com/earth-engine/feature_collections_visualizing?hl=en
 empty = ee.Image().byte()

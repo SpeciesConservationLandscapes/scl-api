@@ -8,7 +8,7 @@ from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
 from django.conf import settings
 from google.cloud import storage
 from google.oauth2 import service_account
-from ....api.models import *
+from api.models import *
 
 
 def _get_landscape_vars(landscape_key):
@@ -52,7 +52,7 @@ def ingest_landscapes(landscape_key, species, scldate, countries_biomes_pas):
         attribs = {"species": species, "date": scldate}
         if landscape_key == "scl_species":
             attribs["name"] = props.get("lsname", "")
-            attribs["sclclass"] = props.get("lsclass", "")
+            attribs["sclclass"] = props.get("lsclass")
         landscape, _ = landscape_model.objects.get_or_create(**attribs)
 
         geom = GEOSGeometry(json.dumps(countries_biomes_pa["geometry"]))

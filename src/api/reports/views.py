@@ -87,15 +87,18 @@ class SpeciesReportView(APIView):
         total_percent_protected_area = None
         for landscape in self.table_data_order:
             lss = landscape_stats[landscape].get(date)
-            table_data.append(
-                [
-                    lss.get("num_landscapes") or 0,
-                    lss.get("habitat_area") or 0,
-                    lss.get("percent_protected_area") or 0,
-                ]
-            )
-            total_habitat_area += lss.get("habitat_area") or 0
-            total_protected_area += lss.get("protected_area") or 0
+            num_landscapes = 0
+            habitat_area = 0
+            percent_protected_area = 0
+            protected_area = 0
+            if lss is not None:
+                num_landscapes = lss.get("num_landscapes") or 0
+                habitat_area = lss.get("habitat_area") or 0
+                percent_protected_area = lss.get("percent_protected_area") or 0
+                protected_area = lss.get("protected_area") or 0
+            table_data.append([num_landscapes, habitat_area, percent_protected_area])
+            total_habitat_area += habitat_area
+            total_protected_area += protected_area
 
         if total_habitat_area:
             total_percent_protected_area = float(total_protected_area) / float(
