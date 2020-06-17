@@ -1,3 +1,4 @@
+import math
 import shutil
 import tempfile
 import uuid
@@ -28,6 +29,7 @@ DATA_CELL_MAP = {
 
 def create_chart():
     pass
+
 
 def is_sequence(val):
     return isinstance(val, Sequence) and not isinstance(val, str)
@@ -72,29 +74,54 @@ def insert_range(sheet, range_str, data):
 
 
 def update_chart_data(workbook, data):
-
     chart_data = data["landscapes over time"]["chart_data"]
+    row_length = len(chart_data) + 1
 
-    data_scl = Reference(workbook["landscapes over time"], min_col=2, max_col=2, min_row=1, max_row=len(chart_data))
-    data_totals = Reference(workbook["landscapes over time"], min_col=6, max_col=6, min_row=1, max_row=len(chart_data))
+    data_scl = Reference(
+        workbook["landscapes over time"],
+        min_col=2,
+        max_col=2,
+        min_row=1,
+        max_row=row_length,
+    )
+    data_totals = Reference(
+        workbook["landscapes over time"],
+        min_col=6,
+        max_col=6,
+        min_row=1,
+        max_row=row_length,
+    )
     chart = workbook["country summary"]._charts[0]
     chart.series.clear()
 
     chart.add_data(data_scl, titles_from_data=True)
     chart.add_data(data_totals, titles_from_data=True)
 
-    dates = Reference(workbook["landscapes over time"], min_col=1, min_row=2, max_row=len(chart_data))
+    dates = Reference(
+        workbook["landscapes over time"], min_col=1, min_row=2, max_row=row_length
+    )
     chart.set_categories(dates)
-    # chart.title = "Hello"
-    # chart.title.text = Text(StrRef(workbook["country summary"]["F3"]))
-    # print(chart.series)
-    
+
+    minval = 0
+    maxval = 0
+    rowmin = None
+    for row in chart_data:
+        if not rowmin or (rowmin and row[1] < rowmin):
+            rowmin = row[1]
+        if row[5] > maxval:
+            maxval = row[5]
+    if rowmin:
+        minval = rowmin
+    ymin = minval - (maxval - minval)
+    if ymin < 0:
+        ymin = 0
+    chart.y_axis.scaling.min = int(math.ceil(int(ymin) / 100.0)) * 100
+
 
 def generate(data):
     report_path = open_new_template(TEMPLATE_PATH)
     workbook = load_workbook(filename=report_path)
     sheet = workbook.active
-
 
     for sheet_name, sheet_data in data.items():
         sheet = workbook[sheet_name]
