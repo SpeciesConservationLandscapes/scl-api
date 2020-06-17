@@ -157,6 +157,7 @@ class Command(BaseCommand):
                     if (
                         len(successes) == len(datafiles)
                         and settings.ENVIRONMENT == "prod"
+                        and not dry_run
                     ):
                         for obj in blobs:
                             obj.delete()
