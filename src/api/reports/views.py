@@ -68,6 +68,7 @@ class SpeciesReportView(APIView):
                 area = lss.get("habitat_area") or 0
                 total_area += area
                 row.append(area)
+            row.append(total_area)
             table.append(row)
         return table
 
