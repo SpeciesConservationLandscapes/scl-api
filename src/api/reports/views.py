@@ -19,9 +19,9 @@ class SpeciesReportView(APIView):
     )
     table_data_order = [
         "conservation_landscape_stats",
-        "fragment_landscape_stats",
         "restoration_landscape_stats",
         "survey_landscape_stats",
+        "fragment_landscape_stats",
     ]
 
     def get_file_name(self, ext="xlsx"):
