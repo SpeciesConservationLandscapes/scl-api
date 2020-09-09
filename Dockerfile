@@ -1,10 +1,11 @@
 FROM python:3.7-slim-buster
 LABEL maintainer="<sysadmin@datamermaid.org>"
 
-ENV DEBIAN_FRONTEND noninteractive
-ENV LANG C.UTF-8
-ENV LANGUAGE C.UTF-8
-ENV LC_ALL C.UTF-8
+RUN apt-get install -y --no-install-recommends cron
+
+ADD ./requirements.txt requirements.txt
+RUN pip install --upgrade -r requirements.txt
+RUN rm requirements.txt
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
@@ -56,5 +57,8 @@ ADD ./config/supervisor_conf.d/webapp.conf /etc/supervisor/conf.d/
 WORKDIR /var/projects/webapp
 ADD ./src .
 
+COPY ./deploy/webapp.nginxconf /etc/nginx/sites-enabled/webapp.nginxconf
+
 EXPOSE 8181 80 443
 CMD ["supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
+RUN (crontab -l ; echo "5 1,13 * * * /usr/bin/supervisorctl restart webapp") | crontab -

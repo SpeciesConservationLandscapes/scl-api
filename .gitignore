@@ -104,3 +104,12 @@ venv.bak/
 .mypy_cache/
 
 src/data/
+
+src/data/
+src/static/
+.DS_Store
+.idea
+
+cloud_sql_proxy
+app.yaml
+.vscode
