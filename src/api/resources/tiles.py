@@ -69,7 +69,7 @@ mapids = {
     ).getMapId({"palette": "#14A51C"}),
     "aoi": {
         "Panthera_tigris": empty.paint(
-            featureCollection=ee.FeatureCollection(f"{ROOTDIR}/Panthera_tigris/aoi"),
+            featureCollection=ee.FeatureCollection(f"{ROOTDIR}/Panthera_tigris/historical_range_200914"),
             color="000000",
             width=3,
         ).getMapId()
