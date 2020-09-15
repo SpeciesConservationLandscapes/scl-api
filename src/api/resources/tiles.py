@@ -89,7 +89,7 @@ def get_assets(eedir):
     return assets
 
 
-hii_images = get_assets("projects/HII/v1/sumatra_poc/hii")
+hii_images = get_assets("projects/HII/v1/hii")
 for hii in hii_images:
     try:
         date = ee.Date(hii[ASSET_TIMESTAMP_PROPERTY])
