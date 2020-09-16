@@ -91,6 +91,8 @@ def get_assets(eedir):
 
 hii_images = get_assets("projects/HII/v1/hii")
 for hii in hii_images:
+    if ASSET_TIMESTAMP_PROPERTY not in hii:
+        continue
     try:
         date = ee.Date(hii[ASSET_TIMESTAMP_PROPERTY])
     except ee.ee_exception.EEException:
@@ -121,6 +123,8 @@ mapids["hii"] = dict(sorted(mapids["hii"].items(), reverse=True))
 
 hab_tiger = get_assets(f"{ROOTDIR}/Panthera_tigris/structural_habitat")
 for hab in hab_tiger:
+    if ASSET_TIMESTAMP_PROPERTY not in hab:
+        continue
     try:
         date = ee.Date(hab[ASSET_TIMESTAMP_PROPERTY])
     except ee.ee_exception.EEException:
