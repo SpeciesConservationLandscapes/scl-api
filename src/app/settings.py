@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "django_filters",
     "django_extensions",
     "api.apps.ApiConfig",
+    "observations.apps.ApiConfig",
     "corsheaders",
     "django_countries",
     "tools",
@@ -138,3 +139,5 @@ ADMIN_API_CLIENT_ID = os.environ.get("ADMIN_API_CLIENT_ID")
 ADMIN_API_CLIENT_SECRET = os.environ.get("ADMIN_API_CLIENT_SECRET")
 ADMIN_API_AUDIENCE = os.environ.get("ADMIN_API_AUDIENCE")
 AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
+
+ZOTERO_GROUP = os.environ.get('ZOTERO_GROUP')

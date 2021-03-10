@@ -1,0 +1,78 @@
+[
+{
+    "model": "observations.profile",
+    "pk": 1,
+    "fields": {
+        "user": 1
+    }
+},
+{
+    "model": "observations.datetype",
+    "pk": 1,
+    "fields": {
+        "created_on": "2021-03-10T19:30:40.477Z",
+        "created_by": 1,
+        "updated_on": "2021-03-10T21:57:22.201Z",
+        "updated_by": 1,
+        "sequence": 1,
+        "name": "exact date",
+        "description": "described to day, month and year",
+        "examples": "March 10, 2021"
+    }
+},
+{
+    "model": "observations.localitytype",
+    "pk": 1,
+    "fields": {
+        "created_on": "2021-03-10T19:41:34.632Z",
+        "created_by": 1,
+        "updated_on": "2021-03-10T21:57:31.912Z",
+        "updated_by": 1,
+        "sequence": 1,
+        "name": "defined point",
+        "description": "Geographic coordinates describing location provided to within 1 km of the location of the observation",
+        "examples": "23deg 19min 00sec N, 105deg 59min 58sec W"
+    }
+},
+{
+    "model": "observations.observationtypegroup",
+    "pk": 1,
+    "fields": {
+        "created_on": "2021-03-10T19:57:57.828Z",
+        "created_by": 1,
+        "updated_on": "2021-03-10T21:57:39.991Z",
+        "updated_by": 1,
+        "name": "historical account"
+    }
+},
+{
+    "model": "observations.observationtype",
+    "pk": 1,
+    "fields": {
+        "created_on": "2021-03-10T19:59:47.201Z",
+        "created_by": 1,
+        "updated_on": "2021-03-10T21:57:48.394Z",
+        "updated_by": 1,
+        "sequence": 1,
+        "name": "hunting event",
+        "description": "species is killed during a hunt",
+        "examples": "",
+        "observation_type_group": 1
+    }
+},
+{
+    "model": "observations.reference",
+    "pk": 1,
+    "fields": {
+        "created_on": "2021-03-10T20:40:15.778Z",
+        "created_by": 1,
+        "updated_on": "2021-03-10T21:57:06.006Z",
+        "updated_by": 1,
+        "name": "Sanderson, Eric. 2019. A full and authentic reckoning of species\u2019 ranges for conservation: response to Ak\u00e7akaya et al. 2018",
+        "name_short": "Sanderson 2019",
+        "year": 2019,
+        "zotero": "HUQEEIA7",
+        "description": ""
+    }
+}
+]
