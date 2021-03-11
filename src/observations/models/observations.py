@@ -44,7 +44,7 @@ class Observation(BaseModel):
     notes = models.TextField(blank=True)
 
     def __str__(self):
-        return self.pk
+        return str(self.pk)
 
 
 class Record(CanonicalModel):
@@ -60,16 +60,18 @@ class Record(CanonicalModel):
     date_type = models.ForeignKey(DateType, on_delete=models.PROTECT)
     date_text = models.TextField(blank=True)
     locality_type = models.ForeignKey(LocalityType, on_delete=models.PROTECT)
-    sex = models.CharField(max_length=50, choices=SEX_CHOICES)
-    age = models.CharField(max_length=50, choices=AGE_CHOICES)
+    sex = models.CharField(max_length=50, choices=SEX_CHOICES, default=UNKNOWN)
+    age = models.CharField(max_length=50, choices=AGE_CHOICES, default=UNKNOWN)
     observation_type = models.ForeignKey(ObservationType, on_delete=models.PROTECT)
     observation_text = models.TextField(blank=True)
     notes = models.TextField(blank=True)
     point = models.PointField(geography=True, blank=True, null=True)
 
     class Meta:
-        ordering = ["observation__pk"]
+        ordering = ["observation__pk", "-canonical", "year", "reference__name_short"]
 
     def __str__(self):
-        year = f" {str(self.year)}" or ""
+        year = ""
+        if self.year:
+            year = f" {str(self.year)}"
         return f"[{self.observation}]{year} {self.reference.name_short}"

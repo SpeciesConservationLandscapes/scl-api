@@ -46,7 +46,7 @@ def ensure_canonical(instance, parent, siblings, *args):
                         "canonical": mark_safe(
                             f"You may not delete or deselect {instance} as canonical until you "
                             f"mark another {instance._meta.model_name} for <a href={link}>{parent._meta.model_name} "
-                            f"{parent}</a> names as canonical."
+                            f"{parent}</a> as canonical."
                         )
                     }
                 )
