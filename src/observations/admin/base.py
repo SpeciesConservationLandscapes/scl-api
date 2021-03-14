@@ -7,11 +7,18 @@ from django.utils.html import format_html
 from api.admin import BaseAdmin
 
 
-def zotero_link(obj):
+def zotero_link(obj, show_code=True):
+    display_text = obj
+    if hasattr(obj, "reference"):
+        display_text = obj.reference
+    if show_code:
+        display_text = obj.zotero
     return format_html(
         f'<a href="https://www.zotero.org/groups/{settings.ZOTERO_GROUP}/items/itemKey/{obj.zotero}" target="_blank">'
-        f"{obj.zotero}</a>"
+        f"{display_text}</a>"
     )
+
+
 zotero_link.admin_order_field = "zotero"
 
 

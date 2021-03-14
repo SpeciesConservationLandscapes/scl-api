@@ -18,11 +18,7 @@ class LocalityTypeAdmin(TypeAdmin):
 
 @admin.register(ObservationTypeGroup)
 class ObservationTypeGroupAdmin(BaseObservationAdmin):
-    fields = [
-        "name",
-        ("created_by", "created_on"),
-        ("updated_by", "updated_on"),
-    ]
+    fields = ["name", ("created_by", "created_on"), ("updated_by", "updated_on")]
 
 
 @admin.register(ObservationType)
@@ -48,7 +44,7 @@ class ObservationTypeAdmin(TypeAdmin):
 @admin.register(Reference)
 class ReferenceAdmin(BaseObservationAdmin):
     list_display = ["name_short", "year", zotero_link, "updated_on"]
-    list_filter = ["created_by", "updated_by", "year"]
+    list_filter = ["year", "created_by", "updated_by"]
     search_fields = ["name", "name_short", "year", "zotero"]
     fields = [
         "name",
@@ -63,18 +59,6 @@ class ReferenceAdmin(BaseObservationAdmin):
 
 class RecordInlineFormset(CanonicalInlineFormset):
     atleast_one = True
-
-    # def __init__(self, data=None, files=None, instance=None,
-    #              save_as_new=False, prefix=None, queryset=None, **kwargs):
-    #     self.atleast_one = True
-    #     super().__init__(data=None, files=None, instance=None,
-    #                      save_as_new=False, prefix=None, queryset=None, **kwargs)
-    #     print(f"RecordInlineFormset init atleast_one: {self.atleast_one}")
-
-    # def clean(self):
-    #     self.atleast_one = True
-    #     print(f"RecordInlineFormset clean atleast_one: {self.atleast_one}")
-    #     super().clean()
 
 
 class RecordInline(admin.StackedInline, BaseObservationAdmin):
@@ -118,13 +102,53 @@ class RecordInline(admin.StackedInline, BaseObservationAdmin):
 
 @admin.register(Observation)
 class ObservationAdmin(BaseObservationAdmin):
-    # list_display = []
-    # list_filter = []
-    # search_fields = ()
+    # TODO: change export_model_all_as_csv or otherwise export canonical record fields
+    list_display = [
+        "id",
+        "year",
+        "reference_link",
+        "date_type",
+        "locality_type",
+        "observation_type",
+        "updated_on",
+    ]
+    # TODO: add "year", "date_type", "locality_type", "observation_type" via custom filters
+    list_filter = ["created_by", "updated_by"]
+    search_fields = ("id", "year", "reference")
     fields = [
         "species",
         "notes",
         ("created_by", "created_on"),
         ("updated_by", "updated_on"),
     ]
-    inlines = [RecordInline, ]
+    inlines = [RecordInline]
+
+    def year(self, obj):
+        return obj.year
+
+    year.admin_order_field = "year"
+
+    def reference(self, obj):
+        return obj.reference
+
+    reference.admin_order_field = "reference"
+
+    def reference_link(self, obj):
+        return zotero_link(obj, False)
+
+    reference_link.admin_order_field = "reference"
+
+    def date_type(self, obj):
+        return obj.date_type
+
+    date_type.admin_order_field = "date_type"
+
+    def locality_type(self, obj):
+        return obj.locality_type
+
+    locality_type.admin_order_field = "locality_type"
+
+    def observation_type(self, obj):
+        return obj.observation_type
+
+    observation_type.admin_order_field = "observation_type"

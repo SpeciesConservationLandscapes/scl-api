@@ -1,3 +1,4 @@
+from django.db.models import F
 from django.utils.translation import ugettext as _
 from .base import *
 from api.models import Species
@@ -22,7 +23,9 @@ class ObservationTypeGroup(BaseModel):
 
 
 class ObservationType(TypeModel):
-    observation_type_group = models.ForeignKey(ObservationTypeGroup, on_delete=models.CASCADE)
+    observation_type_group = models.ForeignKey(
+        ObservationTypeGroup, on_delete=models.CASCADE
+    )
 
 
 class Reference(BaseModel):
@@ -39,9 +42,43 @@ class Reference(BaseModel):
         return _(f"{self.name_short}")
 
 
+class ObservationManager(models.Manager):
+    def get_queryset(self):
+        record_fields = {}
+        base_fields = [f.name for f in BaseModel._meta.fields] + ["notes"]
+        for field in Record._meta.get_fields(include_parents=False):
+            if (
+                field.concrete
+                and not field.hidden
+                and not field.primary_key
+                and field.name not in base_fields
+            ):
+                lookup = f"record__{field.name}"
+                if field.is_relation:
+                    if issubclass(field.related_model, TypeModel):
+                        lookup = f"record__{field.name}__name"
+                    elif field.name == "reference":
+                        lookup = "record__reference__name_short"
+                record_fields[field.name] = F(lookup)
+        record_fields["zotero"] = F("record__reference__zotero")
+
+        qs = (
+            super()
+            .get_queryset()
+            .prefetch_related("record_set")
+            .filter(record__canonical=True)
+            .annotate(**record_fields)
+        )
+        return qs
+
+
 class Observation(BaseModel):
-    species = models.ForeignKey(Species, default=default_species, on_delete=models.PROTECT)
+    species = models.ForeignKey(
+        Species, default=default_species, on_delete=models.PROTECT
+    )
     notes = models.TextField(blank=True)
+
+    objects = ObservationManager()
 
     def __str__(self):
         return str(self.pk)
@@ -68,7 +105,7 @@ class Record(CanonicalModel):
     point = models.PointField(geography=True, blank=True, null=True)
 
     class Meta:
-        ordering = ["observation__pk", "-canonical", "year", "reference__name_short"]
+        ordering = ["observation_id", "-canonical", "year", "reference__name_short"]
 
     def __str__(self):
         year = ""
