@@ -41,6 +41,7 @@ env_variables:
   SECRET_KEY: \"${SECRET_KEY}\"
   GCP_SERVICE_ACCOUNT_KEY: '${GCP_SERVICE_ACCOUNT_KEY}'
   ALLOWED_HOSTS: \"${ALLOWED_HOSTS}\"
+  ZOTERO_GROUP: \"${ZOTERO_GROUP}\"
 
 beta_settings:
   cloud_sql_instances: \"${GCP_CLOUD_SQL_CONNECTION_STRING}\"

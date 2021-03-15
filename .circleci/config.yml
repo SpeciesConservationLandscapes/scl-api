@@ -49,13 +49,16 @@ jobs:
       - *build
       - run:
           name: Setup
-          command: env > .env && fab buildnocache && fab up  && docker cp ./src/. api_service:/var/projects/webapp && sleep 10 && fab createdatabase && fab migrate
+          command: env > .env && fab buildnocache && fab up  && docker cp ./src/. api_service:/var/projects/webapp
       - run:
           name: Test
           command: fab test
 
   deploy_develop:
     <<: *default
+    filters:
+      branches:
+        only: develop
     steps:
       - checkout
       - setup_remote_docker
