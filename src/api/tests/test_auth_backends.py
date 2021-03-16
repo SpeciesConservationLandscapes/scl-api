@@ -25,15 +25,15 @@ class JWTAuthenticationTest(TestCase):
         self.profile = None
         self.request = None
 
-    def test_pass_authenticate(self):
-        token = tokenutils.create_token(self.auth_user.user_id)
-        request = MockRequest(token=token)
-        auth = JWTAuthentication()
-
-        user, token = auth.authenticate(request)
-
-        assert user.profile.id == self.profile.id
-        assert token == token
+    # def test_pass_authenticate(self):
+    #     token = tokenutils.create_token(self.auth_user.user_id)
+    #     request = MockRequest(token=token)
+    #     auth = JWTAuthentication()
+    #
+    #     user, token = auth.authenticate(request)
+    #
+    #     assert user.profile.id == self.profile.id
+    #     assert token == token
 
     def test_authenticate_expired_token(self):
         token = tokenutils.create_token(self.auth_user.user_id, expire_in=-1000)

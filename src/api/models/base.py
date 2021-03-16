@@ -8,7 +8,7 @@ from django_countries.fields import CountryField
 class BaseModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
-        "Profile",
+        "api.Profile",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -16,7 +16,7 @@ class BaseModel(models.Model):
     )
     updated_on = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(
-        "Profile",
+        "api.Profile",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

@@ -56,6 +56,9 @@ jobs:
 
   deploy_develop:
     <<: *default
+    filters:
+      branches:
+        only: develop
     steps:
       - checkout
       - setup_remote_docker
