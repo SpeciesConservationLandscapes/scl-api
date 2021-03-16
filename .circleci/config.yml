@@ -49,7 +49,7 @@ jobs:
       - *build
       - run:
           name: Setup
-          command: env > .env && fab buildnocache && fab up  && docker cp ./src/. api_service:/var/projects/webapp
+          command: env > .env && fab buildnocache && fab up  && docker cp ./src/. api_service:/var/projects/webapp && sleep 10 && fab createdatabase && fab migrate
       - run:
           name: Test
           command: fab test
