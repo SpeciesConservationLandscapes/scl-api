@@ -73,7 +73,7 @@ class Command(BaseCommand):
             return obj
         except model.DoesNotExist as err:
             self.stderr.write(f"No {model._meta.model_name} with {field} = {value}")
-            raise err
+            sys.exit(1)
 
     def handle(self, *args, **options):
         datafile = options["datafile"][0]
@@ -95,8 +95,11 @@ class Command(BaseCommand):
                     recordcount = 0
                     observations = {}
                     for row in reader:
+                        temp_obs_id = row["Observation Id"]
+                        if temp_obs_id is None or temp_obs_id == "":
+                            temp_obs_id = len(observations.keys()) + 1
                         observation = observations.setdefault(
-                            row["Observation Id"],
+                            temp_obs_id,
                             Observation.objects.create(
                                 species=species, created_by=profile, updated_by=profile
                             ),
@@ -105,7 +108,7 @@ class Command(BaseCommand):
                         updated_by = profile
                         canonical = bool(row["Canonical"])
                         year = None
-                        if int(row["Year"]) > 0:
+                        if int(row["Year"]) != -9999:
                             year = int(row["Year"])
                         reference = self._get_lookup(
                             Reference, "name_short", row["Reference"]
@@ -117,9 +120,19 @@ class Command(BaseCommand):
                         observation_type = self._get_lookup(
                             ObservationType, "name", row["Observation type"]
                         )
-                        date_text = row["Date text"]
-                        locality_text = row["Locality text"]
-                        observation_text = row["Observation text"]
+                        date_text = (
+                            row["Date text"] if row["Date text"] != "-9999" else ""
+                        )
+                        locality_text = (
+                            row["Locality text"]
+                            if row["Locality text"] != "-9999"
+                            else ""
+                        )
+                        observation_text = (
+                            row["Observation text"]
+                            if row["Observation text"] != "-9999"
+                            else ""
+                        )
                         sex = Record.UNKNOWN
                         if row["Sex"] in self.sex_choices.keys():
                             sex = self.sex_choices[row["Sex"]]
@@ -133,7 +146,7 @@ class Command(BaseCommand):
 
                         try:
                             # https://code.djangoproject.com/ticket/27314
-                            Record.objects.create(
+                            params = dict(
                                 observation=observation,
                                 created_by=created_by,
                                 updated_by=updated_by,
@@ -149,20 +162,30 @@ class Command(BaseCommand):
                                 sex=sex,
                                 age=age,
                                 notes=notes,
-                                point=point,
                             )
-                            recordcount += 1
+                            try:
+                                obj = Record.objects.get(**params)
+                            except Record.MultipleObjectsReturned:
+                                pass
+                            except Record.DoesNotExist:
+                                params["point"] = point
+                                Record.objects.create(**params)
+                                recordcount += 1
                         except IntegrityError as e:
                             pass
+
+                    if options["dryrun"] is False:
+                        self.stdout.write(
+                            f"{recordcount} records ({len(observations.keys())} observations) written."
+                        )
 
                 finally:
                     if options["dryrun"] is True:
                         self.stdout.write(
-                            f"dryrun: {recordcount} records would have been written."
+                            f"dryrun: {recordcount} records ({len(observations.keys())} observations) would have been written."
                         )
                         transaction.savepoint_rollback(sid)
                     else:
-                        self.stdout.write(f"{recordcount} records written.")
                         transaction.savepoint_commit(sid)
 
         except Exception as err:
