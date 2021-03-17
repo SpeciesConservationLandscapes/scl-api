@@ -67,7 +67,7 @@ class RecordInline(admin.StackedInline, BaseObservationAdmin):
         ("canonical", "year"),
         "point",
         ("reference", "page_numbers"),
-        "locality_type",
+        ("locality_type", "locality_text"),
         ("date_type", "date_text"),
         ("observation_type", "observation_text"),
         ("sex", "age"),
