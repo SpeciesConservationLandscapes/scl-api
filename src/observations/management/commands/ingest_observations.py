@@ -106,7 +106,9 @@ class Command(BaseCommand):
                         )
                         created_by = profile
                         updated_by = profile
-                        canonical = bool(row["Canonical"])
+                        canonical = False
+                        if int(row["Canonical"]) == 1:
+                            canonical = True
                         year = None
                         if int(row["Year"]) != -9999:
                             year = int(row["Year"])
