@@ -8,6 +8,7 @@ from .resources.restorationls_stats import RestorationStatsViewSet
 from .resources.surveyls_stats import SurveyStatsViewSet
 from .resources.me import MeViewSet
 from .resources import tiles
+from .resources.records import RecordsViewSet
 from .reports.views import SpeciesReportView
 
 router = routers.DefaultRouter()
@@ -39,5 +40,7 @@ tile_urls = [
         tiles.TileView.as_view(layer="aoi"),
     ),
 ]
+
+router.register(r"records", RecordsViewSet, "records")
 
 api_urls = router.urls + tile_urls

@@ -84,6 +84,8 @@ class RecordInline(admin.StackedInline, BaseObservationAdmin):
     pnt = Point(90, 27, srid=4326)
     pnt.transform(3857)
     default_lon, default_lat = pnt.coords
+    display_srid = 4326
+    point_zoom = 5
 
     def __init__(self, parent_model, admin_site):
         self.admin_site = admin_site
@@ -106,10 +108,12 @@ class ObservationAdmin(BaseObservationAdmin):
     list_display = [
         "id",
         "year",
-        "reference_link",
+        "reference",
         "date_type",
         "locality_type",
         "observation_type",
+        "latitude",
+        "longitude",
         "updated_on",
     ]
     # TODO: add "year", "date_type", "locality_type", "observation_type" via custom filters
@@ -128,15 +132,21 @@ class ObservationAdmin(BaseObservationAdmin):
 
     year.admin_order_field = "year"
 
+    def latitude(self, obj):
+        return obj.point.y
+
+    def longitude(self, obj):
+        return obj.point.x
+
     def reference(self, obj):
         return obj.reference
 
     reference.admin_order_field = "reference"
 
-    def reference_link(self, obj):
-        return zotero_link(obj, False)
-
-    reference_link.admin_order_field = "reference"
+    # def reference_link(self, obj):
+    #     return zotero_link(obj, False)
+    #
+    # reference_link.admin_order_field = "reference"
 
     def date_type(self, obj):
         return obj.date_type
