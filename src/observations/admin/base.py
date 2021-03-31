@@ -64,18 +64,15 @@ class CanonicalInlineFormset(BaseInlineFormSet):
                     f"One {modelname} for this {parentname} must be marked canonical."
                 )
 
-    # Not terribly DRY, but this just overrides the order: saves new objects before existing, so that
-    # model save/delete canonical checks work
+    # Forms cleaned so canonical object saving in theory ensured.
+    # But need to save canonical form object first so that model checks work.
     def save(self, commit=True):
-        if not commit:
-            self.saved_forms = []
-
-            def save_m2m():
-                for form in self.saved_forms:
-                    form.save_m2m()
-
-            self.save_m2m = save_m2m
-        return self.save_new_objects(commit) + self.save_existing_objects(commit)
+        for form in self.forms:
+            data = form.cleaned_data
+            if data.get("canonical", False):
+                obj = form.instance
+                self.save_existing(form, obj, commit=commit)
+        return super().save(commit)
 
 
 class BaseObservationAdmin(BaseAdmin):
