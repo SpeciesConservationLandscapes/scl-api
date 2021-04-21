@@ -7,7 +7,7 @@ from django.db import transaction, IntegrityError
 from api.models import Species
 from observations.models import (
     Observation,
-    Profile,
+    ObsProfile,
     Reference,
     Record,
     DateType,
@@ -84,7 +84,7 @@ class Command(BaseCommand):
             )
         genus, name = options["species"].split(" ")
         species = Species.objects.get(genus__name=genus, name=name)
-        profile = Profile.objects.get(pk=options["profile"])
+        profile = ObsProfile.objects.get(pk=options["profile"])
         reader = csv.DictReader(datafile)
 
         try:

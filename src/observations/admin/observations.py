@@ -16,6 +16,11 @@ class LocalityTypeAdmin(TypeAdmin):
     pass
 
 
+@admin.register(ObsProfile)
+class ObsProfileAdmin(BaseAdmin):
+    pass
+
+
 @admin.register(ObservationTypeGroup)
 class ObservationTypeGroupAdmin(BaseObservationAdmin):
     fields = ["name", ("created_by", "created_on"), ("updated_by", "updated_on")]
