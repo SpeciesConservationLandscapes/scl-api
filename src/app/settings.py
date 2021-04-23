@@ -142,3 +142,7 @@ AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
 
 ZOTERO_GROUP = os.environ.get('ZOTERO_GROUP')
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
+
+COUNTRIES_OVERRIDE = {
+    "LE": "Leuser"
+}
