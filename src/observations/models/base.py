@@ -52,23 +52,29 @@ def ensure_canonical(instance, parent, siblings, *args):
                 )
 
 
-class Profile(models.Model):
+class ObsProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name = "observations user profile"
+
     def __str__(self):
-        return self.user.get_full_name()
+        name = self.user.get_full_name()
+        if name is None or name == "":
+            name = self.user
+        return str(name)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
-    profile, created = Profile.objects.get_or_create(user=instance)
+    profile, created = ObsProfile.objects.get_or_create(user=instance)
     profile.save()
 
 
 class BaseModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
-        "observations.Profile",
+        "observations.ObsProfile",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -76,7 +82,7 @@ class BaseModel(models.Model):
     )
     updated_on = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(
-        "observations.Profile",
+        "observations.ObsProfile",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
