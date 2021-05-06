@@ -15,25 +15,25 @@ DATE_FORMAT = "%Y-%m-%d"
 DATE_FORMAT_EE = "yyyy-MM-dd"
 ASSET_TIMESTAMP_PROPERTY = "startTime"
 
-service_account_name = json.loads(settings.GCP_SERVICE_ACCOUNT_KEY)["client_email"]
-credentials = ee.ServiceAccountCredentials(
-    service_account_name, key_data=settings.GCP_SERVICE_ACCOUNT_KEY
-)
-ee.Initialize(credentials)
+# service_account_name = json.loads(settings.GCP_SERVICE_ACCOUNT_KEY)["client_email"]
+# credentials = ee.ServiceAccountCredentials(
+#     service_account_name, key_data=settings.GCP_SERVICE_ACCOUNT_KEY
+# )
+# ee.Initialize(credentials)
 
 
-# def init_ee_creds():
-#     refresh_time = 72000.0  # 20hrs
-#     service_account_name = json.loads(settings.GCP_SERVICE_ACCOUNT_KEY)["client_email"]
-#     credentials = ee.ServiceAccountCredentials(
-#         service_account_name, key_data=settings.GCP_SERVICE_ACCOUNT_KEY
-#     )
-#     ee.Initialize(credentials)
-#     t = Timer(refresh_time, init_ee_creds)
-#     t.start()
-#
-#
-# init_ee_creds()
+def init_ee_creds():
+    refresh_time = 72000.0  # 20hrs
+    service_account_name = json.loads(settings.GCP_SERVICE_ACCOUNT_KEY)["client_email"]
+    credentials = ee.ServiceAccountCredentials(
+        service_account_name, key_data=settings.GCP_SERVICE_ACCOUNT_KEY
+    )
+    ee.Initialize(credentials)
+    t = Timer(refresh_time, init_ee_creds)
+    t.start()
+
+
+init_ee_creds()
 
 # https://developers.google.com/earth-engine/feature_collections_visualizing?hl=en
 empty = ee.Image().byte()
