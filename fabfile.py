@@ -39,6 +39,11 @@ def runserver(c):
 
 
 @task
+def runserverplus(c):
+    local(_api_cmd("gunicorn --reload -c runserverplus.conf app.wsgi:application"))
+
+
+@task
 def dbshell(c):
     local(_api_cmd("python manage.py dbshell"))
 
