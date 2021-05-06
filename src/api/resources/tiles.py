@@ -1,6 +1,7 @@
 import ee
 import json
 import requests
+import sys
 from datetime import datetime
 from django.conf import settings
 from rest_framework.views import APIView
@@ -14,132 +15,133 @@ ROOTDIR = "projects/SCL/v1"
 DATE_FORMAT = "%Y-%m-%d"
 DATE_FORMAT_EE = "yyyy-MM-dd"
 ASSET_TIMESTAMP_PROPERTY = "startTime"
+mapids = {}
 
-# service_account_name = json.loads(settings.GCP_SERVICE_ACCOUNT_KEY)["client_email"]
-# credentials = ee.ServiceAccountCredentials(
-#     service_account_name, key_data=settings.GCP_SERVICE_ACCOUNT_KEY
-# )
-# ee.Initialize(credentials)
+use_ee = True
+if len(sys.argv) >= 2 and sys.argv[0] == "manage.py" and sys.argv[1] != "runserver":
+    use_ee = False
+
+if use_ee:
+    def init_ee_creds():
+        refresh_time = 72000.0  # 20hrs
+        service_account_name = json.loads(settings.GCP_SERVICE_ACCOUNT_KEY)["client_email"]
+        credentials = ee.ServiceAccountCredentials(
+            service_account_name, key_data=settings.GCP_SERVICE_ACCOUNT_KEY
+        )
+        ee.Initialize(credentials)
+        t = Timer(refresh_time, init_ee_creds)
+        t.start()
 
 
-def init_ee_creds():
-    refresh_time = 72000.0  # 20hrs
-    service_account_name = json.loads(settings.GCP_SERVICE_ACCOUNT_KEY)["client_email"]
-    credentials = ee.ServiceAccountCredentials(
-        service_account_name, key_data=settings.GCP_SERVICE_ACCOUNT_KEY
+    init_ee_creds()
+
+    # https://developers.google.com/earth-engine/feature_collections_visualizing?hl=en
+    empty = ee.Image().byte()
+
+    mapids = {
+        "hii": {},
+        "biomes": empty.paint(
+            featureCollection=ee.FeatureCollection("RESOLVE/ECOREGIONS/2017"),
+            color="BIOME_NUM",
+        ).getMapId(
+            {
+                "palette": [
+                    "#38A700",
+                    "#CCCD65",
+                    "#88CE66",
+                    "#00734C",
+                    "#458970",
+                    "#7AB6F5",
+                    "#FEAA01",
+                    "#FEFF73",
+                    "#BEE7FF",
+                    "#D6C39D",
+                    "#9ED7C2",
+                    "#FE0000",
+                    "#CC6767",
+                    "#FE01C4",
+                ],
+                "max": 14,
+            }
+        ),
+        "pas": empty.paint(
+            featureCollection=ee.FeatureCollection("WCMC/WDPA/current/polygons"),
+            color=1,
+            # width=1,
+        ).getMapId({"palette": "#14A51C"}),
+        "aoi": {
+            "Panthera_tigris": empty.paint(
+                featureCollection=ee.FeatureCollection(
+                    f"{ROOTDIR}/Panthera_tigris/historical_range_200914"
+                ),
+                color="000000",
+                width=3,
+            ).getMapId()
+        },
+        "structural_habitat": {"Panthera_tigris": {}},
+    }
+
+
+    def get_assets(eedir):
+        assets = []
+        # possible ee api bug requires prepending
+        assetdir = f"projects/earthengine-legacy/assets/{eedir}"
+        try:
+            assets = ee.data.listAssets({"parent": assetdir})["assets"]
+        except ee.ee_exception.EEException:
+            print(f"Folder {eedir} does not exist or is not a folder/image collection.")
+        return assets
+
+
+    hii_images = get_assets("projects/HII/v1/hii")
+    for hii in hii_images:
+        if ASSET_TIMESTAMP_PROPERTY not in hii:
+            continue
+        try:
+            date = ee.Date(hii[ASSET_TIMESTAMP_PROPERTY])
+        except ee.ee_exception.EEException:
+            continue
+
+        date = date.format(DATE_FORMAT_EE).getInfo()
+        mapids["hii"][date] = ee.Image(hii["id"]).getMapId(
+            {
+                "min": 1,
+                "max": 50,
+                "palette": [
+                    "224f1a",
+                    "a3ff76",
+                    "feff6f",
+                    "a09568",
+                    "ffa802",
+                    "f7797c",
+                    "fb0102",
+                    "d87136",
+                    "a90086",
+                    "7a1ca5",
+                    "421137",
+                    "000000",
+                ],
+            }
+        )
+    mapids["hii"] = dict(sorted(mapids["hii"].items(), reverse=True))
+
+    hab_tiger = get_assets(f"{ROOTDIR}/Panthera_tigris/structural_habitat")
+    for hab in hab_tiger:
+        if ASSET_TIMESTAMP_PROPERTY not in hab:
+            continue
+        try:
+            date = ee.Date(hab[ASSET_TIMESTAMP_PROPERTY])
+        except ee.ee_exception.EEException:
+            continue
+
+        date = date.format(DATE_FORMAT_EE).getInfo()
+        sh = ee.Image(hab["id"])
+        mapids["structural_habitat"]["Panthera_tigris"][date] = sh.updateMask(
+            sh.gte(3)
+        ).getMapId({"min": 3, "max": 30, "palette": ["white", "009900"]})
+    mapids["structural_habitat"]["Panthera_tigris"] = dict(
+        sorted(mapids["structural_habitat"]["Panthera_tigris"].items(), reverse=True)
     )
-    ee.Initialize(credentials)
-    t = Timer(refresh_time, init_ee_creds)
-    t.start()
-
-
-init_ee_creds()
-
-# https://developers.google.com/earth-engine/feature_collections_visualizing?hl=en
-empty = ee.Image().byte()
-
-mapids = {
-    "hii": {},
-    "biomes": empty.paint(
-        featureCollection=ee.FeatureCollection("RESOLVE/ECOREGIONS/2017"),
-        color="BIOME_NUM",
-    ).getMapId(
-        {
-            "palette": [
-                "#38A700",
-                "#CCCD65",
-                "#88CE66",
-                "#00734C",
-                "#458970",
-                "#7AB6F5",
-                "#FEAA01",
-                "#FEFF73",
-                "#BEE7FF",
-                "#D6C39D",
-                "#9ED7C2",
-                "#FE0000",
-                "#CC6767",
-                "#FE01C4",
-            ],
-            "max": 14,
-        }
-    ),
-    "pas": empty.paint(
-        featureCollection=ee.FeatureCollection("WCMC/WDPA/current/polygons"),
-        color=1,
-        # width=1,
-    ).getMapId({"palette": "#14A51C"}),
-    "aoi": {
-        "Panthera_tigris": empty.paint(
-            featureCollection=ee.FeatureCollection(f"{ROOTDIR}/Panthera_tigris/historical_range_200914"),
-            color="000000",
-            width=3,
-        ).getMapId()
-    },
-    "structural_habitat": {"Panthera_tigris": {}},
-}
-
-
-def get_assets(eedir):
-    assets = []
-    # possible ee api bug requires prepending
-    assetdir = f"projects/earthengine-legacy/assets/{eedir}"
-    try:
-        assets = ee.data.listAssets({"parent": assetdir})["assets"]
-    except ee.ee_exception.EEException:
-        print(f"Folder {eedir} does not exist or is not a folder/image collection.")
-    return assets
-
-
-hii_images = get_assets("projects/HII/v1/hii")
-for hii in hii_images:
-    if ASSET_TIMESTAMP_PROPERTY not in hii:
-        continue
-    try:
-        date = ee.Date(hii[ASSET_TIMESTAMP_PROPERTY])
-    except ee.ee_exception.EEException:
-        continue
-
-    date = date.format(DATE_FORMAT_EE).getInfo()
-    mapids["hii"][date] = ee.Image(hii["id"]).getMapId(
-        {
-            "min": 1,
-            "max": 50,
-            "palette": [
-                "224f1a",
-                "a3ff76",
-                "feff6f",
-                "a09568",
-                "ffa802",
-                "f7797c",
-                "fb0102",
-                "d87136",
-                "a90086",
-                "7a1ca5",
-                "421137",
-                "000000",
-            ],
-        }
-    )
-mapids["hii"] = dict(sorted(mapids["hii"].items(), reverse=True))
-
-hab_tiger = get_assets(f"{ROOTDIR}/Panthera_tigris/structural_habitat")
-for hab in hab_tiger:
-    if ASSET_TIMESTAMP_PROPERTY not in hab:
-        continue
-    try:
-        date = ee.Date(hab[ASSET_TIMESTAMP_PROPERTY])
-    except ee.ee_exception.EEException:
-        continue
-
-    date = date.format(DATE_FORMAT_EE).getInfo()
-    sh = ee.Image(hab["id"])
-    mapids["structural_habitat"]["Panthera_tigris"][date] = sh.updateMask(
-        sh.gte(3)
-    ).getMapId({"min": 3, "max": 30, "palette": ["white", "009900"]})
-mapids["structural_habitat"]["Panthera_tigris"] = dict(
-    sorted(mapids["structural_habitat"]["Panthera_tigris"].items(), reverse=True)
-)
 
 
 class PngRenderer(BaseRenderer):
@@ -178,6 +180,8 @@ class TileView(APIView):
         return mapid, mapid_date
 
     def __init__(self, layer=None):
+        if use_ee is False or not mapids:
+            raise APIException("Earth Engine not initialized")
         if not layer or layer not in mapids:
             raise APIException("Missing or incorrect tile layer")
         self.layer = layer
