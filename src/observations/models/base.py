@@ -13,43 +13,37 @@ def default_species():
     return Species.objects.get(genus__name="Panthera", name="tigris").pk
 
 
-def ensure_canonical(instance, parent, siblings, *args):
-    othercan = 0
-    # If there are no other objects for this parent, make sure this one is canonical, and then just return
-    if siblings.count() == 0:
-        instance.canonical = True
-        # ? instance.save()
-    # if operation is add/save and obj is canonical, make all others not
-    elif instance.canonical and "delete" not in args:
-        for other in siblings:
-            other.canonical = False
-            other.save_simple()
-    # if adding/saving as noncanonical OR deleting (canonical or not), make sure something else is canonical
-    elif not instance.canonical or "delete" in args:
-        for other in siblings:
-            if other.canonical:
-                othercan += 1
-        if othercan < 1:
-            # If there's only one other object for this parent, set it as canonical
-            if siblings.count() == 1:
-                siblings[0].canonical = True
-                siblings[0].save_simple()
-            else:
-                # Otherwise, make the user choose another object as canonical
-                link = reverse(
-                    "admin:%s_%s_change"
-                    % (parent._meta.app_label, parent._meta.model_name),
-                    args=(parent.pk,),
-                    )
-                raise ValidationError(
-                    {
-                        "canonical": mark_safe(
-                            f"You may not delete or deselect {instance} as canonical until you "
-                            f"mark another {instance._meta.model_name} for <a href={link}>{parent._meta.model_name} "
-                            f"{parent}</a> as canonical."
-                        )
-                    }
+def make_single_sibling_canonical(siblings, canonical_siblings):
+    if siblings.count() == 1 and canonical_siblings.count() < 1:
+        print("saving single sibling as canonical")
+        single_sibling = siblings[0]
+        single_sibling.canonical = True
+        single_sibling.save_simple()
+
+
+def check_siblings(instance, parent, siblings, canonical_siblings, deleting=False):
+    canonical_flag = False
+    if (instance.canonical and deleting) or (not instance.canonical and not deleting):
+        canonical_flag = True
+    print("check_siblings")
+    print(instance.__dict__)
+    print(siblings)
+    print(canonical_siblings)
+    print(canonical_flag)
+    if canonical_flag and siblings.count() > 1 and canonical_siblings.count() < 1:
+        link = reverse(
+            "admin:%s_%s_change" % (parent._meta.app_label, parent._meta.model_name),
+            args=(parent.pk,),
+        )
+        raise ValidationError(
+            {
+                "canonical": mark_safe(
+                    f"You may not delete or deselect {instance} as canonical until you "
+                    f"mark another {instance._meta.model_name} for <a href={link}>{parent._meta.model_name} "
+                    f"{parent}</a> as canonical."
                 )
+            }
+        )
 
 
 class ObsProfile(models.Model):
@@ -99,7 +93,7 @@ class CanonicalModel(BaseModel):
     @property
     def parent(self):
         raise NotImplementedError(
-            "subclasses of CanonicalModel must provide a parent attribute"
+            "Inheritors of CanonicalModel must provide a parent attribute"
         )
 
     def get_family(self):
@@ -107,22 +101,47 @@ class CanonicalModel(BaseModel):
         kwargs = {f"{parent._meta.model_name}__exact": parent.pk}
         model = type(self)
         siblings = model.objects.filter(**kwargs).exclude(pk=self.pk)
-        return parent, siblings
+        canonical_siblings = siblings.filter(canonical=True)
+        return parent, siblings, canonical_siblings
+
+    def ensure_canonical(self, parent, siblings, canonical_siblings):
+        print("ensure_canonical")
+        print(self.__dict__)
+        print(siblings)
+        print(canonical_siblings)
+        # If there are no other objects for this parent, make sure this one is canonical
+        if siblings.count() == 0:
+            self.canonical = True
+        # if obj is canonical, make any siblings not
+        if self.canonical:
+            for other in siblings:
+                other.canonical = False
+                other.save_simple()
+        # if adding/saving as noncanonical, make sure something else is canonical
+        else:
+            make_single_sibling_canonical(siblings, canonical_siblings)
+            check_siblings(self, parent, siblings, canonical_siblings)
+
+    def clean(self):
+        parent, siblings, canonical_siblings = self.get_family()
+        check_siblings(self, parent, siblings, canonical_siblings)
+        print("passed clean")
 
     def save(self, *args, **kwargs):
-        parent, siblings = self.get_family()
-        ensure_canonical(self, parent, siblings)
+        parent, siblings, canonical_siblings = self.get_family()
+        self.ensure_canonical(parent, siblings, canonical_siblings)
         super().save(*args, **kwargs)
 
     def save_simple(self, *args, **kwargs):
+        print("save_simple")
+        print(self.__dict__)
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        parent, siblings = self.get_family()
-        ensure_canonical(self, parent, siblings, "delete")
+        parent, siblings, canonical_siblings = self.get_family()
+        make_single_sibling_canonical(siblings, canonical_siblings)
+        check_siblings(self, parent, siblings, canonical_siblings, True)
         super().delete(*args, **kwargs)
-        if siblings.count() == 0:
-            parent.delete()
 
     class Meta:
         abstract = True

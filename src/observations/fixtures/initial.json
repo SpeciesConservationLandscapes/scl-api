@@ -1,6 +1,6 @@
 [
 {
-    "model": "observations.profile",
+    "model": "observations.obsprofile",
     "pk": 1,
     "fields": {
         "user": 1

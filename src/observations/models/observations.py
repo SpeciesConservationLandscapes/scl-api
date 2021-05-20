@@ -81,7 +81,13 @@ class Observation(BaseModel):
     objects = ObservationManager()
 
     def __str__(self):
-        return str(self.pk)
+        notes = self.notes
+        if len(notes) > 0:
+            shortened_notes = f" {notes[:20]}"
+            if len(shortened_notes) > 20:
+                shortened_notes = f"{shortened_notes}..."
+            notes = shortened_notes
+        return f"{str(self.pk)}{notes}"
 
 
 class Record(CanonicalModel):

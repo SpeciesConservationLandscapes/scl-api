@@ -64,23 +64,13 @@ class CanonicalInlineFormset(BaseInlineFormSet):
                     f"One {modelname} for this {parentname} must be marked canonical."
                 )
 
-    # Forms cleaned so canonical object saving in theory ensured.
-    # But need to save canonical form object first so that model checks work.
-    def save(self, commit=True):
-        for form in self.forms:
-            data = form.cleaned_data
-            if data.get("canonical", False):
-                obj = form.instance
-                self.save_existing(form, obj, commit=commit)
-        return super().save(commit)
-
 
 class BaseObservationAdmin(BaseAdmin):
     readonly_fields = ["created_by", "created_on", "updated_by", "updated_on"]
     formfield_overrides = {CharField: {"widget": TextInput(attrs={"size": "100%"})}}
 
     def save_model(self, request, obj, form, change):
-        profile = request.user.profile
+        profile = request.user.obsprofile
         if change:
             obj.created_by = profile
         obj.updated_by = profile

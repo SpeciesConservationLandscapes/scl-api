@@ -6,6 +6,77 @@ from .base import *
 from observations.models import *
 
 
+def year(obj):
+    return obj.year
+
+
+def latitude(obj):
+    y = ""
+    if obj.point and hasattr(obj.point, "y"):
+        y = str(obj.point.y)
+    return y
+
+
+def longitude(obj):
+    x = ""
+    if obj.point and hasattr(obj.point, "x"):
+        x = str(obj.point.x)
+    return x
+
+
+def reference(obj):
+    return obj.reference
+
+
+# def reference_link(self, obj):
+#     return zotero_link(obj, False)
+#
+# reference_link.admin_order_field = "reference"
+
+
+def date_type(obj):
+    return obj.date_type
+
+
+def locality_type(obj):
+    return obj.locality_type
+
+
+def observation_type(obj):
+    return obj.observation_type
+
+
+year.admin_order_field = "year"
+reference.admin_order_field = "reference"
+date_type.admin_order_field = "date_type"
+locality_type.admin_order_field = "locality_type"
+observation_type.admin_order_field = "observation_type"
+
+record_fields = [
+    ("canonical", "year"),
+    "point",
+    ("reference", "page_numbers"),
+    ("locality_type", "locality_text"),
+    ("date_type", "date_text"),
+    ("observation_type", "observation_text"),
+    ("sex", "age"),
+    "notes",
+    ("created_by", "created_on"),
+    ("updated_by", "updated_on"),
+]
+
+record_list_display = [
+    year,
+    reference,
+    date_type,
+    locality_type,
+    observation_type,
+    latitude,
+    longitude,
+    "updated_on",
+]
+
+
 @admin.register(DateType)
 class DateTypeAdmin(TypeAdmin):
     pass
@@ -62,24 +133,46 @@ class ReferenceAdmin(BaseObservationAdmin):
     ]
 
 
+@admin.register(Record)
+class RecordAdmin(BaseObservationAdmin):
+    list_display = ["selfstr", "canonical"] + record_list_display + ["observation"]
+    list_filter = [
+        "canonical",
+        "date_type",
+        "locality_type",
+        "observation_type",
+        "created_by",
+        "updated_by",
+    ]
+    search_fields = ("id", "year", "reference__name", "sex", "age")
+    fields = ["observation"] + record_fields
+
+    def selfstr(self, obj):
+        return obj.__str__()
+    selfstr.short_description = "record"
+
+    map_width = 800
+    pnt = Point(90, 27, srid=4326)
+    pnt.transform(3857)
+    default_lon, default_lat = pnt.coords
+    display_srid = 4326
+    point_zoom = 5
+
+    # disable deleting selected for records, but preserve individual deletion and csv export
+    def get_actions(self, request):
+        actions = super(RecordAdmin, self).get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+
 class RecordInlineFormset(CanonicalInlineFormset):
     atleast_one = True
 
 
 class RecordInline(admin.StackedInline, BaseObservationAdmin):
     model = Record
-    fields = [
-        ("canonical", "year"),
-        "point",
-        ("reference", "page_numbers"),
-        ("locality_type", "locality_text"),
-        ("date_type", "date_text"),
-        ("observation_type", "observation_text"),
-        ("sex", "age"),
-        "notes",
-        ("created_by", "created_on"),
-        ("updated_by", "updated_on"),
-    ]
+    fields = record_fields
     min_num = 1
     extra = 0
     formset = RecordInlineFormset
@@ -109,19 +202,8 @@ class RecordInline(admin.StackedInline, BaseObservationAdmin):
 
 @admin.register(Observation)
 class ObservationAdmin(BaseObservationAdmin):
-    # TODO: change export_model_all_as_csv or otherwise export canonical record fields
-    list_display = [
-        "id",
-        "year",
-        "reference",
-        "date_type",
-        "locality_type",
-        "observation_type",
-        "latitude",
-        "longitude",
-        "updated_on",
-    ]
-    # TODO: add "year", "date_type", "locality_type", "observation_type" via custom filters
+    list_display = ["selfstr"] + record_list_display
+    # TODO: add "date_type", "locality_type", "observation_type" via custom filters
     list_filter = ["created_by", "updated_by"]
     search_fields = ("id", "year", "reference")
     fields = [
@@ -132,38 +214,6 @@ class ObservationAdmin(BaseObservationAdmin):
     ]
     inlines = [RecordInline]
 
-    def year(self, obj):
-        return obj.year
-
-    year.admin_order_field = "year"
-
-    def latitude(self, obj):
-        return obj.point.y
-
-    def longitude(self, obj):
-        return obj.point.x
-
-    def reference(self, obj):
-        return obj.reference
-
-    reference.admin_order_field = "reference"
-
-    # def reference_link(self, obj):
-    #     return zotero_link(obj, False)
-    #
-    # reference_link.admin_order_field = "reference"
-
-    def date_type(self, obj):
-        return obj.date_type
-
-    date_type.admin_order_field = "date_type"
-
-    def locality_type(self, obj):
-        return obj.locality_type
-
-    locality_type.admin_order_field = "locality_type"
-
-    def observation_type(self, obj):
-        return obj.observation_type
-
-    observation_type.admin_order_field = "observation_type"
+    def selfstr(self, obj):
+        return obj.__str__()
+    selfstr.short_description = "observation"
