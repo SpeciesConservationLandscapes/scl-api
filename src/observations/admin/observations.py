@@ -149,6 +149,7 @@ class RecordAdmin(BaseObservationAdmin):
 
     def selfstr(self, obj):
         return obj.__str__()
+
     selfstr.short_description = "record"
 
     map_width = 800
@@ -161,9 +162,28 @@ class RecordAdmin(BaseObservationAdmin):
     # disable deleting selected for records, but preserve individual deletion and csv export
     def get_actions(self, request):
         actions = super(RecordAdmin, self).get_actions(request)
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
+        if "delete_selected" in actions:
+            del actions["delete_selected"]
         return actions
+
+    def delete_view(self, request, object_id, extra_context=None):
+        extra_context = extra_context or {}
+        obj = self.get_object(request, object_id)
+
+        parent, siblings, canonical_siblings = obj.get_family()
+        try:
+            check_siblings(obj, parent, siblings, canonical_siblings, True)
+        except ValidationError as e:
+            error_dict = dict(e)
+            error = "Cannot delete this canonical record until another record for this observation is canonical."
+            if "canonical" in error_dict:
+                error = error_dict["canonical"]
+                if isinstance(error, list):
+                    error = "<br />".join(error)
+            extra_context["title"] = "Delete disallowed"
+            extra_context["non_canonical_siblings"] = error
+
+        return super().delete_view(request, object_id, extra_context=extra_context)
 
 
 class RecordInlineFormset(CanonicalInlineFormset):
@@ -216,4 +236,5 @@ class ObservationAdmin(BaseObservationAdmin):
 
     def selfstr(self, obj):
         return obj.__str__()
+
     selfstr.short_description = "observation"
