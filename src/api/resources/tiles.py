@@ -18,7 +18,8 @@ ASSET_TIMESTAMP_PROPERTY = "startTime"
 mapids = {}
 
 use_ee = True
-if len(sys.argv) >= 2 and sys.argv[0] == "manage.py" and sys.argv[1] != "runserver":
+# uncomment to use/test tile views (otherwise django reload hangs)
+if len(sys.argv) >= 2 and sys.argv[0] == "manage.py":  # and sys.argv[1] != "runserver"
     use_ee = False
 
 if use_ee:

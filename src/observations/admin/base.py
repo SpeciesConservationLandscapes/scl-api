@@ -44,11 +44,13 @@ class CanonicalInlineFormset(BaseInlineFormSet):
                 raise ValidationError(f"At least one {modelname} is required")
 
         canonical_instances = []
+        canonical_deleted_instances = []
         for form in self.forms:
             data = form.cleaned_data
-
-            if data.get("canonical", False) and not data["DELETE"]:
+            if data.get("canonical", False):
                 canonical_instances.append(form.instance.__str__())
+                if data.get("DELETE", False):
+                    canonical_deleted_instances.append(form.instance.__str__())
 
         # Not more than one canonical instance must be marked...
         if len(canonical_instances) > 1:
@@ -64,15 +66,12 @@ class CanonicalInlineFormset(BaseInlineFormSet):
                     f"One {modelname} for this {parentname} must be marked canonical."
                 )
 
-    # Forms cleaned so canonical object saving in theory ensured.
-    # But need to save canonical form object first so that model checks work.
-    def save(self, commit=True):
-        for form in self.forms:
-            data = form.cleaned_data
-            if data.get("canonical", False):
-                obj = form.instance
-                self.save_existing(form, obj, commit=commit)
-        return super().save(commit)
+        # ...and if only 1 record is canonical and is marked for deletion, make sure there aren't > 1 others
+        if len(canonical_deleted_instances) > 0 and len(self.forms) > 2:
+            raise ValidationError(
+                f"You may not delete the canonical {modelname} without first marking another "
+                f"{modelname} for this {parentname} canonical."
+            )
 
 
 class BaseObservationAdmin(BaseAdmin):
@@ -80,7 +79,7 @@ class BaseObservationAdmin(BaseAdmin):
     formfield_overrides = {CharField: {"widget": TextInput(attrs={"size": "100%"})}}
 
     def save_model(self, request, obj, form, change):
-        profile = request.user.profile
+        profile = request.user.obsprofile
         if change:
             obj.created_by = profile
         obj.updated_by = profile
