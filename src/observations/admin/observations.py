@@ -2,6 +2,7 @@ import copy
 from django.contrib.admin.options import FORMFIELD_FOR_DBFIELD_DEFAULTS
 from django.contrib.gis import admin
 from django.contrib.gis.geos import Point
+from django.core.exceptions import NON_FIELD_ERRORS
 from .base import *
 from observations.models import *
 
@@ -174,12 +175,12 @@ class RecordAdmin(BaseObservationAdmin):
         try:
             check_siblings(obj, parent, siblings, canonical_siblings, True)
         except ValidationError as e:
-            error_dict = dict(e)
+            non_field_errors = e.message_dict.get(NON_FIELD_ERRORS)
+            canonical_errors = e.message_dict.get("canonical")
             error = "Cannot delete this canonical record until another record for this observation is canonical."
-            if "canonical" in error_dict:
-                error = error_dict["canonical"]
-                if isinstance(error, list):
-                    error = "<br />".join(error)
+            for e in [non_field_errors, canonical_errors]:
+                if e and isinstance(e, list):
+                    error = "<br />".join(e)
             extra_context["title"] = "Delete disallowed"
             extra_context["non_canonical_siblings"] = error
 

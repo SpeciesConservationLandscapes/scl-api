@@ -44,11 +44,13 @@ class CanonicalInlineFormset(BaseInlineFormSet):
                 raise ValidationError(f"At least one {modelname} is required")
 
         canonical_instances = []
+        canonical_deleted_instances = []
         for form in self.forms:
             data = form.cleaned_data
-
-            if data.get("canonical", False) and not data["DELETE"]:
+            if data.get("canonical", False):
                 canonical_instances.append(form.instance.__str__())
+                if data.get("DELETE", False):
+                    canonical_deleted_instances.append(form.instance.__str__())
 
         # Not more than one canonical instance must be marked...
         if len(canonical_instances) > 1:
@@ -63,6 +65,13 @@ class CanonicalInlineFormset(BaseInlineFormSet):
                 raise ValidationError(
                     f"One {modelname} for this {parentname} must be marked canonical."
                 )
+
+        # ...and if only 1 record is canonical and is marked for deletion, make sure there aren't > 1 others
+        if len(canonical_deleted_instances) > 0 and len(self.forms) > 2:
+            raise ValidationError(
+                f"You may not delete the canonical {modelname} without first marking another "
+                f"{modelname} for this {parentname} canonical."
+            )
 
 
 class BaseObservationAdmin(BaseAdmin):
