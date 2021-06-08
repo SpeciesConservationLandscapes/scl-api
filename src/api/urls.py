@@ -30,6 +30,7 @@ tile_urls = [
         "tiles/biomes/<int:z>/<int:x>/<int:y>/", tiles.TileView.as_view(layer="biomes")
     ),
     path("tiles/pas/<int:z>/<int:x>/<int:y>/", tiles.TileView.as_view(layer="pas")),
+    path("tiles/kbas/<int:z>/<int:x>/<int:y>/", tiles.TileView.as_view(layer="kbas")),
     path("tiles/hii/<int:z>/<int:x>/<int:y>/", tiles.TileView.as_view(layer="hii")),
     path(
         "tiles/species/<str:species>/structural_habitat/<int:z>/<int:x>/<int:y>/",

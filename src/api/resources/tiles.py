@@ -18,7 +18,7 @@ ASSET_TIMESTAMP_PROPERTY = "startTime"
 mapids = {}
 
 use_ee = True
-# uncomment to use/test tile views (otherwise django reload hangs)
+# comment to use/test tile views (otherwise django reload hangs)
 if len(sys.argv) >= 2 and sys.argv[0] == "manage.py":  # and sys.argv[1] != "runserver"
     use_ee = False
 
@@ -69,6 +69,10 @@ if use_ee:
             featureCollection=ee.FeatureCollection("WCMC/WDPA/current/polygons"),
             color=1,
             # width=1,
+        ).getMapId({"palette": "#14A51C"}),
+        "kbas": empty.paint(
+            featureCollection=ee.FeatureCollection("projects/SCL/v1/source/KBAsGlobal_20200301"),
+            color=1,
         ).getMapId({"palette": "#14A51C"}),
         "aoi": {
             "Panthera_tigris": empty.paint(
