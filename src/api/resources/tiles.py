@@ -19,8 +19,8 @@ mapids = {}
 
 use_ee = True
 # comment to use/test tile views (otherwise django reload hangs)
-if len(sys.argv) >= 2 and sys.argv[0] == "manage.py":  # and sys.argv[1] != "runserver"
-    use_ee = False
+# if len(sys.argv) >= 2 and sys.argv[0] == "manage.py":  # and sys.argv[1] != "runserver"
+#     use_ee = False
 
 if use_ee:
     def init_ee_creds():
@@ -77,7 +77,7 @@ if use_ee:
         "aoi": {
             "Panthera_tigris": empty.paint(
                 featureCollection=ee.FeatureCollection(
-                    f"{ROOTDIR}/Panthera_tigris/historical_range_200914"
+                    f"{ROOTDIR}/Panthera_tigris/historical_range"
                 ),
                 color="000000",
                 width=3,
