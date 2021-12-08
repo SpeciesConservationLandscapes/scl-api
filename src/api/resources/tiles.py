@@ -130,7 +130,7 @@ if use_ee:
         )
     mapids["hii"] = dict(sorted(mapids["hii"].items(), reverse=True))
 
-    hab_tiger = get_assets(f"{ROOTDIR}/Panthera_tigris/structural_habitat")
+    hab_tiger = get_assets(f"{ROOTDIR}/Panthera_tigris/canonical/structural_habitat")
     for hab in hab_tiger:
         if ASSET_TIMESTAMP_PROPERTY not in hab:
             continue
