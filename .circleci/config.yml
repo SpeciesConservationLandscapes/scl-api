@@ -21,7 +21,7 @@ gcp_tasks:
       name: Install gcloud CLI
       command: |
         curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-366.0.0-linux-x86_64.tar.gz
-        tar zxf google-cloud-sdk-236.0.0-linux-x86_64.tar.gz google-cloud-sdk
+        tar zxf google-cloud-sdk-366.0.0-linux-x86_64.tar.gz google-cloud-sdk
         ./google-cloud-sdk/install.sh --quiet
   install_cloud_sql_proxy: &install_cloud_sql_proxy
     run:
