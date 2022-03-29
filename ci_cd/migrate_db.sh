@@ -2,7 +2,7 @@
 
 # CircleCI usage
 # name: Run DB migration
-# run: docker exec -it api_service /var/projects/webapp/migrate_db.sh
+# run: docker exec -it scl_api /var/projects/webapp/migrate_db.sh
 
 _GCP_CREDENTIAL_STRING=${GCP_CREDENTIAL_STRING}
 _GCP_CLOUD_SQL_CONNECTION_STRING=${GCP_CLOUD_SQL_CONNECTION_STRING}

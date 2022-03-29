@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     "django_filters",
     "django_extensions",
     "api.apps.ApiConfig",
-    "observations.apps.ApiConfig",
+    # "observations.apps.ApiConfig",  # effort abandoned
     "corsheaders",
     "django_countries",
     "tools",
@@ -73,8 +73,8 @@ TEMPLATES = [
 WSGI_APPLICATION = "app.wsgi.application"
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ("api.auth_backends.JWTAuthentication",),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    # "DEFAULT_AUTHENTICATION_CLASSES": ("api.auth_backends.JWTAuthentication",),
+    # "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_FILTER_BACKENDS": (
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.OrderingFilter",
@@ -128,6 +128,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 EE_HII_ROOTDIR = "projects/HII/v1/"
 EE_SCL_ROOTDIR = "projects/SCL/v1/"
+TILE_SOURCE = os.environ.get("TILE_SOURCE") or None
 GCP_SERVICE_ACCOUNT_KEY = os.environ.get("GCP_SERVICE_ACCOUNT_KEY")
 GCP_PROJECT_ID = "scl3-244715"
 GCP_BUCKET_SCLS = "scl-pipeline"
@@ -143,6 +144,6 @@ AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
 ZOTERO_GROUP = os.environ.get('ZOTERO_GROUP')
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
 
-COUNTRIES_OVERRIDE = {
-    "LE": "Leuser"
-}
+# COUNTRIES_OVERRIDE = {
+#     "LE": "Leuser"
+# }
