@@ -96,4 +96,4 @@ class BaseAPIViewSet(viewsets.ModelViewSet):
 
 class StatsViewSet(BaseAPIViewSet):
     pagination_class = GeoJsonPagination
-    permission_classes = [UserCountryPermission]
+    # permission_classes = [UserCountryPermission]

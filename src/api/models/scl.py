@@ -1,10 +1,11 @@
 from decimal import Decimal
 from django.conf import settings
+from django.contrib.gis.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.postgres.fields import JSONField
-
-from .base import *
+from django_countries.fields import CountryField
+from .base import BaseModel
 
 
 class Genus(BaseModel):
@@ -54,6 +55,8 @@ class Species(BaseModel):
 
 class Landscape(BaseModel):
     ee_name = None
+
+    lsid = models.PositiveIntegerField(verbose_name=_("landscape ID"))
     species = models.ForeignKey(Species, on_delete=models.CASCADE)
     date = models.DateField(default=timezone.now)
 
@@ -78,29 +81,17 @@ class Landscape(BaseModel):
         name = ""
         if hasattr(self, "name"):
             name = " {}".format(self.name)
-        return _("%s%s %s [%s]") % (self.ee_name, name, self.species, self.date)
+        return _("%s %s%s %s [%s]") % (self.ee_name, self.lsid, name, self.species, self.date)
 
 
 class SCL(Landscape):
     ee_name = "scl"
-    CLASS_CHOICES = ((1, "I"), (2, "II"), (3, "III"), (4, "IV"))
 
     name = models.CharField(max_length=255)
-    sclclass = models.PositiveSmallIntegerField(
-        choices=CLASS_CHOICES, null=True, blank=True, verbose_name=_("SCL class")
-    )
 
     class Meta:
         verbose_name = _("species conservation landscape")
         verbose_name_plural = _("species conservation landscapes")
-
-
-class FragmentLandscape(Landscape):
-    ee_name = "fragment"
-
-    class Meta:
-        verbose_name = _("fragment")
-        verbose_name_plural = _("fragments")
 
 
 class RestorationLandscape(Landscape):
@@ -119,12 +110,42 @@ class SurveyLandscape(Landscape):
         verbose_name_plural = _("survey landscapes")
 
 
-class SCLStats(BaseModel):
-    scl = models.ForeignKey(SCL, on_delete=models.CASCADE)
+class SpeciesFragmentLandscape(Landscape):
+    ee_name = "species_fragment"
+
+    class Meta:
+        verbose_name = _("species conservation landscape fragment")
+        verbose_name_plural = _("species conservation landscape fragments")
+
+
+class RestorationFragmentLandscape(Landscape):
+    ee_name = "restoration_fragment"
+
+    class Meta:
+        verbose_name = _("restoration landscape fragment")
+        verbose_name_plural = _("restoration landscape fragments")
+
+
+class SurveyFragmentLandscape(Landscape):
+    ee_name = "survey_fragment"
+
+    class Meta:
+        verbose_name = _("survey landscape fragment")
+        verbose_name_plural = _("survey landscape fragments")
+
+
+class LandscapeCountryStats(BaseModel):
     country = CountryField()
     geom = models.MultiPolygonField(geography=True, null=True, blank=True)
     area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
     biome_areas = JSONField(null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+
+class SCLStats(LandscapeCountryStats):
+    scl = models.ForeignKey(SCL, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ("country", "scl__date")
@@ -135,30 +156,10 @@ class SCLStats(BaseModel):
         return _("%s %s") % (self.scl, self.country)
 
 
-class FragmentStats(BaseModel):
-    fragment = models.ForeignKey(FragmentLandscape, on_delete=models.CASCADE)
-    country = CountryField()
-    geom = models.MultiPolygonField(geography=True, null=True, blank=True)
-    area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
-    biome_areas = JSONField(null=True, blank=True)
-
-    class Meta:
-        ordering = ("country", "fragment__date")
-        verbose_name = _("fragment statistics")
-        verbose_name_plural = _("fragment statistics")
-
-    def __str__(self):
-        return _("%s %s") % (self.fragment, self.country)
-
-
-class RestorationStats(BaseModel):
+class RestorationStats(LandscapeCountryStats):
     restoration_landscape = models.ForeignKey(
         RestorationLandscape, on_delete=models.CASCADE
     )
-    country = CountryField()
-    geom = models.MultiPolygonField(geography=True, null=True, blank=True)
-    area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
-    biome_areas = JSONField(null=True, blank=True)
 
     class Meta:
         ordering = ("country", "restoration_landscape__date")
@@ -169,12 +170,8 @@ class RestorationStats(BaseModel):
         return _("%s %s") % (self.restoration_landscape, self.country)
 
 
-class SurveyStats(BaseModel):
+class SurveyStats(LandscapeCountryStats):
     survey_landscape = models.ForeignKey(SurveyLandscape, on_delete=models.CASCADE)
-    country = CountryField()
-    geom = models.MultiPolygonField(geography=True, null=True, blank=True)
-    area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
-    biome_areas = JSONField(null=True, blank=True)
 
     class Meta:
         ordering = ("country", "survey_landscape__date")
@@ -183,3 +180,39 @@ class SurveyStats(BaseModel):
 
     def __str__(self):
         return _("%s %s") % (self.survey_landscape, self.country)
+
+
+class SpeciesFragmentStats(LandscapeCountryStats):
+    species_fragment = models.ForeignKey(SpeciesFragmentLandscape, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ("country", "species_fragment__date")
+        verbose_name = _("species fragment statistics")
+        verbose_name_plural = _("species fragment statistics")
+
+    def __str__(self):
+        return _("%s %s") % (self.species_fragment, self.country)
+
+
+class RestorationFragmentStats(LandscapeCountryStats):
+    restoration_fragment = models.ForeignKey(RestorationFragmentLandscape, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ("country", "restoration_fragment__date")
+        verbose_name = _("restoration fragment statistics")
+        verbose_name_plural = _("restoration fragment statistics")
+
+    def __str__(self):
+        return _("%s %s") % (self.restoration_fragment, self.country)
+
+
+class SurveyFragmentStats(LandscapeCountryStats):
+    survey_fragment = models.ForeignKey(SurveyFragmentLandscape, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ("country", "survey_fragment__date")
+        verbose_name = _("survey fragment statistics")
+        verbose_name_plural = _("survey fragment statistics")
+
+    def __str__(self):
+        return _("%s %s") % (self.survey_fragment, self.country)

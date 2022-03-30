@@ -7,17 +7,10 @@ from ..models import SCL, SCLStats
 
 
 class SCLSerializer(LandscapeSerializer):
-    sclclass = serializers.SerializerMethodField()
 
     class Meta:
         model = SCL
         exclude = []
-
-    @staticmethod
-    def get_sclclass(obj):
-        if obj.sclclass is None:
-            return None
-        return dict(SCL.CLASS_CHOICES)[obj.sclclass]
 
 
 class SCLStatsSerializer(StatsSerializer):
@@ -31,44 +24,24 @@ class SCLStatsSerializer(StatsSerializer):
 class SCLStatsFilterSet(BaseAPIFilterSet):
     class Meta:
         model = SCLStats
-        fields = ["country", "scl__species", "scl__date", "scl__name"]
+        fields = ["country", "scl__species", "scl__date", "scl__name", "scl__lsid"]
 
 
 class SCLStatsViewSet(StatsViewSet):
     serializer_class = SCLStatsSerializer
     filter_class = SCLStatsFilterSet
-    ordering_fields = ["country", "scl__species", "scl__date", "scl__name"]
-    required_filters = ["country", "scl__species", "scl__date"]
-
-    def get_queryset(self):
-        for f in self.required_filters:
-            if (
-                f not in self.request.query_params
-                or self.request.query_params[f] is None
-                or self.request.query_params[f] == ""
-            ):
-                return SCLStats.objects.none()
-
-        filters = {
-            "country": self.request.query_params["country"],
-            "scl__species": self.request.query_params["scl__species"],
-            "scl__date": self.request.query_params["scl__date"],
-        }
-
-        return SCLStats.objects.filter(**filters).select_related()
+    ordering_fields = ["country", "scl__species", "scl__date", "scl__name", "scl__lsid"]
+    queryset = SCLStats.objects.select_related()
 
     @action(detail=False, methods=["get"])
     def available_dates(self, request):
-        if (
-            "country" not in self.request.query_params
-            or "scl__species" not in self.request.query_params
-        ):
-            return SCLStats.objects.none()
+        filters = {}
+        if request.query_params.get("country"):
+            filters["country"] = request.query_params.get("country")
+        if request.query_params.get("scl__species"):
+            filters["scl__species"] = request.query_params.get("scl__species")
 
-        qs = SCLStats.objects.filter(
-            country=request.query_params["country"],
-            scl__species=request.query_params["scl__species"],
-        )
+        qs = SCLStats.objects.filter(**filters)
         _available_dates = (
             qs.order_by("scl__date").values_list("scl__date", flat=True).distinct()
         )

@@ -5,10 +5,10 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.apps import apps
 from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
-from django.conf import settings
 from google.cloud import storage
 from google.oauth2 import service_account
 from api.models import *
+from api.utils import round_recursive
 
 
 def _get_landscape_vars(landscape_key):
@@ -29,12 +29,24 @@ def _get_landscape_vars(landscape_key):
         landscape_model = apps.get_model(app_label="api", model_name="SurveyLandscape")
         stats_model = apps.get_model(app_label="api", model_name="SurveyStats")
         landscape_property = "survey_landscape"
-    elif landscape_key == "scl_fragment":
+    elif landscape_key == "scl_species_fragment":
         landscape_model = apps.get_model(
-            app_label="api", model_name="FragmentLandscape"
+            app_label="api", model_name="SpeciesFragmentLandscape"
         )
-        stats_model = apps.get_model(app_label="api", model_name="FragmentStats")
-        landscape_property = "fragment"
+        stats_model = apps.get_model(app_label="api", model_name="SpeciesFragmentStats")
+        landscape_property = "species_fragment"
+    elif landscape_key == "scl_restoration_fragment":
+        landscape_model = apps.get_model(
+            app_label="api", model_name="RestorationFragmentLandscape"
+        )
+        stats_model = apps.get_model(app_label="api", model_name="RestorationFragmentStats")
+        landscape_property = "restoration_fragment"
+    elif landscape_key == "scl_survey_fragment":
+        landscape_model = apps.get_model(
+            app_label="api", model_name="SurveyFragmentLandscape"
+        )
+        stats_model = apps.get_model(app_label="api", model_name="SurveyFragmentStats")
+        landscape_property = "survey_fragment"
 
     return landscape_model, stats_model, landscape_property
 
@@ -48,23 +60,24 @@ def ingest_landscapes(landscape_key, species, scldate, countries_biomes_pas):
     for countries_biomes_pa in countries_biomes_pas["features"]:
         props = countries_biomes_pa["properties"]
 
-        # TODO: add eeid for landscape when we have it
-        attribs = {"species": species, "date": scldate}
+        attribs = {"lsid": props.get("lsid"), "species": species, "date": scldate}
         if landscape_key == "scl_species":
             attribs["name"] = props.get("lsname", "")
-            attribs["sclclass"] = props.get("lsclass")
         landscape, _ = landscape_model.objects.get_or_create(**attribs)
 
         geom = GEOSGeometry(json.dumps(countries_biomes_pa["geometry"]))
         if geom.geom_type == "Polygon":
             geom = MultiPolygon([geom])
 
-        stats_attribs = {
-            landscape_property: landscape,
-            "country": props["lscountry"],
-            "area": props["lscountry_area"],
-            "biome_areas": props["areas"],
-        }
+        stats_attribs = round_recursive(
+            {
+                landscape_property: landscape,
+                "country": props["lscountry"],
+                "area": props["lscountry_area"],
+                "biome_areas": props["areas"],
+            },
+            4
+        )
         s, _ = stats_model.objects.get_or_create(**stats_attribs)
         if _:  # Can't include geom in get_or_create with geography=True
             s.geom = geom

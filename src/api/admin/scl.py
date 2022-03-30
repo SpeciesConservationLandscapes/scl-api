@@ -36,12 +36,7 @@ class SpeciesAdmin(BaseAdmin):
 
 @admin.register(SCL)
 class SCLAdmin(BaseAdmin):
-    list_display = ("name", "sclclass")
-
-
-@admin.register(FragmentLandscape)
-class FragmentLandscapeAdmin(BaseAdmin):
-    pass
+    list_display = ("lsid", "name", "species", "date")
 
 
 @admin.register(RestorationLandscape)
@@ -54,14 +49,24 @@ class SurveyLandscapeAdmin(BaseAdmin):
     pass
 
 
+@admin.register(SpeciesFragmentLandscape)
+class SpeciesFragmentLandscapeAdmin(BaseAdmin):
+    pass
+
+
+@admin.register(RestorationFragmentLandscape)
+class RestorationFragmentLandscapeAdmin(BaseAdmin):
+    pass
+
+
+@admin.register(SurveyFragmentLandscape)
+class SurveyFragmentLandscapeAdmin(BaseAdmin):
+    pass
+
+
 @admin.register(SCLStats)
 class SCLStatsAdmin(StatsAdmin):
     landscape_key = "scl"
-
-
-@admin.register(FragmentStats)
-class FragmentStatsAdmin(StatsAdmin):
-    landscape_key = "fragment"
 
 
 @admin.register(RestorationStats)
@@ -72,3 +77,18 @@ class RestorationStatsAdmin(StatsAdmin):
 @admin.register(SurveyStats)
 class SurveyStatsAdmin(StatsAdmin):
     landscape_key = "survey_landscape"
+
+
+@admin.register(SpeciesFragmentStats)
+class SpeciesFragmentStatsAdmin(StatsAdmin):
+    landscape_key = "species_fragment"
+
+
+@admin.register(RestorationFragmentStats)
+class RestorationFragmentStatsAdmin(StatsAdmin):
+    landscape_key = "restoration_fragment"
+
+
+@admin.register(SurveyFragmentStats)
+class SurveyFragmentStatsAdmin(StatsAdmin):
+    landscape_key = "survey_fragment"

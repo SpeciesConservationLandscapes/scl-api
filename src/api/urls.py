@@ -3,22 +3,18 @@ from rest_framework import routers
 
 from .resources.species import SpeciesViewSet
 from .resources.scl_stats import SCLStatsViewSet
-from .resources.fragment_stats import FragmentStatsViewSet
+# from .resources.fragment_stats import FragmentStatsViewSet
 from .resources.restorationls_stats import RestorationStatsViewSet
 from .resources.surveyls_stats import SurveyStatsViewSet
-from .resources.me import MeViewSet
 from .resources.tileviews import hii_tiles_purple, hii_tiles_rainbow
 from .reports.views import SpeciesReportView
 
 router = routers.DefaultRouter()
 
-me_get = MeViewSet.as_view({"get": "list"})
-species_report_get = SpeciesReportView.as_view()
-
 
 router.register(r"species", SpeciesViewSet, "species")
 router.register(r"sclstats", SCLStatsViewSet, "sclstats")
-router.register(r"fragmentstats", FragmentStatsViewSet, "fragmentstats")
+# router.register(r"fragmentstats", FragmentStatsViewSet, "fragmentstats")
 router.register(r"restorationls_stats", RestorationStatsViewSet, "restorationls_stats")
 router.register(r"surveyls_stats", SurveyStatsViewSet, "surveyls_stats")
 
@@ -44,7 +40,7 @@ hii_urlpatterns = hii_tiles_purple.make_urlpatterns(
 api_urls = (
     router.urls
     + [
-        path("reports/species/", species_report_get, name="species-report-list"),
+        path("reports/species/", SpeciesReportView.as_view(), name="species-report-list"),
     ]
     + hii_urlpatterns
 )
