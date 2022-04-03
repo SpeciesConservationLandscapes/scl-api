@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from .resources.species import SpeciesViewSet
 from .resources.scl_stats import SCLStatsViewSet
-# from .resources.fragment_stats import FragmentStatsViewSet
+from .resources.fragment_stats import RestorationFragmentStatsViewSet, SpeciesFragmentStatsViewSet, SurveyFragmentStatsViewSet
 from .resources.restorationls_stats import RestorationStatsViewSet
 from .resources.surveyls_stats import SurveyStatsViewSet
 from .resources.tileviews import hii_tiles_purple, hii_tiles_rainbow
@@ -13,10 +13,12 @@ router = routers.DefaultRouter()
 
 
 router.register(r"species", SpeciesViewSet, "species")
-router.register(r"sclstats", SCLStatsViewSet, "sclstats")
-# router.register(r"fragmentstats", FragmentStatsViewSet, "fragmentstats")
 router.register(r"restorationls_stats", RestorationStatsViewSet, "restorationls_stats")
+router.register(r"sclstats", SCLStatsViewSet, "sclstats")
 router.register(r"surveyls_stats", SurveyStatsViewSet, "surveyls_stats")
+router.register(r"restorationfragmentstats", RestorationFragmentStatsViewSet, "restorationfragmentstats")
+router.register(r"speciesfragmentstats", SpeciesFragmentStatsViewSet, "speciesfragmentstats")
+router.register(r"surveyfragmentstats", SurveyFragmentStatsViewSet, "surveyfragmentstats")
 
 # TODO: refactor
 #     path(
