@@ -11,6 +11,9 @@ from api.models import *
 from api.utils import round_recursive
 
 
+INDIGENOUS_RANGE_FILE = "country_historical_range.geojson"
+
+
 def _get_landscape_vars(landscape_key):
     landscape_model = None
     stats_model = None
@@ -39,7 +42,9 @@ def _get_landscape_vars(landscape_key):
         landscape_model = apps.get_model(
             app_label="api", model_name="RestorationFragmentLandscape"
         )
-        stats_model = apps.get_model(app_label="api", model_name="RestorationFragmentStats")
+        stats_model = apps.get_model(
+            app_label="api", model_name="RestorationFragmentStats"
+        )
         landscape_property = "restoration_fragment"
     elif landscape_key == "scl_survey_fragment":
         landscape_model = apps.get_model(
@@ -49,6 +54,13 @@ def _get_landscape_vars(landscape_key):
         landscape_property = "survey_fragment"
 
     return landscape_model, stats_model, landscape_property
+
+
+def get_multipolygon(geojson_geom):
+    geom = GEOSGeometry(json.dumps(geojson_geom))
+    if geom.geom_type == "Polygon":
+        geom = MultiPolygon([geom])
+    return geom
 
 
 def ingest_landscapes(landscape_key, species, scldate, countries_biomes_pas):
@@ -65,10 +77,6 @@ def ingest_landscapes(landscape_key, species, scldate, countries_biomes_pas):
             attribs["name"] = props.get("lsname", "")
         landscape, _ = landscape_model.objects.get_or_create(**attribs)
 
-        geom = GEOSGeometry(json.dumps(countries_biomes_pa["geometry"]))
-        if geom.geom_type == "Polygon":
-            geom = MultiPolygon([geom])
-
         stats_attribs = round_recursive(
             {
                 landscape_property: landscape,
@@ -76,11 +84,11 @@ def ingest_landscapes(landscape_key, species, scldate, countries_biomes_pas):
                 "area": props["lscountry_area"],
                 "biome_areas": props["areas"],
             },
-            4
+            4,
         )
-        s, _ = stats_model.objects.get_or_create(**stats_attribs)
-        if _:  # Can't include geom in get_or_create with geography=True
-            s.geom = geom
+        s, created = stats_model.objects.get_or_create(**stats_attribs)
+        if created:  # Can't include geom in get_or_create with geography=True
+            s.geom = get_multipolygon(countries_biomes_pa["geometry"])
             s.save()
             count += 1
 
@@ -102,6 +110,9 @@ class Command(BaseCommand):
         self.client = storage.Client(
             project=settings.GCP_PROJECT_ID, credentials=credentials
         )
+        self.dry_run = False
+        self.indigenous = False
+        self.files = {}
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -109,73 +120,142 @@ class Command(BaseCommand):
             action="store_true",
             help="Runs ingest in a database transaction, then does a rollback.",
         )
+        parser.add_argument(
+            "--indigenous",
+            action="store_true",
+            help="Ingest (overwrite) species indigenous range stats.",
+        )
 
-    def handle(self, dry_run, *args, **options):
+    def handle(self, *args, **options):
+        self.dry_run = options["dry_run"]
+        self.indigenous = options["indigenous"]
         try:
             with transaction.atomic():
                 speciess = Species.objects.all()
                 for species in speciess:
-                    species_slug = species.full_name.replace(" ", "_")
-                    bucket_file_list = self.client.list_blobs(
-                        settings.GCP_BUCKET_SCLS,
-                        prefix="ls_stats/{}".format(species_slug),
-                    )
-                    blobs = []
-                    datafiles = []
-                    for obj in bucket_file_list:
-                        filename = os.path.join(
-                            self.local_restore_dir, obj.name.replace("/", "_")
-                        )
-                        # scl-pipeline/ls_stats/Panthera_tigris/2006-01-01
-                        if not os.path.isfile(filename):
-                            print("Downloading {} to {} ".format(obj.name, filename))
-                            obj.download_to_filename(filename)
-                            if not os.path.isfile(filename):
-                                raise ValueError("File did not download")
-                        filedate = obj.name.split("/")[-2]
-                        landscape_key = obj.name.split("/")[-1].split(".")[0]
-                        datafiles.append((filename, filedate, landscape_key))
-                        blobs.append(obj)
-
-                    if len(datafiles) < 1:
+                    self.get_files(species)
+                    if len(self.files[species]["ls_datafiles"]) < 1:
                         continue
 
-                    successes = []
-                    for (datafile, scldate, landscape_key) in datafiles:
-                        sid = transaction.savepoint()
-                        success = False
-                        count = 0
-                        try:
-                            with open(datafile) as f:
-                                countries_biomes_pas = json.load(f)
-                                count = ingest_landscapes(
-                                    landscape_key,
-                                    species,
-                                    scldate,
-                                    countries_biomes_pas,
-                                )
-                                success = True
-                                successes.append(datafile)
-
-                        finally:
-                            if dry_run is True or success is False:
-                                transaction.savepoint_rollback(sid)
-                                msg = "{} features would have been ingested from {}"
-                            else:
-                                transaction.savepoint_commit(sid)
-                                msg = "{} features were ingested from {}"
-                            print(msg.format(count, datafile))
-                            os.remove(datafile)
+                    sid = transaction.savepoint()
+                    ls_successes = self.process_ls_files(species)
+                    indigenous_success = self.ingest_indigenous_range(
+                        species, self.files[species]["indigenous"]
+                    )
 
                     if (
-                        len(successes) == len(datafiles)
-                        and settings.ENVIRONMENT == "prod"
-                        and not dry_run
+                        len(ls_successes) == len(self.files[species]["ls_datafiles"])
+                        and indigenous_success
+                        and not self.dry_run
                     ):
-                        for obj in blobs:
-                            obj.delete()
+                        transaction.savepoint_commit(sid)
+                        if settings.ENVIRONMENT == "prod":
+                            for obj in self.files[species]["blobs"]:
+                                obj.delete()
+                    else:
+                        transaction.savepoint_rollback(sid)
 
         except Exception as err:
             transaction.savepoint_rollback(sid)
             self.stderr.write(str(err))
             sys.exit(1)
+
+    def get_files(self, species):
+        species_slug = species.full_name.replace(" ", "_")
+        bucket_file_list = self.client.list_blobs(
+            settings.GCP_BUCKET_SCLS,
+            prefix="ls_stats/{}".format(species_slug),
+        )
+        blobs = []
+        ls_datafiles = []
+        indigenous_file = None
+        for obj in bucket_file_list:
+            filename = os.path.join(self.local_restore_dir, obj.name.replace("/", "_"))
+            # scl-pipeline/ls_stats/Panthera_tigris/2006-01-01
+            if not os.path.isfile(filename):
+                self.stdout.write("Downloading {} to {} ".format(obj.name, filename))
+                obj.download_to_filename(filename)
+                if not os.path.isfile(filename):
+                    raise ValueError("File did not download")
+            blobs.append(obj)
+            if INDIGENOUS_RANGE_FILE in obj.name:
+                indigenous_file = filename
+            else:
+                filedate = obj.name.split("/")[-2]
+                landscape_key = obj.name.split("/")[-1].split(".")[0]
+                ls_datafiles.append((filename, filedate, landscape_key))
+
+        self.files[species] = {
+            "blobs": blobs,
+            "ls_datafiles": ls_datafiles,
+            "indigenous": indigenous_file,
+        }
+
+    def process_ls_files(self, species):
+        ls_successes = []
+        for (datafile, scldate, landscape_key) in self.files[species]["ls_datafiles"]:
+            success = False
+            count = 0
+            try:
+                with open(datafile) as f:
+                    countries_biomes_pas = json.load(f)
+                    count = ingest_landscapes(
+                        landscape_key,
+                        species,
+                        scldate,
+                        countries_biomes_pas,
+                    )
+                    success = True
+                    ls_successes.append(datafile)
+
+            finally:
+                msg = "{} features were ingested from {}"
+                if self.dry_run or not success:
+                    msg = "{} features would have been ingested from {}"
+                self.stdout.write(msg.format(count, datafile))
+                os.remove(datafile)
+
+        return ls_successes
+
+    def ingest_indigenous_range(self, species, filename):
+        if not self.indigenous:
+            return True
+        if not os.path.isfile(filename):
+            self.stderr.write(
+                f"Indigenous range file for {species} does not exist; skipping"
+            )
+            return False
+
+        success = False
+        count = 0
+        try:
+            with open(filename) as f:
+                country_irs = json.load(f)
+                for country_ir in country_irs["features"]:
+                    props = country_ir["properties"]
+                    attribs = round_recursive(
+                        {
+                            "species": species,
+                            "country": props["country"],
+                            "area": props["area"],
+                        },
+                        4,
+                    )
+                    c, created = IndigenousRangeCountryStats.objects.get_or_create(
+                        **attribs
+                    )
+                    if created:
+                        c.geom = get_multipolygon(country_ir["geometry"])
+                        c.save()
+                        count += 1
+
+                success = True
+
+        finally:
+            msg = "{} features were ingested from {}"
+            if self.dry_run or not success:
+                msg = "{} features would have been ingested from {}"
+            self.stdout.write(msg.format(count, filename))
+            os.remove(filename)
+
+        return success

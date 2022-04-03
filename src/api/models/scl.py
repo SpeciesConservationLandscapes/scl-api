@@ -216,3 +216,16 @@ class SurveyFragmentStats(LandscapeCountryStats):
 
     def __str__(self):
         return _("%s %s") % (self.survey_fragment, self.country)
+
+
+class IndigenousRangeCountryStats(BaseModel):
+    species = models.ForeignKey(Species, on_delete=models.CASCADE)
+    country = CountryField()
+    geom = models.MultiPolygonField(geography=True, null=True, blank=True)
+    area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
+
+    class Meta:
+        ordering = ("species", "country")
+
+    def __str__(self):
+        return _("%s %s") % (self.species, self.country)

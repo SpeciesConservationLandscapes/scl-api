@@ -92,3 +92,9 @@ class RestorationFragmentStatsAdmin(StatsAdmin):
 @admin.register(SurveyFragmentStats)
 class SurveyFragmentStatsAdmin(StatsAdmin):
     landscape_key = "survey_fragment"
+
+
+@admin.register(IndigenousRangeCountryStats)
+class IndigenousRangeCountryStatsAdmin(BaseAdmin):
+    list_display = ("species", "country", "area",)
+    list_filter = ("species", "country",)
