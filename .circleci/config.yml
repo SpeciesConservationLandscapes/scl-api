@@ -50,7 +50,15 @@ jobs:
       - *build
       - run:
           name: Setup
-          command: env > .env && fab buildnocache && fab up  && docker cp ./src/. scl_api:/var/projects/webapp && sleep 10 && fab createdatabase && fab migrate
+          command: |
+            export ENV="dev"
+            env > .env
+            fab buildnocache
+            fab up
+            docker cp ./src/. scl_api:/var/projects/webapp
+            sleep 10
+            fab createdatabase
+            fab migrate
       - run:
           name: Test
           command: fab test
@@ -78,7 +86,10 @@ jobs:
       - run:
           name: Run DB migration
           command: |
-            env > .env && fab buildnocache && fab up
+            export ENV="dev"
+            env > .env
+            fab buildnocache
+            fab up
             docker cp ./src/. scl_api:/var/projects/webapp
             docker cp ./ci_cd/migrate_db.sh scl_api:/var/projects/webapp/migrate_db.sh
             docker exec -it scl_api /var/projects/webapp/migrate_db.sh

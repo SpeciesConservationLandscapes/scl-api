@@ -111,3 +111,6 @@ src/static/
 cloud_sql_proxy
 app.yaml
 .vscode
+
+.envrc
+.direnv/
