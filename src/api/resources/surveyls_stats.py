@@ -19,36 +19,11 @@ class SurveyStatsSerializer(StatsSerializer):
 class SurveyStatsFilterSet(BaseAPIFilterSet):
     class Meta:
         model = SurveyStats
-        fields = ["country", "survey_landscape__species", "survey_landscape__date"]
+        fields = ["country", "survey_landscape__species", "survey_landscape__date", "survey_landscape__lsid"]
 
 
 class SurveyStatsViewSet(StatsViewSet):
     serializer_class = SurveyStatsSerializer
     filter_class = SurveyStatsFilterSet
-    ordering_fields = ["country", "survey_landscape__species", "survey_landscape__date"]
-    required_filters = [
-        "country",
-        "survey_landscape__species",
-        "survey_landscape__date",
-    ]
-
-    def get_queryset(self):
-        for f in self.required_filters:
-            if (
-                f not in self.request.query_params
-                or self.request.query_params[f] is None
-                or self.request.query_params[f] == ""
-            ):
-                return SurveyStats.objects.none()
-
-        filters = {
-            "country": self.request.query_params["country"],
-            "survey_landscape__species": self.request.query_params[
-                "survey_landscape__species"
-            ],
-            "survey_landscape__date": self.request.query_params[
-                "survey_landscape__date"
-            ],
-        }
-
-        return SurveyStats.objects.filter(**filters).select_related()
+    queryset = SurveyStats.objects.select_related()
+    ordering_fields = ["country", "survey_landscape__species", "survey_landscape__date", "survey_landscape__lsid"]

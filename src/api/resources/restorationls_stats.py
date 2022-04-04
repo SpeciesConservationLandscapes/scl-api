@@ -30,40 +30,17 @@ class RestorationStatsFilterSet(BaseAPIFilterSet):
             "country",
             "restoration_landscape__species",
             "restoration_landscape__date",
+            "restoration_landscape__lsid",
         ]
 
 
 class RestorationStatsViewSet(StatsViewSet):
     serializer_class = RestorationStatsSerializer
     filter_class = RestorationStatsFilterSet
+    queryset = RestorationStats.objects.select_related()
     ordering_fields = [
         "country",
         "restoration_landscape__species",
         "restoration_landscape__date",
+        "restoration_landscape__lsid",
     ]
-    required_filters = [
-        "country",
-        "restoration_landscape__species",
-        "restoration_landscape__date",
-    ]
-
-    def get_queryset(self):
-        for f in self.required_filters:
-            if (
-                f not in self.request.query_params
-                or self.request.query_params[f] is None
-                or self.request.query_params[f] == ""
-            ):
-                return RestorationStats.objects.none()
-
-        filters = {
-            "country": self.request.query_params["country"],
-            "restoration_landscape__species": self.request.query_params[
-                "restoration_landscape__species"
-            ],
-            "restoration_landscape__date": self.request.query_params[
-                "restoration_landscape__date"
-            ],
-        }
-
-        return RestorationStats.objects.filter(**filters).select_related()

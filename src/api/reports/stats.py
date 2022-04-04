@@ -1,7 +1,7 @@
 from django.db.models import Count, Sum
 from django.db.models.expressions import RawSQL
 
-from api.models import FragmentStats, RestorationStats, SCLStats, SurveyStats
+from api.models import RestorationStats, SCLStats, SurveyStats, SpeciesFragmentStats, RestorationFragmentStats, SurveyFragmentStats
 
 
 def _calc_summary(queryset, date_field):
@@ -45,7 +45,7 @@ def calc_landscape_stats(country, date, species):
         conservation_landscape_stats=calc_conservation_landscape_stats(
             country, date, species
         ),
-        fragment_landscape_stats=calc_fragment_landscape_stats(country, date, species),
+        # fragment_landscape_stats=calc_fragment_landscape_stats(country, date, species),
         restoration_landscape_stats=calc_restoration_landscape_stats(
             country, date, species
         ),
@@ -60,13 +60,13 @@ def calc_conservation_landscape_stats(country, date, species):
     return _calc_summary(qs, date_field="scl__date")
 
 
-def calc_fragment_landscape_stats(country, date, species):
-    filter_args = dict(
-        fragment__date__lte=date, fragment__species_id=species, country=country
-    )
-
-    qs = FragmentStats.objects.filter(**filter_args)
-    return _calc_summary(qs, date_field="fragment__date")
+# def calc_fragment_landscape_stats(country, date, species):
+#     filter_args = dict(
+#         fragment__date__lte=date, fragment__species_id=species, country=country
+#     )
+#
+#     qs = FragmentStats.objects.filter(**filter_args)
+#     return _calc_summary(qs, date_field="fragment__date")
 
 
 def calc_restoration_landscape_stats(country, date, species):

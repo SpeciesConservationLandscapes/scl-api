@@ -1,47 +1,64 @@
 from django.urls import path
 from rest_framework import routers
 
-from .resources.species import SpeciesViewSet
-from .resources.scl_stats import SCLStatsViewSet
-from .resources.fragment_stats import FragmentStatsViewSet
-from .resources.restorationls_stats import RestorationStatsViewSet
-from .resources.surveyls_stats import SurveyStatsViewSet
-from .resources.me import MeViewSet
-from .resources import tiles
-from .resources.records import RecordsViewSet
 from .reports.views import SpeciesReportView
+from .resources.fragment_stats import (
+    RestorationFragmentStatsViewSet,
+    SpeciesFragmentStatsViewSet,
+    SurveyFragmentStatsViewSet,
+)
+from .resources.indigenous_stats import IndigenousRangeStatsViewSet
+from .resources.restorationls_stats import RestorationStatsViewSet
+from .resources.scl_stats import SCLStatsViewSet
+from .resources.species import SpeciesViewSet
+from .resources.surveyls_stats import SurveyStatsViewSet
+from .resources.tileviews import (
+    hii_tiles_purple,
+    hii_tiles_rainbow,
+    biometiles,
+    patiles,
+    kbatiles,
+    structuralhabitattiles
+)
 
 router = routers.DefaultRouter()
 
-me_get = MeViewSet.as_view({"get": "list"})
-species_report_get = SpeciesReportView.as_view()
 
-
+router.register(
+    r"indigenousrangestats", IndigenousRangeStatsViewSet, "indigenousrangestats"
+)
 router.register(r"species", SpeciesViewSet, "species")
-router.register(r"sclstats", SCLStatsViewSet, "sclstats")
-router.register(r"fragmentstats", FragmentStatsViewSet, "fragmentstats")
 router.register(r"restorationls_stats", RestorationStatsViewSet, "restorationls_stats")
+router.register(r"sclstats", SCLStatsViewSet, "sclstats")
 router.register(r"surveyls_stats", SurveyStatsViewSet, "surveyls_stats")
+router.register(
+    r"restorationfragmentstats",
+    RestorationFragmentStatsViewSet,
+    "restorationfragmentstats",
+)
+router.register(
+    r"speciesfragmentstats", SpeciesFragmentStatsViewSet, "speciesfragmentstats"
+)
+router.register(
+    r"surveyfragmentstats", SurveyFragmentStatsViewSet, "surveyfragmentstats"
+)
 
-tile_urls = [
-    path("me/", me_get, name="me-list"),
-    path("reports/species/", species_report_get, name="species-report-list"),
-    path(
-        "tiles/biomes/<int:z>/<int:x>/<int:y>/", tiles.TileView.as_view(layer="biomes")
-    ),
-    path("tiles/pas/<int:z>/<int:x>/<int:y>/", tiles.TileView.as_view(layer="pas")),
-    path("tiles/kbas/<int:z>/<int:x>/<int:y>/", tiles.TileView.as_view(layer="kbas")),
-    path("tiles/hii/<int:z>/<int:x>/<int:y>/", tiles.TileView.as_view(layer="hii")),
-    path(
-        "tiles/species/<str:species>/structural_habitat/<int:z>/<int:x>/<int:y>/",
-        tiles.TileView.as_view(layer="structural_habitat"),
-    ),
-    path(
-        "tiles/species/<str:species>/<int:z>/<int:x>/<int:y>/",
-        tiles.TileView.as_view(layer="aoi"),
-    ),
-]
+tile_urlpatterns = (
+    hii_tiles_purple.make_urlpatterns("tiles/hii")
+    + hii_tiles_rainbow.make_urlpatterns("tiles/hii")
+    + biometiles.make_urlpatterns("tiles/biomes")
+    + patiles.make_urlpatterns("tiles/pas")
+    + kbatiles.make_urlpatterns("tiles/kbas")
+    # TODO: make species dynamic
+    + structuralhabitattiles.make_urlpatterns("tiles/species/Panthera_tigris/structural_habitat")
+)
 
-router.register(r"records", RecordsViewSet, "records")
-
-api_urls = router.urls + tile_urls
+api_urls = (
+    router.urls
+    + tile_urlpatterns
+    + [
+        path(
+            "reports/species/", SpeciesReportView.as_view(), name="species-report-list"
+        ),
+    ]
+)

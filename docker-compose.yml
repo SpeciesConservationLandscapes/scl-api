@@ -2,8 +2,8 @@ version: '2'
 
 services:
 
-  api_db:
-    container_name: api_db
+  scl_db:
+    container_name: scl_db
     image: mdillon/postgis:11
     environment:
       - POSTGRES_PASSWORD=postgres
@@ -11,8 +11,8 @@ services:
     ports:
       - 5432:5432
 
-  api_service:
-    container_name: api_service
+  scl_api:
+    container_name: scl_api
     build:
         context: .
         dockerfile: Dockerfile
@@ -25,4 +25,4 @@ services:
       - .env
 
     links:
-      - api_db
+      - scl_db

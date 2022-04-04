@@ -1,46 +1,83 @@
 from .base import BaseAPIFilterSet, LandscapeSerializer, StatsSerializer, StatsViewSet
-from ..models import FragmentLandscape, FragmentStats
+from ..models import RestorationFragmentLandscape, RestorationFragmentStats, SpeciesFragmentLandscape, SpeciesFragmentStats, SurveyFragmentLandscape, SurveyFragmentStats
 
 
-class FragmentSerializer(LandscapeSerializer):
+class RestorationFragmentSerializer(LandscapeSerializer):
     class Meta:
-        model = FragmentLandscape
+        model = RestorationFragmentLandscape
         exclude = []
 
 
-class FragmentStatsSerializer(StatsSerializer):
-    fragment = FragmentSerializer()
+class RestorationFragmentStatsSerializer(StatsSerializer):
+    restoration_fragment = RestorationFragmentSerializer()
 
     class Meta(StatsSerializer.Meta):
-        model = FragmentStats
-        fields = ["id", "country", "fragment", "geom", "area", "biome_areas"]
+        model = RestorationFragmentStats
+        fields = ["id", "country", "restoration_fragment", "geom", "area", "biome_areas"]
 
 
-class FragmentStatsFilterSet(BaseAPIFilterSet):
+class RestorationFragmentStatsFilterSet(BaseAPIFilterSet):
+    class Meta(BaseAPIFilterSet.Meta):
+        model = RestorationFragmentStats
+        fields = ["country", "restoration_fragment__species", "restoration_fragment__date"]
+
+
+class RestorationFragmentStatsViewSet(StatsViewSet):
+    serializer_class = RestorationFragmentStatsSerializer
+    filter_class = RestorationFragmentStatsFilterSet
+    queryset = RestorationFragmentStats.objects.select_related()
+    ordering_fields = ["country", "restoration_fragment__species", "restoration_fragment__date"]
+
+
+class SpeciesFragmentSerializer(LandscapeSerializer):
     class Meta:
-        model = FragmentStats
-        fields = ["country", "fragment__species", "fragment__date"]
+        model = SpeciesFragmentLandscape
+        exclude = []
 
 
-class FragmentStatsViewSet(StatsViewSet):
-    serializer_class = FragmentStatsSerializer
-    filter_class = FragmentStatsFilterSet
-    ordering_fields = ["country", "fragment__species", "fragment__date"]
-    required_filters = ["country", "fragment__species", "fragment__date"]
+class SpeciesFragmentStatsSerializer(StatsSerializer):
+    species_fragment = SpeciesFragmentSerializer()
 
-    def get_queryset(self):
-        for f in self.required_filters:
-            if (
-                f not in self.request.query_params
-                or self.request.query_params[f] is None
-                or self.request.query_params[f] == ""
-            ):
-                return FragmentStats.objects.none()
+    class Meta(StatsSerializer.Meta):
+        model = SpeciesFragmentStats
+        fields = ["id", "country", "species_fragment", "geom", "area", "biome_areas"]
 
-        filters = {
-            "country": self.request.query_params["country"],
-            "fragment__species": self.request.query_params["fragment__species"],
-            "fragment__date": self.request.query_params["fragment__date"],
-        }
 
-        return FragmentStats.objects.filter(**filters).select_related()
+class SpeciesFragmentStatsFilterSet(BaseAPIFilterSet):
+    class Meta(BaseAPIFilterSet.Meta):
+        model = SpeciesFragmentStats
+        fields = ["country", "species_fragment__species", "species_fragment__date"]
+
+
+class SpeciesFragmentStatsViewSet(StatsViewSet):
+    serializer_class = SpeciesFragmentStatsSerializer
+    filter_class = SpeciesFragmentStatsFilterSet
+    queryset = SpeciesFragmentStats.objects.select_related()
+    ordering_fields = ["country", "species_fragment__species", "species_fragment__date"]
+
+
+class SurveyFragmentSerializer(LandscapeSerializer):
+    class Meta:
+        model = SurveyFragmentLandscape
+        exclude = []
+
+
+class SurveyFragmentStatsSerializer(StatsSerializer):
+    survey_fragment = SurveyFragmentSerializer()
+
+    class Meta(StatsSerializer.Meta):
+        model = SurveyFragmentStats
+        fields = ["id", "country", "survey_fragment", "geom", "area", "biome_areas"]
+
+
+class SurveyFragmentStatsFilterSet(BaseAPIFilterSet):
+    class Meta(BaseAPIFilterSet.Meta):
+        model = SurveyFragmentStats
+        fields = ["country", "survey_fragment__species", "survey_fragment__date"]
+
+
+class SurveyFragmentStatsViewSet(StatsViewSet):
+    serializer_class = SurveyFragmentStatsSerializer
+    filter_class = SurveyFragmentStatsFilterSet
+    queryset = SurveyFragmentStats.objects.select_related()
+    ordering_fields = ["country", "survey_fragment__species", "survey_fragment__date"]

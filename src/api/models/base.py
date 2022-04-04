@@ -1,7 +1,5 @@
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
-
-# countries: 'USDOS/LSIB/2013' https://developers.google.com/earth-engine/datasets/catalog/USDOS_LSIB_2013
 from django_countries.fields import CountryField
 
 

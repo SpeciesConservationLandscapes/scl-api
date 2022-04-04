@@ -6,7 +6,7 @@ from invoke import run
 ### HELPER FUNCTIONS ###
 def _api_cmd(cmd):
     """Prefix the container command with the docker cmd"""
-    return "docker exec -it api_service %s" % cmd
+    return "docker exec -it scl_api %s" % cmd
 
 
 def local(command):
@@ -82,7 +82,7 @@ def migrate(c):
 def createdatabase(c):
     local(
         _api_cmd(
-            """psql "postgresql://postgres:postgres@api_db" -c "CREATE DATABASE scl;" """
+            """psql "postgresql://postgres:postgres@scl_db" -c "CREATE DATABASE scl;" """
         )
     )
 
