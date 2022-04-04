@@ -36,10 +36,12 @@ class SCLStatsViewSet(StatsViewSet):
     @action(detail=False, methods=["get"])
     def available_dates(self, request):
         filters = {}
-        if request.query_params.get("country"):
-            filters["country"] = request.query_params.get("country")
-        if request.query_params.get("scl__species"):
-            filters["scl__species"] = request.query_params.get("scl__species")
+        country = request.query_params.get("country")
+        species = request.query_params.get("scl__species")
+        if country:
+            filters["country"] = country
+        if species:
+            filters["scl__species"] = species
 
         qs = SCLStats.objects.filter(**filters)
         _available_dates = (

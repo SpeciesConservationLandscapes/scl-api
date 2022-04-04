@@ -9,11 +9,9 @@ from rest_framework.views import APIView
 from . import species_report
 from . import stats
 from ..models import Species
-# from ..resources.base import UserCountryPermission
 
 
 class SpeciesReportView(APIView):
-    # permission_classes = [UserCountryPermission]
     EXCEL_MIME_TYPE = (
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )

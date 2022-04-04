@@ -25,7 +25,5 @@ class SurveyStatsFilterSet(BaseAPIFilterSet):
 class SurveyStatsViewSet(StatsViewSet):
     serializer_class = SurveyStatsSerializer
     filter_class = SurveyStatsFilterSet
+    queryset = SurveyStats.objects.select_related()
     ordering_fields = ["country", "survey_landscape__species", "survey_landscape__date", "survey_landscape__lsid"]
-
-    def get_queryset(self):
-        return SurveyStats.objects.select_related()

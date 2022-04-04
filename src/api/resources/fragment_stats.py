@@ -25,10 +25,8 @@ class RestorationFragmentStatsFilterSet(BaseAPIFilterSet):
 class RestorationFragmentStatsViewSet(StatsViewSet):
     serializer_class = RestorationFragmentStatsSerializer
     filter_class = RestorationFragmentStatsFilterSet
+    queryset = RestorationFragmentStats.objects.select_related()
     ordering_fields = ["country", "restoration_fragment__species", "restoration_fragment__date"]
-
-    def get_queryset(self):
-        return RestorationFragmentStats.objects.select_related()
 
 
 class SpeciesFragmentSerializer(LandscapeSerializer):
@@ -54,10 +52,8 @@ class SpeciesFragmentStatsFilterSet(BaseAPIFilterSet):
 class SpeciesFragmentStatsViewSet(StatsViewSet):
     serializer_class = SpeciesFragmentStatsSerializer
     filter_class = SpeciesFragmentStatsFilterSet
+    queryset = SpeciesFragmentStats.objects.select_related()
     ordering_fields = ["country", "species_fragment__species", "species_fragment__date"]
-
-    def get_queryset(self):
-        return SpeciesFragmentStats.objects.select_related()
 
 
 class SurveyFragmentSerializer(LandscapeSerializer):
@@ -83,7 +79,5 @@ class SurveyFragmentStatsFilterSet(BaseAPIFilterSet):
 class SurveyFragmentStatsViewSet(StatsViewSet):
     serializer_class = SurveyFragmentStatsSerializer
     filter_class = SurveyFragmentStatsFilterSet
+    queryset = SurveyFragmentStats.objects.select_related()
     ordering_fields = ["country", "survey_fragment__species", "survey_fragment__date"]
-
-    def get_queryset(self):
-        return SurveyFragmentStats.objects.select_related()

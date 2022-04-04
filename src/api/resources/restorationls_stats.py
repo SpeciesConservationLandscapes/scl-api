@@ -37,12 +37,10 @@ class RestorationStatsFilterSet(BaseAPIFilterSet):
 class RestorationStatsViewSet(StatsViewSet):
     serializer_class = RestorationStatsSerializer
     filter_class = RestorationStatsFilterSet
+    queryset = RestorationStats.objects.select_related()
     ordering_fields = [
         "country",
         "restoration_landscape__species",
         "restoration_landscape__date",
         "restoration_landscape__lsid",
     ]
-
-    def get_queryset(self):
-        return RestorationStats.objects.select_related()

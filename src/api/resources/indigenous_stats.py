@@ -24,7 +24,5 @@ class IndigenousRangeStatsFilterSet(BaseAPIFilterSet):
 class IndigenousRangeStatsViewSet(StatsViewSet):
     serializer_class = IndigenousRangeStatsSerializer
     filter_class = IndigenousRangeStatsFilterSet
+    queryset = IndigenousRangeCountryStats.objects.select_related()
     ordering_fields = ["species", "country"]
-
-    def get_queryset(self):
-        return IndigenousRangeCountryStats.objects.select_related()
