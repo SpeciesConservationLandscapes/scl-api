@@ -12,7 +12,7 @@ import django_countries.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0010_auto_20220329_1441'),
+        ('api', '0009_auto_20210601_1449'),
     ]
 
     operations = [

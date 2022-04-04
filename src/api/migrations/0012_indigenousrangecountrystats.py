@@ -10,7 +10,7 @@ import django_countries.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0011_auto_20220329_2027'),
+        ('api', '0011_truncate_stats'),
     ]
 
     operations = [

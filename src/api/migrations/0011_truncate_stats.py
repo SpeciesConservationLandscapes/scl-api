@@ -23,7 +23,7 @@ def truncate(*args, **kwargs):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0009_auto_20210601_1449'),
+        ('api', '0010_add_fragment_fields'),
     ]
 
     operations = [
