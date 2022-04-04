@@ -1,4 +1,4 @@
-import os
+import datetime
 import typing
 
 import ee
@@ -13,8 +13,39 @@ DATE_FORMAT = "%Y-%m-%d"
 DATE_FORMAT_EE = "yyyy-MM-dd"
 ASSET_TIMESTAMP_PROPERTY = "startTime"
 
+today = datetime.datetime.now().date().isoformat()
 
-class DatedAssets:
+
+class EEAssets:
+    """
+    Base class for fetching Earth Engine assets
+    """
+
+    asset_ids: typing.Dict[str, str] = {}
+
+    def __init__(self, asset_ids: typing.Dict[str, str]) -> None:
+        self.asset_ids = asset_ids
+
+    @classmethod
+    def empty(cls):
+        return cls({})
+
+    @classmethod
+    def fetch_assets(cls, asset_directory: str, adjust_date: bool = False):
+        raise NotImplementedError()
+
+    @classmethod
+    def list_project_assets(cls, directory):
+        try:
+            assets = ee.data.listAssets({"parent": directory})["assets"]
+        except ee.ee_exception.EEException:
+            raise ValueError(
+                f"Folder {directory} does not exist or is not a folder/image collection."
+            )
+        return assets
+
+
+class DatedImageAssets(EEAssets):
     """
     - List Assets from a particular Earth Engine Directory
     - Filter to those with 'startTime' attribute
@@ -24,25 +55,15 @@ class DatedAssets:
     - requires that ee.Initialize() has been run
     """
 
-    asset_ids: typing.Dict[str, str] = {}
     dates: typing.List[str] = []
 
     def __init__(self, asset_ids: typing.Dict[str, str]) -> None:
-        self.asset_ids = asset_ids
+        super().__init__(asset_ids)
         self.dates = list(sorted(self.asset_ids.keys()))
 
     @classmethod
-    def empty(cls):
-        return cls({})
-
-    @classmethod
-    def fetch_assets(
-        cls, asset_directory: str, ee_directory: str, adjust_date: bool = False
-    ):
-
-        directory = os.path.join(asset_directory, ee_directory)
-
-        assets = cls._list_assets(directory)
+    def fetch_assets(cls, asset_directory: str, adjust_date: bool = False):
+        assets = cls.list_project_assets(asset_directory)
 
         asset_ids = {}
         for asset in assets:
@@ -61,15 +82,18 @@ class DatedAssets:
 
         return cls(asset_ids)
 
+
+class FCTileAssets(EEAssets):
+    """
+    Earth Engine asset class for working with a single FeatureCollection
+    """
+
+    def __init__(self, asset_id: str) -> None:
+        super().__init__({today: asset_id})
+
     @classmethod
-    def _list_assets(cls, directory):
-        try:
-            assets = ee.data.listAssets({"parent": directory})["assets"]
-        except ee.ee_exception.EEException:
-            raise ValueError(
-                f"Folder {directory} does not exist or is not a folder/image collection."
-            )
-        return assets
+    def fetch_assets(cls, asset_id: str, adjust_date: bool = False):
+        return cls(asset_id)
 
 
 class PngRenderer(BaseRenderer):
@@ -91,7 +115,7 @@ class TileView(APIView):
     tilecollection = None
     date = None
 
-    def __init__(self, tilecollection, date):
+    def __init__(self, tilecollection=None, date=None):
         self.tilecollection = tilecollection
         self.date = date
         super().__init__()
@@ -132,7 +156,25 @@ class DatesView(APIView):
         return Response([date for date in self.dates])
 
 
-class DatedTileCollection:
+class TileCollection:
+    """
+    Base class for generating mapids and url patterns based on Earth Engine assets
+    """
+
+    def __init__(self, name: str, assets: EEAssets, viz_params: dict) -> None:
+        self.mapids = None
+        self.name = name
+        self.assets = assets
+        self.viz_params = viz_params
+
+    def refresh_mapids(self):
+        raise NotImplementedError()
+
+    def make_urlpatterns(self, url_stub):
+        raise NotImplementedError()
+
+
+class DatedTileCollection(TileCollection):
     """
     - for each asset in dated_assets, get mapids, applying visualization parameters
       (https://developers.google.com/earth-engine/apidocs/ee-data-getmapid)
@@ -146,24 +188,15 @@ class DatedTileCollection:
     ../tiles/hii/2020-12-31/z/x/y/ -> 2020 tiles
     """
 
-    def __init__(
-        self,
-        name: str,
-        dated_assets: DatedAssets,
-        viz_params: dict,
-    ) -> None:
-
-        self.mapids = None
-        self.name = name
-        self.dated_assets = dated_assets
-        self.viz_params = viz_params
-        self.dates = self.dated_assets.dates
+    def __init__(self, name: str, assets: DatedImageAssets, viz_params: dict) -> None:
+        super().__init__(name, assets, viz_params)
+        self.dates = self.assets.dates
         self.refresh_mapids()
 
     def refresh_mapids(self):
         self.mapids = {
             date: ee.Image(asset_id).getMapId(self.viz_params)
-            for (date, asset_id) in self.dated_assets.asset_ids.items()
+            for (date, asset_id) in self.assets.asset_ids.items()
         }
 
     def make_urlpatterns(self, url_stub):
@@ -178,3 +211,38 @@ class DatedTileCollection:
         date_urlpattern = path(f"{url_stub}", DatesView.as_view(dates=self.dates))
 
         return [date_urlpattern] + tile_urlpatterns
+
+
+class FCTileCollection(TileCollection):
+    """
+    TileCollection for tiles based on a single FeatureCollection
+    """
+
+    def __init__(
+        self,
+        name: str,
+        assets: FCTileAssets,
+        viz_params: dict,
+        color: [str, int],
+        filters=[],
+    ) -> None:
+        super().__init__(name, assets, viz_params)
+        self.color = color
+        self.filters = filters
+        self.refresh_mapids()
+
+    def refresh_mapids(self):
+        asset_id = [asset_id for (date, asset_id) in self.assets.asset_ids.items()][0]
+        fc = ee.FeatureCollection(asset_id)
+        for filter in self.filters:
+            fc = fc.filter(filter)
+        fc_image = ee.Image().byte().paint(featureCollection=fc, color=self.color)
+        self.mapids = {today: fc_image.getMapId(self.viz_params)}
+
+    def make_urlpatterns(self, url_stub):
+        return [
+            path(
+                f"{url_stub}/<int:z>/<int:x>/<int:y>/",
+                TileView.as_view(tilecollection=self, date=today),
+            )
+        ]
