@@ -99,7 +99,7 @@ if os.getenv("GAE_INSTANCE"):
         "GCP_CLOUD_SQL_CONNECTION_STRING"
     )
 else:
-    DATABASES["default"]["HOST"] = os.environ.get("DB_HOST") or "api_db"
+    DATABASES["default"]["HOST"] = os.environ.get("DB_HOST") or "scl_db"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
