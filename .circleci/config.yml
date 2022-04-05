@@ -130,13 +130,13 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - deploy_develop:
-          context: org-global
-          filters:
-            branches:
-              only: develop
-          requires:
-            - build_and_test
+      # - deploy_develop:
+      #     context: org-global
+      #     filters:
+      #       branches:
+      #         only: develop
+      #     requires:
+      #       - build_and_test
       - deploy_prod:
           context: org-global
           filters:
