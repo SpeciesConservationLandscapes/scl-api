@@ -148,7 +148,7 @@ class SCLStats(LandscapeCountryStats):
     scl = models.ForeignKey(SCL, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ("country", "scl__date")
+        ordering = ("scl__date", )
         verbose_name = _("SCL statistics")
         verbose_name_plural = _("SCL statistics")
 
@@ -162,7 +162,7 @@ class RestorationStats(LandscapeCountryStats):
     )
 
     class Meta:
-        ordering = ("country", "restoration_landscape__date")
+        ordering = ("restoration_landscape__date", )
         verbose_name = _("restoration landscape statistics")
         verbose_name_plural = _("restoration landscape statistics")
 
@@ -174,7 +174,7 @@ class SurveyStats(LandscapeCountryStats):
     survey_landscape = models.ForeignKey(SurveyLandscape, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ("country", "survey_landscape__date")
+        ordering = ("survey_landscape__date", )
         verbose_name = _("survey landscape statistics")
         verbose_name_plural = _("survey landscape statistics")
 
@@ -186,7 +186,7 @@ class SpeciesFragmentStats(LandscapeCountryStats):
     species_fragment = models.ForeignKey(SpeciesFragmentLandscape, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ("country", "species_fragment__date")
+        ordering = ("species_fragment__date", )
         verbose_name = _("species fragment statistics")
         verbose_name_plural = _("species fragment statistics")
 
@@ -198,7 +198,7 @@ class RestorationFragmentStats(LandscapeCountryStats):
     restoration_fragment = models.ForeignKey(RestorationFragmentLandscape, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ("country", "restoration_fragment__date")
+        ordering = ("restoration_fragment__date", )
         verbose_name = _("restoration fragment statistics")
         verbose_name_plural = _("restoration fragment statistics")
 
@@ -210,7 +210,7 @@ class SurveyFragmentStats(LandscapeCountryStats):
     survey_fragment = models.ForeignKey(SurveyFragmentLandscape, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ("country", "survey_fragment__date")
+        ordering = ("survey_fragment__date", )
         verbose_name = _("survey fragment statistics")
         verbose_name_plural = _("survey fragment statistics")
 

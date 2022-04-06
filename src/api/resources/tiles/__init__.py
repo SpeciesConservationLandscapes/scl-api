@@ -87,13 +87,13 @@ class FCTileAssets(EEAssets):
     """
     Earth Engine asset class for working with a single FeatureCollection
     """
-
-    def __init__(self, asset_id: str) -> None:
-        super().__init__({today: asset_id})
+    def __init__(self, asset_ids: typing.Dict[str, str]) -> None:
+        assert len(asset_ids) <= 1
+        super().__init__(asset_ids)
 
     @classmethod
     def fetch_assets(cls, asset_id: str, adjust_date: bool = False):
-        return cls(asset_id)
+        return cls({today: asset_id})
 
 
 class PngRenderer(BaseRenderer):
@@ -232,17 +232,19 @@ class FCTileCollection(TileCollection):
         self.refresh_mapids()
 
     def refresh_mapids(self):
-        asset_id = [asset_id for (date, asset_id) in self.assets.asset_ids.items()][0]
-        fc = ee.FeatureCollection(asset_id)
-        for filter in self.filters:
-            fc = fc.filter(filter)
-        fc_image = ee.Image().byte().paint(featureCollection=fc, color=self.color)
-        self.mapids = {today: fc_image.getMapId(self.viz_params)}
+        self.mapids = {}
+        for (date, asset_id) in list(self.assets.asset_ids.items())[:1]:
+            fc = ee.FeatureCollection(asset_id)
+            for filter in self.filters:
+                fc = fc.filter(filter)
+            fc_image = ee.Image().byte().paint(featureCollection=fc, color=self.color)
+            self.mapids[date] = fc_image.getMapId(self.viz_params)
 
     def make_urlpatterns(self, url_stub):
         return [
             path(
                 f"{url_stub}/<int:z>/<int:x>/<int:y>/",
-                TileView.as_view(tilecollection=self, date=today),
+                TileView.as_view(tilecollection=self, date=date),
             )
+            for date in self.mapids.keys()
         ]
