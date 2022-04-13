@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework import routers
 
-from .reports.views import SpeciesReportView
+from .reports.views import SpeciesReportView, GlobalReportView
 from .resources.fragment_stats import (
     RestorationFragmentStatsViewSet,
     SpeciesFragmentStatsViewSet,
@@ -59,6 +59,9 @@ api_urls = (
     + [
         path(
             "reports/species/", SpeciesReportView.as_view(), name="species-report-list"
+        ),
+        path(
+            "reports/species-global/", GlobalReportView.as_view(), name="species-global-report-list"
         ),
     ]
 )

@@ -114,3 +114,5 @@ app.yaml
 
 .envrc
 .direnv/
+
+src/templates/.~lock*
