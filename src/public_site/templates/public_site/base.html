@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="{%  static 'public_site/images/wcs-logo.svg' %}"
+    />
+    {% load compress %} {% compress css %}
+    <link
+      type="text/x-scss"
+      href="{% static 'public_site/scss/source.scss' %}"
+      rel="stylesheet"
+      media="screen"
+    />
+    {% endcompress %}
+    <title>HII</title>
+  </head>
+  <body>
+    <header>
+      <a href="https://wcs.org" target="_blank"
+        ><img
+          alt="WCS Logo"
+          src="{% static 'public_site/images/wcs-logo.svg' %}"
+      /></a>
+      <nav>
+        <button type="button" class="menu-icon">
+          <span class="iconify" data-icon="ic:round-menu"></span>
+        </button>
+        <div id="mobile-menu" class="hideMenu mobile-switcher">
+          <ul>
+            <li><a href="/">The Human Footprint</a></li>
+            <li><a href="./data-access">Data Access</a></li>
+            <li><a href="./resources">Resources</a></li>
+          </ul>
+        </div>
+      </nav>
+      <a href="./map" type="button" class="button header primary">Go to map</a>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+      <div class="footer contact">
+        <h4>Contact</h4>
+        <h5>Wildlife Conservation Society (WCS)</h5>
+        <p>
+          MISSION: WCS saves wildlife and wild places worldwide through science,
+          conservation action, education, and inspiring people to value nature.
+          To achieve our mission, WCS, based at the Bronx Zoo, harnesses the
+          power of its Global Conservation Program in nearly 60 nations and in
+          all the world’s oceans and its five wildlife parks in New York City,
+          visited by 4 million people annually. WCS combines its expertise in
+          the field, zoos, and aquarium to achieve its conservation mission.
+          Visit:
+          <a href="https://newsroom.wcs.org" target="_blank"
+            >https://newsroom.wcs.org</a
+          >
+          Follow:
+          <a href="https://twitter.com/WCSNewsroom" target="_blank"
+            >@WCSNewsroom</a
+          >. For more information: 347-840-1242.
+        </p>
+        <p>
+          For questions about the human footprint data, contact Eric Sanderson
+          at <a href="mailto:esanderson@wcs.org">esanderson@wcs.org</a>.
+        </p>
+      </div>
+      <div class="footer partners">
+        <h4>Partners</h4>
+        <a href="https://wcs.org" target="_blank"
+          ><div>
+            <p>Wildlife Conservation Society</p>
+            <img
+              src="{% static '/public_site/images/wcs-logo.svg' %}"
+              alt="WCS Logo"
+            /></div
+        ></a>
+        <a href="https://panthera.org" target="_blank"
+          ><div>
+            <p>Panthera</p>
+            <img
+              src="{% static '/public_site/images/panthera-logo.svg' %}"
+              alt="Panthera logo"
+            /></div
+        ></a>
+        <a href="https://sparkgeo.com" target="_blank"
+          ><div>
+            <p>Sparkgeo</p>
+            <img
+              src="{% static '/public_site/images/sparkgeo-icon-white.svg' %}"
+              alt="Sparkgeo Logo"
+            /></div
+        ></a>
+        <a href="https://www.nasa.gov" target="_blank"
+          ><div>
+            <p>NASA</p>
+            <img
+              src="{% static '/public_site/images/nasa-logo.webp' %}"
+              alt="NASA logo"
+            /></div
+        ></a>
+      </div>
+      <div class="footer credits">
+        <h4>Credits</h4>
+        <p>
+          To learn more about the 20-year time series of the human footprint,
+          access our peer-reviewed scientific paper here.
+        </p>
+        <p>
+          Authors:
+          <a href="https://twitter.com/ewsanderson" target="_blank"
+            >Eric W. Sanderson</a
+          >, <a href="https://kimfisher.com" target="_blank">Kim Fisher</a>,
+          <a href="https://twitter.com/LFgeomatics" target="_blank"
+            >Adam Duncan</a
+          >, and Lucinda Royte (Wildlife Conservation Society); Nathaniel
+          Robinson (Panthera); Dustin Sampson (SparkGeo)
+        </p>
+        <p>
+          Research funding: National Aeronautics and Space Administration
+          (NASA), Grant Number 80NSSC19K0201 and institutional funds from the
+          Wildlife Conservation Society and Panthera.
+        </p>
+        <p>
+          Analytical platform:
+          <a href="https://earthengine.google.com/" target="_blank"
+            >Google Earth Engine</a
+          >.
+        </p>
+        <p>Earth Engine apps: Nathaniel Robinson, Panthera</p>
+        <p>
+          Web design and implementation:
+          <a href="https://sparkgeo.com" target="_blank">Sparkgeo</a>
+        </p>
+        <p>
+          Photos by
+          <a
+            target="_blank"
+            href="https://unsplash.com/@ryoji__iwata?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+            >Ryoji Iwata</a
+          >,
+          <a
+            target="_blank"
+            href="https://unsplash.com/@iriser?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+            >Irina Iriser</a
+          >, and
+          <a
+            target="_blank"
+            href="https://unsplash.com/@nadyeldems?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+            >Dan Smedley</a
+          >.
+        </p>
+        <p>
+          <a href="https://www.wcs.org/legal/terms-of-use" target="_blank"
+            >Terms of Use</a
+          >
+        </p>
+        <p>&copy; Wildlife Conservation Society, 2022. All rights reserved.</p>
+      </div>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.iconify.design/2/2.1.2/iconify.min.js"></script>
+    <script src="{% static 'public_site/js/main.js' %}"></script>
+  </body>
+</html>

@@ -1,0 +1,66 @@
+%button {
+  padding: 1.2rem 3.2rem;
+  line-height: 1;
+  font-size: 2rem;
+  font-family: $sans-serif;
+  text-decoration: none;
+  margin: 0;
+  display: inline-block;
+  border-radius: $border-radius;
+  border: none;
+  mask-image: url("../images/button-texture.png");
+  -webkit-mask-image: url("../images/button-texture.png");
+  color: black;
+  text-align: left;
+  transition: $transition;
+  box-shadow: $box-shadow;
+  cursor: pointer;
+  @include hover {
+    transition: $transition;
+  }
+  &.header,
+  &.callout,
+  &.secondary,
+  &.primary {
+    text-transform: uppercase;
+  }
+  &.primary {
+    background: $primary;
+    color: white;
+    @include hover {
+      background: $primary-hover;
+    }
+  }
+  &.secondary {
+    background: $secondary;
+    color: $green;
+    mask-image: url("../images/texture-bg-dark.png");
+    -webkit-mask-image: url("../images/texture-bg-dark.png");
+    @include hover {
+      background: $white;
+    }
+    &.active {
+      outline: auto;
+    }
+  }
+  &.callout {
+    background: $callout-button;
+    color: white;
+    @include hover {
+      background: $callout-button-hover;
+    }
+  }
+  &.header {
+    font-size: inherit;
+  }
+  &.close {
+    border: solid 1px;
+    @include hover {
+      background: $grey;
+    }
+  }
+}
+a.button,
+button:not(.menu-icon) {
+  @extend %button;
+}

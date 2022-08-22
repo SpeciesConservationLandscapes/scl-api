@@ -1,0 +1,57 @@
+header {
+  color: $white;
+  nav {
+    justify-self: end;
+    .menu-icon {
+      display: none;
+      background: transparent;
+      border: none;
+      color: inherit;
+      font-size: 3rem;
+      .iconify{
+        color: $header-brown;
+        @include hover{
+          color: white;
+        }
+      }
+    }
+    .mobile-switcher {
+      display: inline;
+    }
+    ul {
+      list-style: none;
+      li {
+        padding: 0 $padding;
+        white-space: nowrap;
+        display: inline-block;
+      }
+    }
+    @include narrow {
+      position: relative;
+      .menu-icon {
+        display: inline;
+      }
+      .mobile-switcher {
+        &.hideMenu {
+          display: none;
+        }
+        display: block;
+        background: $black;
+        box-shadow: $box-shadow;
+        position: absolute;
+        justify-self: start;
+        top: 0;
+        margin: 6rem auto 0 auto;
+        ul {
+          list-style: none;
+          padding: 0;
+          li {
+            padding: $padding;
+            white-space: nowrap;
+            display: block;
+          }
+        }
+      }
+    }
+  }
+}

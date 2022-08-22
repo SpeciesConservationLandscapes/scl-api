@@ -23,6 +23,7 @@ else:
 # Application definition
 
 INSTALLED_APPS = [
+    "public_site.apps.PublicSiteConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

@@ -1,0 +1,81 @@
+@font-face {
+    font-family: 'Futura';
+    src: url('futura-webfont.woff2') format('woff2'),
+         url('futura-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Erato-light';
+    src: url('../fonts/eratolig-webfont.woff2') format('woff2'),
+         url('../fonts/eratolig-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+$serif: 'Erato-light', serif;
+$sans-serif: 'Futura', sans-serif;
+body,
+button,
+input,
+select,
+textarea {
+  font-family: $serif;
+  font-size: $font-size;
+  line-height: $line-height;
+  font-variation-settings: "wght" 375;
+  @include narrow {
+    line-height: 1.5;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  span {
+    white-space: nowrap;
+  }
+  @include narrow {
+    span {
+      white-space: normal;
+    }
+  }
+}
+p {
+  max-width: $max-line-length;
+}
+.callout {
+  background: $callout;
+  padding: $big-padding;
+  margin: 0 auto;
+}
+
+a {
+  color: inherit;
+  @include hover {
+    text-decoration: none;
+  }
+}
+.tabular-numbers {
+  font-variant-numeric: tabular-nums;
+}
+%code {
+  color: #980000;
+}
+code {
+  @extend %code;
+}
+hr{
+  box-sizing: border-box;
+  height: 2px;
+  width: 75%;
+  margin: 1rem auto;
+  border: none;
+  background: $white;
+  opacity: 0.7;
+}
