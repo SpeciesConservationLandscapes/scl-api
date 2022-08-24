@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     # "observations.apps.ApiConfig",  # effort abandoned
     "corsheaders",
     "django_countries",
+    "map.apps.MapConfig",
     "tools",
+    "compressor",
 ]
 
 MIDDLEWARE = [
@@ -116,6 +118,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 if os.getenv("GAE_INSTANCE"):
     STATIC_URL = os.environ.get("GCP_DJANGO_STATIC_URL")
@@ -123,6 +126,16 @@ else:
     STATIC_URL = "/static/"
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
+]
+
+COMPRESS_PRECOMPILERS = (("text/x-scss", "django_libsass.SassCompiler"),)
+
+
 
 APPEND_SLASH = True
 CORS_ORIGIN_ALLOW_ALL = True

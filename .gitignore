@@ -116,3 +116,5 @@ app.yaml
 .direnv/
 
 src/templates/.~lock*
+
+service.json

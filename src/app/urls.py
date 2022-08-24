@@ -23,5 +23,6 @@ admin.autodiscover()
 urlpatterns = [
     path("", include("public_site.urls")),
     url(r"^v1/", include(api_urls), name="api-root"),
+    path("map/", include("map.urls")),
     path("admin/", admin.site.urls),
 ]
