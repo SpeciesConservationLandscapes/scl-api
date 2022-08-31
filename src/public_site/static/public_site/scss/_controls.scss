@@ -1,0 +1,90 @@
+.controls {
+  margin: 0 auto auto 0.5rem;
+  z-index: 99;
+  > div {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: $padding;
+    > p.title {
+      margin: 0;
+      font-size: 2rem;
+    }
+    span {
+      padding: 0;
+      background: $white;
+      margin-bottom: $margin-bottom;
+      display: block;
+      p {
+        margin: 0;
+        font-size: small;
+        white-space: nowrap;
+      }
+      label {
+        width: $button-width;
+        height: $button-height;
+        display: flex;
+        place-items: center;
+        font-size: 2rem;
+        border: solid 1px $border;
+        cursor: pointer;
+        &:hover {
+          border: solid 2px $primary;
+        }
+      }
+      input {
+        display: none;
+        &:checked {
+          ~ label {
+            border: solid 2px $black;
+          }
+        }
+        &:focus {
+          ~ p {
+            display: block;
+          }
+        }
+      }
+    }
+    &.layercontrols {
+      small {
+        display: flex;
+        justify-content: space-between;
+        span {
+          font-size: 11px;
+        }
+      }
+      label {
+        width: $button-width;
+        height: $button-height;
+        &.nolayer {
+          @include nolayer();
+        }
+        &.rainbow {
+          @include rainbow();
+        }
+        &.purple {
+          @include purple();
+        }
+      }
+    }
+    &.basemap {
+      label {
+        background-size: 200%;
+        border: solid 2px $white;
+        &.roads {
+          background-image: url("/static/public_site/images/roads.png");
+        }
+        &.satellite {
+          background-image: url("/static/public_site/images/satellite.png");
+        }
+        &.dark {
+          background-image: url("/static/public_site/images/dark.png");
+        }
+        &.light {
+          background-image: url("/static/public_site/images/light.png");
+        }
+      }
+    }
+  }
+}

@@ -17,7 +17,7 @@ class _ReportMixin:
     COUNTRIES = dict(countries)
 
     def _parse_date(self, request):
-        """return date in format yyy-mm-dd"""
+        """return date in format yyyy-mm-dd"""
         date = request.query_params.get("date")
         if not date:
             raise ParseError("Missing date")

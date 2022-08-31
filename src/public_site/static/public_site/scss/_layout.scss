@@ -1,0 +1,320 @@
+body {
+  background-color: #f6fefd;
+  background-image: url("../images/texture-bg.png");
+  background-attachment: fixed;
+}
+@mixin section-bg($img) {
+  background-image: url($img);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+header:not(#mapHeader) {
+  font-family: $sans-serif;
+  padding: $padding;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 2rem;
+  position: fixed;
+  width: 100%;
+  left: 0;
+  top: 0;
+  background: black;
+  background-image: url("../images/header-texture.png");
+  height: $header-height;
+  z-index: 9;
+  li a:not(.button) {
+    color: $header-brown;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 1.4rem;
+    position: relative;
+    transition: $transition;
+    &:after {
+      content: "";
+      position: absolute;
+      width: 0px;
+      height: 1px;
+      text-align: center;
+      background: white;
+      bottom: 0;
+      left: 0;
+      font-size: 3rem;
+    }
+    &.current-page {
+      color: white;
+    }
+    @include hover {
+      color: white;
+      &:after {
+        transition: $transition;
+        width: 30px;
+      }
+    }
+  }
+  img {
+    max-height: 50px;
+    width: 44px;
+    -webkit-mask-image: url("../images/header-texture.png");
+    mask-image: url("../images/header-texture.png");
+  }
+}
+main:not(.map-page) {
+  min-height: calc(100vh - #{$big-padding} - #{$header-height});
+  margin: $header-height auto $big-padding auto;
+  &.home {
+    section {
+      min-height: calc(100vh - #{$header-height});
+      padding: 0 $big-padding;
+      display: grid;
+      align-items: center;
+      div.text-wrapper {
+        z-index: 2;
+        background: rgba($white, 0.9);
+        border-radius: 4px;
+        @include width;
+        padding: $big-padding;
+        color: $black;
+        mask-image: url("../images/button-texture.png");
+        -webkit-mask-image: url("../images/button-texture.png");
+        p {
+          text-align: justify;
+        }
+        @include narrow {
+          width: 99%;
+          max-width: 65rem;
+          p {
+            text-align: start;
+          }
+        }
+        h1,
+        h2 {
+          line-height: 1;
+        }
+      }
+      &:nth-child(1) {
+        @include section-bg("../images/home-images/crosswalk.webp");
+        display: flex;
+        justify-content: space-around;
+        position: relative;
+        &:before {
+          content: "";
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          position: absolute;
+          height: 100%;
+          z-index: 1;
+          background-image: linear-gradient(90deg, transparent, $white 40%);
+        }
+        @include narrow {
+          flex-direction: column;
+          &:before {
+            background-image: linear-gradient(180deg, transparent, $white 50%);
+          }
+        }
+        div.gif-wrapper,
+        div.text-wrapper {
+          margin: 0 atuo;
+        }
+        div.gif-wrapper {
+          z-index: 2;
+          place-items: center;
+          div.gif-display {
+            position: relative;
+            #legend-wrapper {
+              bottom: 8px;
+              right: 1px;
+              z-index: 1;
+              font-family: $sans-serif;
+              .legend {
+                height: 10px;
+              }
+            }
+            figure {
+              position: relative;
+              overflow: hidden;
+              margin: 0;
+              text-align: end;
+              &.paused:after {
+                content: "\25BA";
+                display: grid;
+                place-items: center;
+                font-size: 7rem;
+                line-height: 1;
+                color: white;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 5px;
+                z-index: 2;
+                background: rgba($black, $transparency);
+              }
+              @include hover {
+                cursor: pointer;
+                &.paused:after {
+                  transition: $transition;
+                  background: rgba($black, 0.5);
+                }
+                img {
+                  outline: solid 2px $primary;
+                }
+              }
+              figcaption {
+                position: absolute;
+                top: $padding;
+                right: 0;
+                background: rgba($white, $transparency);
+                color: $black;
+                padding: $padding;
+                text-transform: capitalize;
+                font-family: $sans-serif;
+                z-index: 8;
+              }
+              img {
+                object-fit: cover;
+                width: 100%;
+              }
+            }
+          }
+          div.button-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            max-width: $max-line-length;
+            button {
+              font-size: 1.5rem;
+              flex-grow: 2;
+              flex-basis: 0;
+              text-align: center;
+              max-width: 25rem;
+            }
+          }
+        }
+      }
+      &:nth-child(2) {
+        min-height: auto;
+      }
+      &:nth-child(3) {
+        @include section-bg("../images/home-images/forest.webp");
+        justify-content: flex-end;
+        h2 {
+          text-align: right;
+        }
+      }
+      &:nth-child(4) {
+        @include section-bg("../images/home-images/nyc.webp");
+      }
+      @include narrow {
+        place-items: center;
+        padding: $padding;
+        grid-template-columns: auto;
+        grid-template-rows: auto auto;
+      }
+    }
+  }
+
+  &.data-access,
+  &.other-tools {
+    @include width;
+    h1 {
+      padding: $big-padding;
+      margin: calc(#{$header-height} + #{$big-padding}) 0 $big-padding 0;
+    }
+    section {
+      margin: $padding;
+    }
+  }
+  &.data-access {
+    div {
+      display: flex;
+      align-items: flex-start;
+      gap: $padding;
+      @include narrow {
+        flex-direction: column;
+      }
+      img {
+        width: 12rem;
+        margin-bottom: $margin-bottom;
+      }
+    }
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      max-width: 99vw;
+      overflow: scroll;
+      li {
+        white-space: nowrap;
+      }
+    }
+  }
+  &.other-tools {
+    a {
+      background: rgba($white, 0.9);
+      margin-bottom: $margin-bottom;
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      padding: $padding;
+      gap: $padding;
+      text-decoration: none;
+      span {
+        width: 100%;
+      }
+      img {
+        width: 10rem;
+      }
+      @include hover {
+        outline: solid 2px $primary;
+        background: $white;
+      }
+    }
+  }
+}
+
+footer:not(#mapFooter) {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: $black;
+  color: $white;
+  @include narrow {
+    display: block;
+    & > div:not(:last-child) {
+      border-bottom: solid 1px white;
+    }
+  }
+  p {
+    font-size: 1.3rem;
+  }
+  & > div {
+    border: solid 20px $black;
+    &:not(:last-child) {
+      border-right: solid 1px $white;
+    }
+  }
+  .partners {
+    div {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: space-between;
+      align-items: center;
+      max-width: $max-line-length;
+      width: 100%;
+      padding: $padding;
+      margin-bottom: $margin-bottom;
+      img {
+        height: 6rem;
+      }
+      p {
+        font-size: 2rem;
+        text-align: end;
+      }
+    }
+  }
+}

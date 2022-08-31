@@ -1,0 +1,80 @@
+.countries {
+  form {
+    height: $filter-height;
+    border-bottom: solid 1px $border;
+    padding: $padding;
+    label {
+      display: block;
+    }
+    input {
+      width: 100%;
+    }
+  }
+  ul {
+    height: calc(
+      100vh - #{$header-height} - #{$graph-height} - #{$filter-height} - #{$padding}
+    );
+    overflow-y: scroll;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background: $white;
+    .noresults span {
+      min-width: 200px;
+      padding: 5px;
+    }
+    li {
+      display: flex;
+      @include hover {
+        background: $hover;
+        button {
+          color: $hover-color;
+          background: $hover;
+          visibility: visible;
+        }
+      }
+      input {
+        height: 0;
+        width: 0;
+      }
+      label {
+        display: inline-block;
+        width: 100%;
+        padding: 5px;
+        cursor: pointer;
+        max-width: 26ch;
+        line-height: 1.5;
+      }
+      button {
+        font-size: smaller;
+        text-transform: uppercase;
+        visibility: hidden;
+        background: $selected;
+        color: $selected-color;
+        border: none;
+        border-radius: 0;
+        cursor: pointer;
+        transition: none;
+        @include hover {
+          outline: solid 1px;
+          opacity: 0.8;
+        }
+        &:active {
+          opacity: 1;
+        }
+      }
+      input:checked {
+        ~ button {
+          visibility: visible;
+          background: $selected;
+          color: $selected-color;
+        }
+        ~ label,
+        ~ button {
+          background: $selected;
+          color: $selected-color;
+        }
+      }
+    }
+  }
+}

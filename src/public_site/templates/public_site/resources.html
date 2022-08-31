@@ -1,0 +1,109 @@
+{% extends "./base.html" %} {% block content %} {% load static %}
+<main class="other-tools">
+  <h1>Resources</h1>
+  <section class="callout">
+    <h2>Other Tools</h2>
+    <p>
+      Please find below other cool tools created by us or others to explore the
+      human footprint. If you have a tool or resource to share, please use
+      information below to contact us.
+    </p>
+  </section>
+  <section>
+    <a href="{% url 'hiiv2:index' %}" target="_blank">
+      <img
+        src="{% static '/public_site/images/other-tools/hf2.png' %}"
+        alt="Screen shot showing previous version of the human footprint site"
+      />
+      <span
+        >Previous analysis: Sixteen years of change in the global human
+        footprint. Venter et al. (2016)</span
+      >
+    </a>
+    <a
+      href="https://scl.earthengine.app/view/hii---annual-comparison"
+      target="_blank"
+    >
+      <img
+        src="{% static '/public_site/images/other-tools/compare.png' %}"
+        alt="Screen shot showing Earth Engine annual comparison"
+      />
+      <span>Compare the human footprint for two years</span>
+    </a>
+    <a href="https://scl.earthengine.app/view/hii---animation" target="_blank">
+      <img
+        src="{% static '/public_site/images/other-tools/hii-animation.png' %}"
+        alt="Screen shot showing Earth Engine yearly animation"
+      />
+      <span>Watch an animation of the human footprint</span>
+    </a>
+    <a
+      href="https://scl.earthengine.app/view/hii---driver-visualization"
+      target="_blank"
+    >
+      <img
+        src="{% static '/public_site/images/other-tools/hii-driver-visualization.png' %}"
+        alt="Screen shot showing Earth Engine drivers of HII"
+      />
+      <span>Explore the drivers of human impacts</span>
+    </a>
+  </section>
+  <section class="callout">
+    <h2>Further Reading</h2>
+    <p>
+      To learn more about the human footprint and what it means for people and
+      wildlife, check out the links below.
+    </p>
+  </section>
+  <section>
+    <a
+      href="https://academic.oup.com/bioscience/article/52/10/891/354831"
+      target="_blank"
+    >
+      <span>The Human Footprint and Last of the Wild - BioScience, 2002</span>
+    </a>
+    <a
+      href="https://www.science.org/doi/full/10.1126/science.1140170"
+      target="_blank"
+    >
+      <span
+        >Domesticated Nature: Shaping Landscapes and Ecosystems for Human
+        Welfare - Science, 2007</span
+      >
+    </a>
+    <a href="https://www.nature.com/articles/ncomms12558" target="_blank">
+      <span
+        >Sixteen years of change in the global terrestrial human footprint and
+        implications for biodiversity conservation - Nature Communications,
+        2016</span
+      >
+    </a>
+    <a
+      href="https://www.thenatureofcities.com/2016/02/16/setting-priorities-with-the-human-footprint-or-why-i-am-an-urban-conservationist/"
+      target="_blank"
+    >
+      <span
+        >Setting Priorities with the Human Footprint, or Why I Am an Urban
+        Conservationist - The Nature of Cities, 2016</span
+      >
+    </a>
+    <a
+      href="https://www.sciencedirect.com/science/article/pii/S2590332219300715"
+      target="_blank"
+    >
+      <span
+        >Mapping the Continuum of Humanity's Footprint on Land - One Earth,
+        2019</span
+      >
+    </a>
+    <a
+      href="https://www.zotero.org/groups/2019274/human_footprint_studies/library"
+      target="_blank"
+    >
+      <span>
+        Bibliography of human footprint-related papers - available via Zotero
+      </span>
+    </a>
+  </section>
+</main>
+{% endblock %}

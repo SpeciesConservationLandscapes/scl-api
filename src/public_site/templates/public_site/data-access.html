@@ -1,0 +1,252 @@
+{% extends "./base.html" %} {% block content %} {% load static %}
+<main class="data-access">
+  <h1>Data Access</h1>
+  <section class="callout">
+    <p>
+      Human Impact Index data are freely accessible, and the code to generate
+      them is fully open souce,
+      <a
+        href="https://opensource.com/life/15/12/why-open-source"
+        target="_blank"
+      >
+        because we support the transparency and reproducibility</a
+      >
+      of
+      <a href="https://opensource.com/resources/open-science" target="_blank"
+        >Open Science</a
+      >.
+      <a
+        href="https://www.researchgate.net/publication/354335140_Closing_the_knowledge-action_gap_in_conservation_with_open_science"
+        target="_blank"
+      >
+        It also helps conservation.</a
+      >
+    </p>
+    <p>
+      Data are licensed under the
+      <a
+        href="https://creativecommons.org/licenses/by-nc-sa/3.0/"
+        target="_blank"
+        >Creative Commons Attribution-NonCommercial_ShareAlike 3.0 Unported (CC
+        BY-NC-SA 3.0) license</a
+      >. Please cite this paper in all uses.
+    </p>
+  </section>
+  <section>
+    <h2>Github</h2>
+    <div>
+      <img
+        alt="github logo"
+        src="{% static 'public_site/images/GitHub-logo.png' %}"
+      />
+      <p>
+        All HII calculations are based on a common task framework written in
+        Python and making heavy use of the Earth Engine API. Each task is a
+        separate Git repository hosted under a GPL 3.0 license on GitHub,
+        inheriting from a common set of classes Docker container maintained in
+        <a
+          href="https://github.com/SpeciesConservationLandscapes/task_base"
+          target="_blank"
+          >task_base</a
+        >. READMEs and code is fully accessible at the link below.
+      </p>
+    </div>
+    <a
+      class="button primary"
+      href="https://github.com/SpeciesConservationLandscapes"
+      target="_blank"
+      >View on Github</a
+    >
+  </section>
+  <section>
+    <h2>Google Earth Engine</h2>
+    <div>
+      <img
+        alt="Google earth engine logo"
+        src="{% static 'public_site/images/google-earth-engine-logo.png' %}"
+      />
+      <p>
+        All Human Impact Index calculations are done within the task framework
+        referenced below, with Google Earth Engine at its core. Earth Engine is
+        a Cloud-based framework that combines a multi-petabyte catalog with a
+        powerful geospatial analysis API. HII outputs are stored in an
+        <code>ImageCollection</code> at <code>projects/HII/v1/hii</code>, one
+        image per date. Individual driver <code>ImageCollections</code> are also
+        available within <code>projects/HII/v1/driver</code>, named
+        <code>infrastructure</code>, <code>land_use</code>,
+        <code>population_density</code>, <code>power</code>,
+        <code>railways</code>, <code>roads</code>, and <code>water</code>.
+      </p>
+    </div>
+    <a
+      class="button primary"
+      href="https://code.earthengine.google.com/f904097220e577cad2e0dc5379371c91"
+      target="_blank"
+      >Asset location script on Google earthengine</a
+    >
+  </section>
+  <section>
+    <h2>Outside Google Earth Engine</h2>
+    <div>
+      <img
+        alt="Download icon"
+        src="{% static 'public_site/images/download-icon.png' %}"
+      />
+      <p>
+        For those without GEE access, HII assets are exported to a public bucket
+        on Google Cloud Storage as
+        <a href="https://www.cogeo.org/" target="_blank"
+          >Cloud-Optimized GeoTIFFs</a
+        >. These TIFFs can be
+        <a href="https://www.cogeo.org/qgis-tutorial.html" target="_blank"
+          >loaded by url directly into QGIS</a
+        >, or downloaded for local manipulation.
+      </p>
+    </div>
+    <h3>HII TIFFS currently available:</h3>
+    <p class="callout">Tiff files are over 3gb each.</p>
+    <ul class="tabular-numbers">
+      <li>
+        (3.2gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2001-01-01/hii_2001-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2001-01-01/hii_2001-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.2gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2002-01-01/hii_2002-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2002-01-01/hii_2002-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.2gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2003-01-01/hii_2003-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2003-01-01/hii_2003-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.2gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2004-01-01/hii_2004-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2004-01-01/hii_2004-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.2gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2005-01-01/hii_2005-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2005-01-01/hii_2005-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.2gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2006-01-01/hii_2006-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2006-01-01/hii_2006-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.2gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2007-01-01/hii_2007-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2007-01-01/hii_2007-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.2gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2008-01-01/hii_2008-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2008-01-01/hii_2008-01-01.tif</a
+        >
+      </li>
+      <li>
+        (2.3gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2009-01-01/hii_2009-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2009-01-01/hii_2009-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.2gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2010-01-01/hii_2010-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2010-01-01/hii_2010-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.2gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2011-01-01/hii_2011-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2011-01-01/hii_2011-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.2gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2012-01-01/hii_2012-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2012-01-01/hii_2012-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.2gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2013-01-01/hii_2013-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2013-01-01/hii_2013-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.2gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2014-01-01/hii_2014-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2014-01-01/hii_2014-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.4gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2015-01-01/hii_2015-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2015-01-01/hii_2015-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.4gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2016-01-01/hii_2016-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2016-01-01/hii_2016-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.4gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2017-01-01/hii_2017-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2017-01-01/hii_2017-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.5gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2018-01-01/hii_2018-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2018-01-01/hii_2018-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.5gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2019-01-01/hii_2019-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2019-01-01/hii_2019-01-01.tif</a
+        >
+      </li>
+      <li>
+        (3.5gb)
+        <a
+          href="https://storage.googleapis.com/hii-export/2020-01-01/hii_2020-01-01.tif"
+          >https://storage.googleapis.com/hii-export/2020-01-01/hii_2020-01-01.tif</a
+        >
+      </li>
+    </ul>
+  </section>
+</main>
+{% endblock %}

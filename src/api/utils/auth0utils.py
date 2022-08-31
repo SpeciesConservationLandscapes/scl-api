@@ -3,7 +3,7 @@ import random
 import string
 
 from django.utils.encoding import smart_text
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from jose import jws, jwt
 from rest_framework import exceptions
 from rest_framework.authentication import get_authorization_header
