@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="{%  static 'public_site/images/wcs-logo.svg' %}"
+    />
+    {% load compress %} {% compress css %}
+    <link
+      type="text/x-scss"
+      href="{% static 'public_site/scss/source.scss' %}"
+      rel="stylesheet"
+      media="screen"
+    />
+    {% endcompress %}
+    <title>HII</title>
+  </head>
+  <body>
+    <div class="modal" id="about-modal">
+      <div class="modal-content">
+        <div>
+          <h2>About this map</h2>
+        </div>
+        <div>
+          <p>
+            The graph shows the mean human impact calculated from the human
+            footprint over time. Human impact is calculated with improved
+            sources of information about infrastructure and nighttime lights
+            starting in 2014. Click on the “Countries” button to select a
+            country and corresponding graph. See Sanderson et al. (2022) for
+            additional details.
+          </p>
+        </div>
+        <div>
+          <div><!-- this aligns the close button to the right --></div>
+          <button class="close" type="button">Close</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="country-modal">
+      <div class="modal-content">
+        <div>
+          <h2>A note about countries</h2>
+        </div>
+        <div>
+          <p>
+            The country boundaries employed for analytical purposes do not imply
+            endorsement of any particular claims to sovereignty or territorial
+            integrity, and do not claim to be definitive for any particular
+            purpose. For purposes of analysis, we define "country" as any entity
+            with an
+            <a href="https://en.wikipedia.org/wiki/ISO_3166-1" target="_blank"
+              >ISO-3166-1 code</a
+            >, as shown here. If different geographies need to be analyzed,
+            <a
+              href="https://github.com/SpeciesConservationLandscapes"
+              target="_blank"
+              >all code is open to inspection</a
+            >, and a
+            <a
+              href="https://code.earthengine.google.com/cfcbb568f0e1f9caca23f165ecad563a"
+              target="_blank"
+              >demonstration Earth Engine script is available</a
+            >
+            for analyzing user-defined geographies.
+          </p>
+        </div>
+        <div>
+          <div><!-- this aligns the close button to the right --></div>
+          <button class="close" type="button">Close</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="download-modal">
+      <div class="modal-content">
+        <div>
+          <h2>Download Report</h2>
+        </div>
+        <div>
+          <p>
+            Select a report to download for <span class="country-name"></span>.
+          </p>
+          <p>
+            Reports include mean, min, max, sum per area, and standard deviation
+            statistics for all available dates.
+          </p>
+          <p>
+            For access to the Human Impact Index data analyzed in these reports,
+            go to <a href="/data-access">Data Access</a>.
+          </p>
+          <button data-type="geojson" type="buton" class="download-for primary">
+            Download geoJSON report
+          </button>
+          <button data-type="xlsx" type="buton" class="download-for primary">
+            Download xlsx report
+          </button>
+        </div>
+        <div>
+          <div></div>
+          <button class="close" type="button">Close</button>
+        </div>
+      </div>
+    </div>
+    <main class="map-page">
+      <header id="mapHeader">
+        <a href="https://wcs.org" target="_blank"
+          ><img
+            alt="WCS Logo"
+            src="{%  static 'public_site/images/wcs-logo.svg' %}"
+        /></a>
+        <h1>March of the <span>human footprint</span></h1>
+        <div class="home">
+          <button type="button" class="about-button">About</button>
+          <a href="/" class="button header primary">Home</a>
+        </div>
+      </header>
+      <div id="middle-content">
+        <div id="sidebar">
+          <div class="sidebar-buttons">
+            <button
+              class="sidebar-button-toggle"
+              data-toggle="layercontrols-toggle"
+              type="button"
+            >
+              <span class="iconify-inline" data-icon="mdi:layers-triple"></span>
+              Footprint
+            </button>
+            <button
+              class="sidebar-button-toggle"
+              data-toggle="basemap-toggle"
+              type="button"
+            >
+              <span class="iconify-inline" data-icon="mdi:map"></span>
+              Basemap
+            </button>
+            <button
+              class="sidebar-button-toggle"
+              data-toggle="countries-toggle"
+              type="button"
+            >
+              <span class="iconify-inline" data-icon="mdi:earth"></span>
+              Countries
+            </button>
+            <hr />
+            <button
+              class="sidebar-button-toggle graph-button active"
+              data-toggle="graph-toggle"
+              type="button"
+            >
+              <span class="iconify-inline" data-icon="mdi:graph"></span>
+              Impact over Time
+            </button>
+            <div id="date-stepper-wrapper">
+              <button id="date-down" type="button">
+                <span class="iconify-inline" data-icon="mdi:menu-left"></span>
+              </button>
+              <p id="current-date">2019</p>
+              <button id="date-up" type="button">
+                <span class="iconify-inline" data-icon="mdi:menu-right"></span>
+              </button>
+            </div>
+          </div>
+          <div class="controls">
+            <div id="layercontrols-toggle" class="layercontrols control">
+              <p class="title">Layer</p>
+              <span>
+                <input
+                  id="rainbow"
+                  class="hiiSelector"
+                  name="tile"
+                  checked="checked"
+                  type="radio"
+                  value="legacy" />
+                <small
+                  ><span>lower impact</span><span>higher impact</span></small
+                >
+                <label class="rainbow" for="rainbow"></label></span
+              ><span>
+                <input
+                  id="purple"
+                  class="hiiSelector"
+                  name="tile"
+                  type="radio"
+                  value="linear" />
+                <small
+                  ><span>lower impact</span><span>higher impact</span></small
+                >
+                <label class="purple" for="purple"> </label></span
+              ><span>
+                <input
+                  id="nolayer"
+                  class="hiiSelector"
+                  name="tile"
+                  type="radio"
+                  value="none" />
+                <p>None</p>
+                <label class="nolayer" for="nolayer"> </label
+              ></span>
+            </div>
+            <div id="basemap-toggle" class="basemap control">
+              <p class="title">Basemap</p>
+              <span>
+                <input
+                  id="c1"
+                  class="baseSelector"
+                  name="basemap"
+                  checked="checked"
+                  type="radio"
+                  value="roads" />
+                <p>Roads</p>
+                <label class="roads" for="c1"> </label></span
+              ><span>
+                <input
+                  id="c2"
+                  class="baseSelector"
+                  name="basemap"
+                  type="radio"
+                  value="satellite" />
+                <p>Satellite</p>
+                <label class="satellite" for="c2"> </label></span
+              ><span>
+                <input
+                  id="c3"
+                  class="baseSelector"
+                  name="basemap"
+                  type="radio"
+                  value="dark" />
+                <p>Dark</p>
+                <label class="dark" for="c3"></label></span
+              ><span>
+                <input
+                  id="c4"
+                  class="baseSelector"
+                  name="basemap"
+                  type="radio"
+                  value="light" />
+                <p>Light</p>
+                <label class="light" for="c4"></label
+              ></span>
+            </div>
+            <div id="countries-toggle" class="countries control">
+              <form id="country-filter-form">
+                <label for="country-filter">Filter Countries</label>
+                <input type="text" name="country-filter" id="country-filter" />
+              </form>
+              <ul id="countries">
+                <li tab-index="0" class="country" data-country-name="Global">
+                  <input
+                    name="country"
+                    class="countrySelector"
+                    type="radio"
+                    id="country-global"
+                    value="global"
+                  />
+                  <label for="country-global">Global</label>
+                  <button
+                    class="download-country"
+                    data-country="Global"
+                    data-iso2="global"
+                    type="button"
+                  >
+                    download...
+                  </button>
+                </li>
+                {% for country in countries %}
+                <li
+                  tab-index="0"
+                  class="country"
+                  data-country-name="{{country.name}}"
+                >
+                  <input
+                    name="country"
+                    class="countrySelector"
+                    type="radio"
+                    id="country-{{country.iso2}}"
+                    value="{{country.iso2}}"
+                  />
+                  <label for="country-{{country.iso2}}">{{country.name}}</label>
+                  <button
+                    class="download-country"
+                    data-country="{{country.name}}"
+                    data-iso2="{{country.iso2}}"
+                    type="button"
+                  >
+                    download...
+                  </button>
+                </li>
+                {% endfor %}
+                <li class="noresults" id="no-filter-results">
+                  <span>No results</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div id="map"></div>
+      </div>
+      <div id="graph-toggle" class="graph">
+        <div id="graph-wrapper">
+          <div id="graph"></div>
+        </div>
+      </div>
+      <footer id="mapFooter">
+        <button class="country-note" type="button">
+          A note about countries...
+        </button>
+        <div id="legend-wrapper">
+          <small><span>lower impact</span><span>higher impact</span></small>
+          <div class="legend rainbow"></div>
+        </div>
+      </footer>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.iconify.design/2/2.1.2/iconify.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.8.3.min.js"></script>
+    <script src="https://unpkg.com/maplibre-gl@2.1.1/dist/maplibre-gl.js"></script>
+    <link
+      href="https://unpkg.com/maplibre-gl@2.1.1/dist/maplibre-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/flatgeobuf@3.22.0/dist/flatgeobuf-geojson.min.js"></script>
+    <script src="{% static 'map/js/map.js' %}"></script>
+    <script src="{% static 'public_site/js/main.js' %}"></script>
+  </body>
+</html>

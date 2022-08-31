@@ -1,0 +1,8 @@
+@media print {
+  header {
+    position: static;
+  }
+  a:after {
+    content: " (" attr(href) ") ";
+  }
+}

@@ -1,0 +1,126 @@
+// TYPO
+$font-size: 1.6rem;
+$line-height: 2;
+$max-line-length: 70ch;
+
+// COLOURS
+$black: #21282a;
+$green: #00ccba;
+$text-color: $black;
+$white: #fdfefa;
+$grey: #d9d9d9;
+$border: $grey;
+$header-brown: #ac9167;
+$primary: $green;
+$primary-hover: #00c7b6;
+$primary-bg: linear-gradient(156deg, #0dab9c 33%, #096d41 100%);
+$secondary: $white;
+$secondary-hover: $white;
+$highlight: linear-gradient(45deg, #0dab9c33, #3aaa5333, #1772ae33);
+$callout: linear-gradient(45deg, #0dab9c33, #3aaa5333, #1772ae33);
+$callout-button: #d83237;
+$callout-button-hover: #f7131a;
+$selected: #212121;
+$selected-color: #fff;
+$hover: lightgrey;
+$hover-color: black;
+$box-shadow: 0 0 12px 1px rgba(#484747, 0.5);
+$text-shadow: 0 1px 2px rgba(0, 0, 0, 50%);
+$transparency: 0.7;
+
+@mixin nolayer() {
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cg fill='%23c2c2c2' fill-opacity='1'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E");
+}
+@mixin rainbow() {
+  background: linear-gradient(
+    90deg,
+    #00734c,
+    #38a800,
+    #ffff00,
+    #ff0000,
+    #4c0073,
+    #000000
+  );
+}
+@mixin purple() {
+  background: linear-gradient(90deg, #ffffff, #8400a8, #4c0073, #000000);
+}
+
+// SPACING
+$small-padding: 0.5rem;
+$padding: 1rem;
+$big-padding: 3rem;
+
+// LAYOUT
+$sidebar-width: clamp(450px, 35vw, 550px);
+$graph-height: 32.5vh;
+$button-height: 5rem;
+$button-width: 20rem;
+$header-height: 8rem;
+$filter-height: 9rem;
+$margin-bottom: 0.5rem;
+$border-width: 4px;
+$border-radius: 4px;
+$map-footer-height: 4rem;
+
+//OTHER
+$transition: 0.25s;
+
+:root {
+  box-sizing: border-box;
+  font-size: 62.5%;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+//MIXINS
+@mixin width {
+  min-width: 30rem;
+  width: 60vw;
+  max-width: $max-line-length;
+  @include narrow {
+    width: 99vw;
+  }
+}
+
+@mixin hover() {
+  @media (hover: hover) {
+    &:hover {
+      @content;
+    }
+  }
+}
+@mixin narrow {
+  @media (max-width: 950px) {
+    @content;
+  }
+}
+@mixin phone-only {
+  @media (max-width: 599px) {
+    @content;
+  }
+}
+@mixin tablet-portrait-up {
+  @media (min-width: 600px) {
+    @content;
+  }
+}
+@mixin tablet-landscape-up {
+  @media (min-width: 900px) {
+    @content;
+  }
+}
+@mixin desktop-up {
+  @media (min-width: 1200px) {
+    @content;
+  }
+}
+@mixin big-desktop-up {
+  @media (min-width: 1800px) {
+    @content;
+  }
+}

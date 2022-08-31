@@ -1,0 +1,12 @@
+[
+    {
+        "origin": [
+            "http://localhost:8181",
+            "https://speciescl.org",
+            "https://*.speciescl.org"
+        ],
+        "method": ["GET"],
+        "responseHeader": ["Content-Type"],
+        "maxAgeSeconds": 3600
+    }
+]
