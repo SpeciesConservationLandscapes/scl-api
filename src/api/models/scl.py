@@ -242,3 +242,28 @@ class ReportData(models.Model):
     
     def __str__(self):
         return f"{self.report} - {self.task_date}"
+
+
+class Country(models.Model):
+    iso2 = models.CharField(max_length=2, blank=True, unique=True)
+    iso3 = models.CharField(max_length=3, blank=True, unique=True)
+    name = models.CharField(max_length=255, unique=True)
+    isonumeric = models.IntegerField(null=True, blank=True)
+    geom = models.MultiPolygonField(srid=4326)
+
+    class Meta:
+        db_table = "countries"
+
+
+class State(models.Model):
+    iso2 = models.CharField(max_length=2, blank=True, unique=True)
+    iso3 = models.CharField(max_length=3, blank=True, unique=True)
+    name = models.CharField(max_length=255, unique=True)
+    isonumeric = models.IntegerField(null=True, blank=True)
+    gadmi_code = models.IntegerField(null=True, blank=True) 
+    gadmi_name = models.CharField(max_length=100, null=True, blank=True)
+    gadmi_type = models.CharField(max_length=100, null=True, blank=True)
+    geom = models.MultiPolygonField(srid=4326, null=True, blank=True)
+
+    class Meta:
+        db_table = "states"
