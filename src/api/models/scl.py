@@ -2,8 +2,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
-from django.contrib.postgres.fields import JSONField
+from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from .base import BaseModel
 
@@ -138,7 +137,7 @@ class LandscapeCountryStats(BaseModel):
     country = CountryField()
     geom = models.MultiPolygonField(geography=True, null=True, blank=True)
     area = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal("0.00"))
-    biome_areas = JSONField(null=True, blank=True)
+    biome_areas = models.JSONField(null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -229,3 +228,42 @@ class IndigenousRangeCountryStats(BaseModel):
 
     def __str__(self):
         return _("%s %s") % (self.species, self.country)
+
+
+class ReportData(models.Model):
+    task_date = models.DateField()
+    report = models.CharField(max_length=50)
+    data = models.JSONField()
+    updated_on = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("task_date", "report")
+        db_table = "report_data"
+    
+    def __str__(self):
+        return f"{self.report} - {self.task_date}"
+
+
+class Country(models.Model):
+    iso2 = models.CharField(max_length=2, blank=True, unique=True)
+    iso3 = models.CharField(max_length=3, blank=True, unique=True)
+    name = models.CharField(max_length=255, unique=True)
+    isonumeric = models.IntegerField(null=True, blank=True)
+    geom = models.MultiPolygonField(srid=4326)
+
+    class Meta:
+        db_table = "countries"
+
+
+class State(models.Model):
+    iso2 = models.CharField(max_length=2, blank=True, unique=True)
+    iso3 = models.CharField(max_length=3, blank=True, unique=True)
+    name = models.CharField(max_length=255, unique=True)
+    isonumeric = models.IntegerField(null=True, blank=True)
+    gadmi_code = models.IntegerField(null=True, blank=True) 
+    gadmi_name = models.CharField(max_length=100, null=True, blank=True)
+    gadmi_type = models.CharField(max_length=100, null=True, blank=True)
+    geom = models.MultiPolygonField(srid=4326, null=True, blank=True)
+
+    class Meta:
+        db_table = "states"

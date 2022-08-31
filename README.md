@@ -47,3 +47,34 @@ gsutil defacl set public-read gs://scl-django-static
 gsutil rsync -R static/ gs://scl-django-static/static
 # Assets available at https://storage.googleapis.com/scl-django-static/static/
 ```
+
+
+## Loading Countries and States
+
+Data source: https://drive.google.com/file/d/1vHsyu-GdSasb7Nktt7ij13Lv-eh57Kvk/view?usp=sharing
+
+Countries:
+
+```
+ogr2ogr -f "PostGreSQL" PG:"host=scl_db user=postgres dbname=scl password=postgres" \
+    "GDAM404_country_simp2.shp" \
+    -append -update \
+    -preserve_fid \
+    -nln public.countries \
+    -nlt MULTIPOLYGON \
+    -dialect sqlite \
+    -sql "SELECT Geometry as geom, countrynam as name, iso2 as iso2, iso3 as iso3, isonumeric from GDAM404_country_simp2"
+```
+
+States:
+
+```
+ogr2ogr -f "PostGreSQL" PG:"host=scl_db user=postgres dbname=scl password=postgres" \
+    "GDAM404_state_simp2.shp" \
+    -append -update \
+    -preserve_fid \
+    -nln public.states \
+    -nlt MULTIPOLYGON \
+    -dialect sqlite \
+    -sql 'SELECT Geometry as geom, countrynam as name, iso2 as iso2, iso3 as iso3, isonumeric, gadm1code as gadm1_code, gadm1name as gadm1_name, "ENGTYPE_1" AS gadm1_type from GDAM404_state_simp2'
+```

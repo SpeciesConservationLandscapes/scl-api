@@ -1,0 +1,120 @@
+{% extends "./base.html" %} {% block content %} {% load static %}
+
+<main class="home">
+  <section class="home-section">
+    <div class="text-wrapper">
+      <h1>March of the <span>human footprint</span></h1>
+      <p>
+        The human footprint on Earth is on the move, impacting wildlife,
+        ecosystems, the climate, and human health and welfare on a global scale.
+        Here we show the maps and share the data from a new 20-year analysis of
+        the human footprint. Our analysis indicates that human impacts grew
+        faster in the five years prior to the COVID-19 pandemic than at any
+        other time in the last 12,000 years.
+      </p>
+      <a href="./map" class="button callout"
+        >Explore 20 years of human footprint</a
+      >
+    </div>
+    <div class="gif-wrapper">
+      <div class="gif-display">
+        <div id="legend-wrapper">
+          <small><span>lower impact</span><span>higher impact</span></small>
+          <div class="legend rainbow"></div>
+        </div>
+        <figure class="paused">
+          <figcaption>Ankara</figcaption>
+          <img
+            class="img-animation"
+            alt="Animation of the human footprint"
+            src="../../static/public_site/animations/ankara.png"
+          />
+        </figure>
+      </div>
+      <div class="button-wrapper">
+        <button
+          class="primary animation active"
+          type="button"
+          data-imgsrc="ankara"
+        >
+          Ankara
+        </button>
+        <button class="primary animation" type="button" data-imgsrc="bangkok">
+          Bangkok
+        </button>
+        <button class="primary animation" type="button" data-imgsrc="chihuahua">
+          Chihuahua
+        </button>
+        <button class="primary animation" type="button" data-imgsrc="cusco">
+          Cusco
+        </button>
+        <button class="primary animation" type="button" data-imgsrc="dhaka">
+          Dhaka
+        </button>
+        <button class="primary animation" type="button" data-imgsrc="kunming">
+          Kunming
+        </button>
+        <button class="primary animation" type="button" data-imgsrc="malinau">
+          Malinau
+        </button>
+        <button class="primary animation" type="button" data-imgsrc="phoenix">
+          Phoenix
+        </button>
+      </div>
+    </div>
+  </section>
+  <section class="gif-section"></section>
+  <section>
+    <div class="text-wrapper">
+      <h2>Mapping Human Impacts</h2>
+      <p>
+        The
+        <a href="https://en.wikipedia.org/wiki/Human_Footprint" target="_blank"
+          >human footprint</a
+        >
+        map is the world’s most widely used metric of human impacts, yet at its
+        core is quite simple in concept. The footprint is a simple weighted sum
+        of maps of where people live (<a
+          href="https://www.worldpop.org/"
+          target="_blank"
+          >population density</a
+        >), where we build
+        <a
+          href="https://www.openstreetmap.org/%23map=8/44.306/134.033&layers=NG"
+          target="_blank"
+          >infrastructure</a
+        >
+        (including roads, railways, factories, and other kinds of
+        infrastructure),
+        <a
+          href="https://nap.nationalacademies.org/read/11535/chapter/13"
+          target="_blank"
+          >where we can go</a
+        >
+        (accessibility), and where we use electrical energy, a proxy for access
+        to industrial energy supplies, as measured by the
+        <a
+          href="mailto:https://payneinstitute.mines.edu/eog/nighttime-lights/"
+          target="_blank"
+          >night-time lights</a
+        >. These impacts are mapped at a nominal resolution of 300 meters.
+      </p>
+    </div>
+  </section>
+  <section>
+    <div class="text-wrapper">
+      <h2>Explore the Maps</h2>
+      <p>
+        The human footprint shows the gradient of human influence, from city
+        centers, through suburbs, past farms and fields, to the least impacted
+        corners of the planet. Higher values indicate greater human impacts,
+        lower values, less impact. Through this website, you can explore the
+        human footprint using our country-level <a href="./map">data viewer</a>,
+        <a href="./data-access">access the data</a> for your own analysis, and
+        <a href="./resources">explore it using Google Earth Engine</a>. To read
+        more about the science behind the human footprint, read our paper here.
+      </p>
+    </div>
+  </section>
+</main>
+{% endblock %}
