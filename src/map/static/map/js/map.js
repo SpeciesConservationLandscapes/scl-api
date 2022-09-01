@@ -9,14 +9,70 @@ const CHART_LABELS = {
   nodeHoverLabelSeries2: "second generation",
   yaxisLabel: "Mean Impact",
 };
-const LAYER_STYLES = {
-
+const ANALYSIS_LAYERS = {
+  "scl_species": {
+    "name": "Species",
+    "style": {
+      'fill-color': '#f0bc59',
+      'fill-opacity': 0.6,
+      'fill-antialias': true,
+    },
+  },
+  "scl_species_fragment": {
+    "name": "Species Fragment",
+    "style": {
+      'fill-color': '#fff1ca',
+      'fill-opacity': 0.6,
+      'fill-antialias': true,
+    },
+  },
+  "scl_survey": {
+    "name": "Survey",
+    "style": {
+      'fill-color': '#c8ff59',
+      'fill-opacity': 0.6,
+      'fill-antialias': true,
+      
+    },
+  },
+  "scl_survey_fragment": {
+    "name": "Survey Fragment",
+    "style": {
+      'fill-color': '#e3ffd6',
+      'fill-opacity': 0.6,
+      'fill-antialias': true,
+    },
+  },
+  "scl_restoration": {
+    "name": "Restoration",
+    "style": {
+      'fill-color': '#aeaeae',
+      'fill-opacity': 0.6,
+      'fill-antialias': true,
+    },
+  },
+  "scl_survey_fragment": {
+    "name": "Restoration Fragment",
+    "style": {
+      'fill-color': '#dedede',
+      'fill-opacity': 0.6,
+      'fill-antialias': true,
+    },
+  },
+  // "": {
+  //   "name": "Structural Habitat",
+  //   "style": {},
+  // },
+  // "": {
+  //   "name": "Indigenous Range",
+  //   "style": {},
+  // },
 }
 
 // Need to fetch dates
-let DATES = ["2000-12-31","2001-12-31","2002-12-31","2003-12-31","2004-12-31","2005-12-31","2006-12-31","2007-12-31","2008-12-31","2009-12-31","2010-12-31","2011-12-31","2012-12-31","2013-12-31","2014-12-31","2015-12-31","2016-12-31","2017-12-31","2018-12-31","2019-12-31"];
-
-let currentDateIndex = null;
+let dateChoices = []; // For fetching data
+let yearChoices = []; // For display
+let currentDateIndex = 0;
 let currentDate = null;
 let currentColourScheme = null;
 let currentBasemap = "roads";
@@ -24,13 +80,23 @@ let currentCountry = "global";
 
 
 
-const getData = function() {
-  return $.get()
-    .then(function() {
-      
+const parseOutYear = function(dateString) {
+  const arr = dateString.split('-');
+  if (arr.length !== 3) {
+    throw new Error("Invalid date string");
+  }
+  return parseInt(arr[0], 10);
+} 
+
+const fetchData = function() {
+  return $.get("/v1/choices/")
+    .then(function(data) {
+      data.dates = data.dates || [];
+      dateChoices = data.dates.sort((a, b) => {return b - a});
+      yearChoices = dateChoices.map(parseOutYear);
     })
-    .catch(function() {
-      
+    .catch(function(err) {
+      console.error(err);
     });
 };
 
@@ -50,59 +116,82 @@ const setBaseMap = function(basemap) {
 };
 
 const setCountryLayer = function(iso2) {
-  let geojsonUrl;
+  const sourceName = 'scl_country';
+  const layerName = 'country';
+  let geojsonUrl = `https://cache.speciescl.org/masked_countries/${iso2}.geojson`;
 
-  if (!iso2) {
-    geojsonUrl = `https://cache.speciescl.org/countries/global.geojson`;
+  if (map.getLayer(layerName)) {
+    map.removeLayer(layerName);
+    map.removeSource(sourceName);
   }
-  else {
-    geojsonUrl = `https://cache.speciescl.org/masked_countries/${iso2}.geojson`;
+
+  if (!iso2 || iso2.toUpperCase() === "GLOBAL") {
+    // geojsonUrl = `https://cache.speciescl.org/countries/global.geojson`;
+    return;
   }
-  
-  map.addSource('scl_country', {
+
+  map.addSource(sourceName, {
     type: 'geojson',
     data: geojsonUrl
   });
+
   map.addLayer({
-    'id': 'country',
+    'id': layerName,
     'type': 'fill',
-    'source': 'scl_country',
+    'source': sourceName,
     'layout': {},
     'paint': {
-        "fill-color": "rgba(0, 0, 0, 1)",
-        "fill-opacity": 0.4,
-        "fill-antialias": true,
-        "fill-outline-color": "rgba(0, 0, 0, 0)",
+        'fill-color': 'rgba(0, 0, 0, 1)',
+        'fill-opacity': 0.4,
+        'fill-antialias': true,
+        'fill-outline-color': 'rgba(0, 0, 0, 0)',
     }
-    });
+  });
 }
 
 const setCountry = function(iso2) {
-  console.log("iso2", iso2);
+  setCountryLayer(iso2);
 };
 
+const redraw = function() {
+  refreshNavigateDateControls();
+  setAnalysisLayers(dateChoices[currentDateIndex]);
+}
 
-// rename this function
-const addLayer = function(layerName, date) {
+
+/* MAP */
+
+const setAnalysisLayer = function(layerName, date, opts) {
+  const sourceName = `scl_${layerName}`;
   const geojsonUrl = `https://cache.speciescl.org/ls_stats/Panthera_tigris/canonical/${date}/${layerName}.geojson`;
-  map.addSource('scl_states', {
+  const source = map.getSource(sourceName);
+
+  console.log('source', source);
+  
+
+  if (source) {
+    source.setData(geojsonUrl);
+    return;
+  }
+
+  map.addSource(sourceName, {
     type: 'geojson',
     data: geojsonUrl
   });
+
   map.addLayer({
-    'id': 'scl_states',
+    'id': layerName,
     'type': 'fill',
-    'source': 'scl_states',
+    'source': sourceName,
     'layout': {},
-    'paint': {
-    'fill-color': '#088',
-    'fill-opacity': 0.8
-    }
-    });
+    'paint': opts.style
+  });
 };
 
-const reDraw = function(dateIndex, colourScheme, basemap) {
-  
+const setAnalysisLayers = function(date) {
+  Object.entries(ANALYSIS_LAYERS).forEach(([layerName, opts]) => {
+    setAnalysisLayer(layerName, date, opts);
+  });
 };
 
 const initMap = function() {
@@ -164,12 +253,16 @@ const initMap = function() {
     maxZoom: MAX_ZOOM
   });
   
-  map.on("load", function () {
-    // addLayer("scl_states", "2020-01-01");
-    setCountryLayer("LK");
+  return new Promise((resolve, reject) => {
+    map.on("load", function () {
+      setCountry(currentCountry);
+      setAnalysisLayers("2020-01-01");
+      resolve();
+    });
   });
 };
 
+/* CHART */
 
 const newChart = function (xData, yData, title) {
   var splitData = splitChartData(xData, yData);
@@ -255,28 +348,41 @@ const newChart = function (xData, yData, title) {
   });
 };
 
-$(document).ready(function () {
-  $(".baseSelector")
-    .filter(`[value="${currentBasemap}"]`)
-    .prop("checked", true);
+/* CONTROLS */
+
+const refreshNavigateDateControls = function() {
+  const numDates = dateChoices.length;
+
+  $("#current-date").html(yearChoices[currentDateIndex]);
+  $("#date-down").prop("disabled", numDates === 0 || currentDateIndex + 1 >= numDates);
+  $("#date-up").prop("disabled", numDates === 0 || currentDateIndex <= 0);
+}
+
+const navigateDate = function(event) {
+  const elem = event.currentTarget;
+  const numDates = dateChoices.length;
+  const indexChange = elem.id === "date-up" ? -1 : 1;
+  const dateIndex = currentDateIndex + indexChange;
+
+  if (numDates === 0 || dateIndex < 0 || dateIndex > numDates - 1) return;
   
-    $(".countrySelector")
-      .filter(`[value="${currentCountry}"]`)
-      .prop("checked", true);
+  currentDateIndex = dateIndex;
+  redraw();
+};
 
-  initMap();
+
+/*
+
+1. Fetch choices
+2. Set default year, base map, country
+3. Load Map and chart
+
+*/
+
+const createEventListeners = function() {
   $(".baseSelector").change(function (e) {
-    var basemap = $(this)[0].value;
-    reDraw(currentDateIndex, currentColourScheme, basemap);
-  });
-
-
-
-  // Events
-  $(".baseSelector").change(function (e) {
-    var basemap = $(this)[0].value;
+    const basemap = $(this)[0].value;
     setBaseMap(basemap);
-    // reDraw(currentDateIndex, currentColourScheme, basemap);
   });
 
   $(".countrySelector").change(function (e) {
@@ -284,343 +390,23 @@ $(document).ready(function () {
     setCountry(iso2);
   });
 
+  $("#date-down, #date-up").click(navigateDate);
+};
 
+window.onload = function () {
+  $(".baseSelector")
+    .filter(`[value="${currentBasemap}"]`)
+    .prop("checked", true);
+  
+  $(".countrySelector")
+    .filter(`[value="${currentCountry}"]`).prop("checked", true);
+ 
+  fetchData()
+    .then(function() {
+      currentDate = dateChoices[currentDateIndex];
+      refreshNavigateDateControls();
+      return initMap();
+    })
+    .then(createEventListeners);
 
-  // $(".hiiSelector").filter('[value="legacy"]').prop("checked", true);
-  // $(".baseSelector").filter('[value="roads"]').prop("checked", true);
-  // $(".countrySelector").filter('[value="global"]').prop("checked", true);
-
-  // start by getting global stats, which provides a list of dates
-  // $.get("../api/stats/global/", function (data, status) {
-  //   var dates = data["dates"];
-  //   var numDates = dates.length;
-
-  //   // hii layer can have one of two colour schemes, or be turned off
-  //   // within each colour scheme, there is a source and a layer for each date
-  //   // var hiiLegacy = Object.assign(
-  //   //   {},
-  //   //   ...dates.map((x) => ({ [x]: { layerId: null } }))
-  //   // );
-  //   // var hiiLinear = Object.assign(
-  //   //   {},
-  //   //   ...dates.map((x) => ({ [x]: { layerId: null } }))
-  //   // );
-  //   // var hiiLayers = { legacy: hiiLegacy, linear: hiiLinear };
-
-  //   // var currentColourScheme = null;
-  //   // var currentDateIndex = null;
-  //   // var currentDate = null;
-
-  //   // var currentPolygonLayer = null;
-
-  //   var currentBasemap = "roads";
-
-  //   // var splitIndex = firstIndexPast2013(dates);
-
-  //   // function for changing which date is displayed on map,
-  //   // and highlighted on chart
-  //   var reDraw = function (dateIndex, colourScheme, basemap) {
-  //     // highlight date in graph
-  //     var sizes = new Array(numDates);
-  //     for (let i = 0; i < numDates; i++) {
-  //       if (i == dateIndex) {
-  //         sizes[i] = 20;
-  //       } else {
-  //         sizes[i] = 10;
-  //       }
-  //     }
-  //     Plotly.restyle("graph", {
-  //       "marker.size": [sizes.slice(0, splitIndex), sizes.slice(splitIndex)],
-  //     });
-
-  //     // remove previous layer
-  //     if (currentColourScheme != "none") {
-  //       if (currentDate) {
-  //         var layerId = hiiLayers[currentColourScheme][currentDate]["layerId"];
-  //         if (layerId) {
-  //           if (map.getLayer(layerId)) {
-  //             map.removeLayer(layerId);
-  //           }
-  //         }
-  //       }
-  //     }
-
-  //     // add new layer, along with source if not already added
-  //     var newDate = dates[dateIndex];
-  //     var newColourScheme = colourScheme;
-
-  //     if (newColourScheme != "none") {
-  //       var newLayerId = hiiLayers[newColourScheme][newDate]["layerId"];
-  //       if (newLayerId) {
-  //       } else {
-  //         newLayerId = `hii-${newDate}-tiles-${newColourScheme}`;
-  //         hiiLayers[newColourScheme][newDate]["layerId"] = newLayerId;
-  //         map.addSource(newLayerId, {
-  //           type: "raster",
-  //           tiles: [
-  //             `../api/tiles-${newColourScheme}/hii/${newDate}/{z}/{x}/{y}`,
-  //           ],
-  //           tileSize: 256,
-  //         });
-  //       }
-  //       map.addLayer(
-  //         {
-  //           id: newLayerId,
-  //           type: "raster",
-  //           source: newLayerId,
-  //           minzoom: 2,
-  //           maxzoom: 14,
-  //         },
-  //         currentPolygonLayer
-  //       );
-  //     }
-
-  //     //basemap
-  //     if (map.getLayer("basemap-layer")) {
-  //       map.removeLayer("basemap-layer");
-  //     }
-  //     map.addLayer(
-  //       {
-  //         id: "basemap-layer",
-  //         type: "raster",
-  //         source: basemap,
-  //         minzoom: 2,
-  //         maxzoom: 14,
-  //       },
-  //       "background"
-  //     );
-
-  //     // set global vars with new values
-  //     currentDateIndex = dateIndex;
-  //     currentDate = newDate;
-  //     currentColourScheme = newColourScheme;
-  //     currentBasemap = basemap;
-  //   };
-
-  //   var setCountry = function (iso2) {
-  //     // fetch geometry
-  //     $.get(
-  //       `../api/countries_geometry?iso2=${iso2}&mask=true`,
-  //       function (data, status) {
-  //         var geojsonFeature = data["results"]["features"][0];
-
-  //         map.addSource(`${iso2}`, {
-  //           type: "geojson",
-  //           data: geojsonFeature,
-  //           buffer: 512,
-  //         });
-  //         map.addLayer({
-  //           id: `${iso2}`,
-  //           type: "fill",
-  //           source: `${iso2}`,
-  //           layout: {},
-  //           paint: {
-  //             "fill-color": "rgba(0, 0, 0, 1)",
-  //             "fill-opacity": 0.4,
-  //             "fill-antialias": true,
-  //             "fill-outline-color": "rgba(0, 0, 0, 0)",
-  //           },
-  //         });
-  //         currentPolygonLayer = `${iso2}`;
-
-  //         // if multipolygon, flatten one more level
-  //         if (geojsonFeature.geometry.type === "GeometryCollection") {
-  //           var geom2 = geojsonFeature.geometry.geometries[1];
-  //         } else {
-  //           var geom2 = geojsonFeature.geometry;
-  //         }
-
-  //         if (geom2 === "Polygon") {
-  //           var coordinates = geom2.coordinates.flat(1).slice(5);
-  //         } else {
-  //           var coordinates = geom2.coordinates.flat(2).slice(5);
-  //         }
-
-  //         var bounds = coordinates.reduce(function (bounds, coord) {
-  //           return bounds.extend(coord);
-  //         }, new maplibregl.LngLatBounds(coordinates[0], coordinates[0]));
-
-  //         map.fitBounds(bounds, {
-  //           padding: 20,
-  //         });
-
-  //         $.get(`../api/stats/country/${iso2}`, function (data, status) {
-  //           var restyleChartData1 = {
-  //             y: [data["means"].slice(0, splitIndex)],
-  //             name: labels.nodeHoverLabelSeries1,
-  //           };
-  //           var restyleChartData2 = {
-  //             y: [data["means"].slice(splitIndex)],
-  //             name: labels.nodeHoverLabelSeries2,
-  //           };
-
-  //           Plotly.restyle("graph", restyleChartData1, 0);
-  //           Plotly.restyle("graph", restyleChartData2, 1);
-  //           Plotly.update("graph", {}, { title: data["name"] });
-  //         });
-  //       }
-  //     );
-  //   };
-
-  //   var setGlobal = function () {
-  //     currentPolygonLayer = null;
-
-  //     map.jumpTo({
-  //       center: [0, 0],
-  //       zoom: 2,
-  //     });
-
-  //     $.get("../api/stats/global", function (data, status) {
-  //       var globalRestyle1 = {
-  //         y: [data["means"].slice(0, splitIndex)],
-  //         name: labels.nodeHoverLabelSeries1,
-  //       };
-  //       var globalRestyle2 = {
-  //         y: [data["means"].slice(splitIndex)],
-  //         name: labels.nodeHoverLabelSeries2,
-  //       };
-  //       Plotly.restyle("graph", globalRestyle1, 0);
-  //       Plotly.restyle("graph", globalRestyle2, 1);
-  //       Plotly.update("graph", {}, { title: "Global" });
-  //     });
-  //   };
-
-  //   // function on country change
-  //   var changeCountry = function (iso2) {
-  //     // remove source and layer
-  //     if (currentPolygonLayer) {
-  //       if (map.getLayer(currentPolygonLayer)) {
-  //         map.removeLayer(currentPolygonLayer);
-  //       }
-  //       if (map.getSource(currentPolygonLayer)) {
-  //         map.removeSource(currentPolygonLayer);
-  //       }
-  //     }
-
-  //     if (iso2 === "global") {
-  //       setGlobal();
-  //     } else {
-  //       setCountry(iso2);
-  //     }
-  //   };
-
-  //   // initialize chart
-  //   console.warn("use years only, not full dates, as chart x-axis");
-  //   newChart(
-  //     data["dates"].map((x) => x.slice(0, 4)),
-  //     data["means"],
-  //     "Global"
-  //   );
-
-  //   // init map
-  //   // var map = new maplibregl.Map({
-  //   //   container: "map", // container id
-  //   //   style: {
-  //   //     sources: {
-  //   //       roads: {
-  //   //         type: "raster",
-  //   //         tiles: [
-  //   //           "https://server.arcgisonline.com/ArcGIS/rest/services//World_Street_Map/MapServer/tile/{z}/{y}/{x}",
-  //   //         ],
-  //   //         tileSize: 256,
-  //   //       },
-  //   //       satellite: {
-  //   //         type: "raster",
-  //   //         tiles: [
-  //   //           "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-  //   //         ],
-  //   //         tileSize: 256,
-  //   //       },
-  //   //       light: {
-  //   //         type: "raster",
-  //   //         tiles: [
-  //   //           "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
-  //   //         ],
-  //   //         tileSize: 256,
-  //   //       },
-  //   //       dark: {
-  //   //         type: "raster",
-  //   //         tiles: [
-  //   //           "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
-  //   //         ],
-  //   //         tileSize: 256,
-  //   //       },
-  //   //     },
-  //   //     layers: [
-  //   //       {
-  //   //         id: "basemap-layer",
-  //   //         type: "raster",
-  //   //         source: "roads",
-  //   //         minzoom: 2,
-  //   //         maxzoom: 14,
-  //   //       },
-  //   //       {
-  //   //         // consistent layer to draw basemap-layer lower than in draw order
-  //   //         id: "background",
-  //   //         type: "background",
-  //   //         layout: {
-  //   //           visibility: "none",
-  //   //         },
-  //   //       },
-  //   //     ],
-  //   //     version: 8,
-  //   //   },
-  //   //   center: [0, 48.8534], // starting position [lng, lat]
-  //   //   zoom: 2, // starting zoom
-  //   //   minZoom: 2,
-  //   //   maxZoom: 14,
-  //   // });
-
-  //   // map.on("load", function () {
-  //   //   reDraw(numDates - 1, "legacy", "roads");
-
-  //   //   // add event listeners to buttons
-
-  //   //   $(".hiiSelector").change(function (e) {
-  //   //     var colourScheme = $(this)[0].value;
-  //   //     reDraw(currentDateIndex, colourScheme, currentBasemap);
-  //   //   });
-
-  //   //   $(".baseSelector").change(function (e) {
-  //   //     var basemap = $(this)[0].value;
-  //   //     reDraw(currentDateIndex, currentColourScheme, basemap);
-  //   //   });
-
-  //   //   $(".countrySelector").change(function (e) {
-  //   //     var iso2 = $(this)[0].value;
-  //   //     changeCountry(iso2);
-  //   //   });
-
-  //   //   // some date stepper stuff
-  //   //   $("#date-down, #date-up").click(function () {
-  //   //     let currentStepperDate = parseInt($("#current-date").html(), 10);
-  //   //     const min = 2000;
-  //   //     const max = 2019;
-  //   //     $("#date-down, #date-up").prop("disabled", false);
-  //   //     if (this.id === "date-up" && currentStepperDate < max) {
-  //   //       $("#current-date").html(++currentStepperDate);
-  //   //       reDraw(++currentDateIndex, currentColourScheme, currentBasemap);
-  //   //     } else if (this.id === "date-down" && currentStepperDate > min) {
-  //   //       $("#current-date").html(--currentStepperDate);
-  //   //       reDraw(--currentDateIndex, currentColourScheme, currentBasemap);
-  //   //     }
-  //   //     if (currentStepperDate === min) {
-  //   //       $("#date-down").prop("disabled", true);
-  //   //     } else if (currentStepperDate === max) {
-  //   //       $("#date-up").prop("disabled", true);
-  //   //     }
-  //   //   });
-  //   //   var graphDiv = document.getElementById("graph");
-  //   //   graphDiv.on("plotly_click", function (data) {
-  //   //     var curveNumber = data.points[0].curveNumber;
-  //   //     var pointIndex = data.points[0].pointIndex;
-  //   //     $("#current-date").html(2000 + curveNumber * splitIndex + pointIndex);
-  //   //     reDraw(
-  //   //       curveNumber * splitIndex + pointIndex,
-  //   //       currentColourScheme,
-  //   //       currentBasemap
-  //   //     );
-  //   //   });
-  //   // });
-  // });
-});
+};

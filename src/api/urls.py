@@ -20,6 +20,10 @@ from .resources.tileviews import (
     kbatiles,
     structuralhabitattiles
 )
+from .views import (
+    CountryViewset,
+    ChoicesView,
+)
 
 router = routers.DefaultRouter()
 
@@ -43,6 +47,8 @@ router.register(
     r"surveyfragmentstats", SurveyFragmentStatsViewSet, "surveyfragmentstats"
 )
 
+router.register(r"countries", CountryViewset, basename="countries")
+
 tile_urlpatterns = (
     hii_tiles_purple.make_urlpatterns("tiles/hii")
     + hii_tiles_rainbow.make_urlpatterns("tiles/hii")
@@ -63,5 +69,8 @@ api_urls = (
         path(
             "reports/species-global/", GlobalReportView.as_view(), name="species-global-report-list"
         ),
-    ]
+        path("choices/", ChoicesView.as_view()),
+    ] 
 )
+
+# Choices
