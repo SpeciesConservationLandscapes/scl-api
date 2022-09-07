@@ -30,5 +30,4 @@ class ChoicesView(APIView):
         data = {
             "dates": [td["task_date"] for td in ReportData.objects.values("task_date").distinct().order_by("-task_date")]
         }
-        print(f"data: {data}")
         return Response(data)

@@ -49,11 +49,15 @@ gsutil rsync -R static/ gs://scl-django-static/static
 ```
 
 
-## Loading Countries and States
+## Loading Datasets
 
-Data source: https://drive.google.com/file/d/1vHsyu-GdSasb7Nktt7ij13Lv-eh57Kvk/view?usp=sharing
 
-Countries:
+GADM Countries and States
+Cloud Storage Bucket: scl-backup/gadm_states_countries_simp2
+
+https://drive.google.com/file/d/1vHsyu-GdSasb7Nktt7ij13Lv-eh57Kvk/view?usp=sharing
+
+**Countries:**
 
 ```
 ogr2ogr -f "PostGreSQL" PG:"host=scl_db user=postgres dbname=scl password=postgres" \
@@ -66,7 +70,7 @@ ogr2ogr -f "PostGreSQL" PG:"host=scl_db user=postgres dbname=scl password=postgr
     -sql "SELECT Geometry as geom, countrynam as name, iso2 as iso2, iso3 as iso3, isonumeric from GDAM404_country_simp2"
 ```
 
-States:
+**States:**
 
 ```
 ogr2ogr -f "PostGreSQL" PG:"host=scl_db user=postgres dbname=scl password=postgres" \
@@ -78,3 +82,8 @@ ogr2ogr -f "PostGreSQL" PG:"host=scl_db user=postgres dbname=scl password=postgr
     -dialect sqlite \
     -sql 'SELECT Geometry as geom, countrynam as name, iso2 as iso2, iso3 as iso3, isonumeric, gadm1code as gadm1_code, gadm1name as gadm1_name, "ENGTYPE_1" AS gadm1_type from GDAM404_state_simp2'
 ```
+
+
+**Indigenous Range for TCL:**
+
+Cloud Storage Bucket: `scl-backup/indigenous_range_for_tcl_3`
